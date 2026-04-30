@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Vantix — E-Commerce | Cash on Delivery</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #0a0a0c;
+            font-family: 'Inter', sans-serif;
+            padding: 20px;
+            color: #fff;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(40px, 40px); }
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(18, 18, 24, 0.8);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 16px 32px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .logo-image {
+            width: 40px;
+            height: auto;
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
+        }
+
+        .logo-text {
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff 0%, #a0a0c0 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .btn-back {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px 20px;
+            border-radius: 40px;
+            color: rgba(255,255,255,0.7);
+            font-weight: 500;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-back:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            padding: 32px;
+            position: relative;
+            z-index: 1;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .page-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #10b981, #059669);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: rgba(255,255,255,0.5);
+            font-size: 14px;
+        }
+
+        /* Form Container */
+        .form-container {
+            background: rgba(18, 18, 24, 0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 32px;
+            margin-bottom: 32px;
+        }
+
+        .form-section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            font-size: 14px;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #10b981;
+            background: rgba(0,0,0,0.6);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Upload de Imagem */
+        .upload-area {
+            border: 2px dashed rgba(255,255,255,0.2);
+            border-radius: 20px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .upload-area:hover {
+            border-color: #10b981;
+            background: rgba(16,185,129,0.05);
+        }
+
+        .upload-area i {
+            font-size: 40px;
+            color: rgba(255,255,255,0.3);
+            margin-bottom: 12px;
+        }
+
+        .upload-area p {
+            color: rgba(255,255,255,0.5);
+            font-size: 13px;
+        }
+
+        .preview-image {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 16px;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .preview-banner {
+            width: 100%;
+            max-height: 150px;
+            object-fit: cover;
+            border-radius: 16px;
+            margin-top: 16px;
+            display: none;
+        }
+
+        /* Row para 2 colunas */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        /* Botão Submit */
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(90deg, #10b981, #059669);
+            border: none;
+            border-radius: 44px;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+        }
+
+        /* Lista de Produtos */
+        .produtos-list {
+            background: rgba(18, 18, 24, 0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 24px;
+        }
+
+        .produtos-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .produtos-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .produtos-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .produto-card {
+            background: rgba(0,0,0,0.3);
+            border-radius: 20px;
+            padding: 16px;
+            display: flex;
+            gap: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .produto-card:hover {
+            background: rgba(0,0,0,0.5);
+        }
+
+        .produto-imagem {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            object-fit: cover;
+        }
+
+        .produto-info {
+            flex: 1;
+        }
+
+        .produto-nome {
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .produto-preco {
+            color: #10b981;
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .produto-serial {
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            font-family: monospace;
+        }
+
+        .produto-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .btn-icon {
+            background: rgba(255,255,255,0.05);
+            border: none;
+            padding: 8px;
+            border-radius: 12px;
+            color: rgba(255,255,255,0.6);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-icon:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .btn-icon.delete:hover {
+            background: rgba(239,68,68,0.2);
+            color: #ef4444;
+        }
+
+        .link-produto {
+            font-size: 11px;
+            color: #10b981;
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255,255,255,0.4);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        /* Popup */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(8px);
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-overlay.show {
+            display: flex;
+        }
+
+        .popup-card {
+            background: rgba(18, 18, 24, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 32px;
+            max-width: 400px;
+            text-align: center;
+            animation: popupIn 0.3s ease;
+        }
+
+        @keyframes popupIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .popup-card i {
+            font-size: 48px;
+            color: #f59e0b;
+            margin-bottom: 16px;
+        }
+
+        .popup-card h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .popup-card p {
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 24px;
+        }
+
+        .popup-btn {
+            background: linear-gradient(90deg, #10b981, #059669);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        @media (max-width: 640px) {
+            .main-content { padding: 20px; }
+            .form-container { padding: 24px; }
+            .form-row { grid-template-columns: 1fr; }
+            .produto-card { flex-direction: column; }
+            .produto-imagem { width: 100%; height: 120px; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo-area" onclick="window.location.href='dashboard.html'">
+            <img src="ei_1777492717837-removebg-preview.png" alt="Vantix" class="logo-image">
+            <span class="logo-text">Vantix</span>
+        </div>
+        <button class="btn-back" onclick="window.location.href='dashboard.html'">
+            <i class="fas fa-arrow-left"></i> Voltar
+        </button>
+    </nav>
+
+    <div class="main-content">
+        <div class="page-header">
+            <h1><i class="fas fa-store"></i> E-Commerce Vantix</h1>
+            <p>Cash on Delivery — Crie e venda seus produtos com pagamento na entrega</p>
+        </div>
+
+        <!-- Formulário de Criação de Produto -->
+        <div class="form-container">
+            <div class="form-section-title">
+                <i class="fas fa-plus-circle"></i> Criar Novo Produto
+            </div>
+            <form id="product-form">
+                <div class="form-group">
+                    <label>IMAGEM DO PRODUTO *</label>
+                    <div class="upload-area" onclick="document.getElementById('imagem-input').click()">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Clique para fazer upload da imagem</p>
+                        <p style="font-size: 11px;">PNG, JPG até 5MB</p>
+                    </div>
+                    <input type="file" id="imagem-input" accept="image/*" style="display: none;">
+                    <img class="preview-image" id="preview-imagem" alt="Prévia da imagem">
+                </div>
+
+                <div class="form-group">
+                    <label>BANNER (OPCIONAL)</label>
+                    <div class="upload-area" onclick="document.getElementById('banner-input').click()">
+                        <i class="fas fa-image"></i>
+                        <p>Clique para fazer upload do banner</p>
+                        <p style="font-size: 11px;">Imagem de destaque (opcional)</p>
+                    </div>
+                    <input type="file" id="banner-input" accept="image/*" style="display: none;">
+                    <img class="preview-banner" id="preview-banner" alt="Prévia do banner">
+                </div>
+
+                <div class="form-group">
+                    <label>NOME DO PRODUTO *</label>
+                    <input type="text" id="produto-nome" placeholder="Ex: Ebook Marketing Digital" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>PREÇO (MZN) *</label>
+                        <input type="number" id="produto-preco" placeholder="270" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>CATEGORIA</label>
+                        <select id="produto-categoria">
+                            <option value="Ebooks">📚 Ebooks</option>
+                            <option value="Cursos">🎓 Cursos</option>
+                            <option value="Serviços">💼 Serviços</option>
+                            <option value="Produtos Físicos">📦 Produtos Físicos</option>
+                            <option value="Outros">✨ Outros</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>DESCRIÇÃO CURTA *</label>
+                    <textarea id="produto-descricao-curta" placeholder="Resumo do produto (aparece na listagem)"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>DESCRIÇÃO COMPLETA</label>
+                    <textarea id="produto-descricao-longa" placeholder="Detalhes completos do produto..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>CONTACTO DO VENDEDOR *</label>
+                        <input type="tel" id="produto-contacto" placeholder="84 123 4567" required>
+                    </div>
+                    <div class="form-group">
+                        <label>ESTOQUE</label>
+                        <input type="number" id="produto-estoque" placeholder="Quantidade disponível" value="99">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>TAGS (separadas por vírgula)</label>
+                    <input type="text" id="produto-tags" placeholder="marketing, digital, vendas">
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-check-circle"></i> Publicar Produto
+                </button>
+            </form>
+        </div>
+
+        <!-- Lista de Produtos Criados -->
+        <div class="produtos-list">
+            <div class="produtos-header">
+                <h3><i class="fas fa-box"></i> Meus Produtos</h3>
+                <span id="produtos-count" style="font-size: 12px; color: rgba(255,255,255,0.5);">0 produtos</span>
+            </div>
+            <div id="produtos-grid" class="produtos-grid">
+                <div class="empty-state">
+                    <i class="fas fa-store"></i>
+                    <p>Nenhum produto criado ainda</p>
+                    <p style="font-size: 13px;">Preencha o formulário acima para começar</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popup de Sem Produtos -->
+    <div id="popup-overlay" class="popup-overlay">
+        <div class="popup-card">
+            <i class="fas fa-info-circle"></i>
+            <h3>Criar Produto</h3>
+            <p>Você ainda não tem produtos cadastrados. Preencha o formulário acima para começar a vender!</p>
+            <button class="popup-btn" onclick="closePopup()">Entendi</button>
+        </div>
+    </div>
+
+    <script>
+        const sessao = JSON.parse(localStorage.getItem('vantix_session'));
+        let produtos = JSON.parse(localStorage.getItem('vantix_produtos_ecommerce')) || [];
+        
+        // Verificar login
+        if (!sessao) {
+            window.location.href = 'acesso.html';
+        }
+
+        let imagemBase64 = null;
+        let bannerBase64 = null;
+
+        // Previews de imagem
+        const imagemInput = document.getElementById('imagem-input');
+        const previewImagem = document.getElementById('preview-imagem');
+        const bannerInput = document.getElementById('banner-input');
+        const previewBanner = document.getElementById('preview-banner');
+
+        imagemInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    imagemBase64 = event.target.result;
+                    previewImagem.src = imagemBase64;
+                    previewImagem.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        bannerInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    bannerBase64 = event.target.result;
+                    previewBanner.src = bannerBase64;
+                    previewBanner.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Gerar número de série único
+        function gerarNumeroSerie(vendedorId, produtoId) {
+            const vendedorCode = vendedorId.slice(-6);
+            const produtoCode = produtoId.toString().slice(-6);
+            const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+            return `VAN${vendedorCode}${produtoCode}${random}`;
+        }
+
+        // Gerar link único
+        function gerarLinkUnico(produtoId) {
+            const hash = Math.random().toString(36).substring(2, 10);
+            return `customershow.html?id=${produtoId}&hash=${hash}`;
+        }
+
+        // Salvar produto
+        document.getElementById('product-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const nome = document.getElementById('produto-nome').value.trim();
+            const preco = parseFloat(document.getElementById('produto-preco').value);
+            const descricaoCurta = document.getElementById('produto-descricao-curta').value.trim();
+            const descricaoLonga = document.getElementById('produto-descricao-longa').value.trim();
+            const contacto = document.getElementById('produto-contacto').value.trim();
+            const categoria = document.getElementById('produto-categoria').value;
+            const estoque = parseInt(document.getElementById('produto-estoque').value) || 0;
+            const tags = document.getElementById('produto-tags').value.split(',').map(t => t.trim());
+
+            if (!nome) {
+                alert('Digite o nome do produto');
+                return;
+            }
+            if (isNaN(preco) || preco <= 0) {
+                alert('Digite um preço válido');
+                return;
+            }
+            if (!descricaoCurta) {
+                alert('Digite uma descrição curta');
+                return;
+            }
+            if (!contacto) {
+                alert('Digite o contacto do vendedor');
+                return;
+            }
+            if (!imagemBase64) {
+                alert('Faça upload da imagem do produto');
+                return;
+            }
+
+            const produtoId = Date.now();
+            const vendedorId = sessao.email || sessao.nome || 'vendedor';
+
+            const novoProduto = {
+                id: produtoId,
+                serial: gerarNumeroSerie(vendedorId, produtoId),
+                link_unico: gerarLinkUnico(produtoId),
+                vendedor_id: vendedorId,
+                vendedor_nome: sessao.nome,
+                vendedor_contacto: contacto,
+                nome: nome,
+                descricao_curta: descricaoCurta,
+                descricao_longa: descricaoLonga || '',
+                preco: preco,
+                categoria: categoria,
+                estoque: estoque,
+                tags: tags,
+                imagem: imagemBase64,
+                banner: bannerBase64 || null,
+                data_criacao: new Date().toISOString(),
+                status: 'active',
+                visualizacoes: 0,
+                vendas: 0
+            };
+
+            produtos.unshift(novoProduto);
+            localStorage.setItem('vantix_produtos_ecommerce', JSON.stringify(produtos));
+
+            // Reset form
+            document.getElementById('product-form').reset();
+            imagemBase64 = null;
+            bannerBase64 = null;
+            previewImagem.style.display = 'none';
+            previewBanner.style.display = 'none';
+            document.getElementById('produto-estoque').value = '99';
+
+            renderizarProdutos();
+            alert('✅ Produto criado com sucesso!');
+        });
+
+        // Deletar produto
+        function deletarProduto(id) {
+            if (confirm('Tem certeza que deseja excluir este produto?')) {
+                produtos = produtos.filter(p => p.id !== id);
+                localStorage.setItem('vantix_produtos_ecommerce', JSON.stringify(produtos));
+                renderizarProdutos();
+            }
+        }
+
+        // Copiar link
+        function copiarLink(link) {
+            const urlCompleto = `${window.location.origin}/${link}`;
+            navigator.clipboard.writeText(urlCompleto);
+            alert('Link copiado para a clipboard!');
+        }
+
+        // Renderizar produtos
+        function renderizarProdutos() {
+            const container = document.getElementById('produtos-grid');
+            const countSpan = document.getElementById('produtos-count');
+
+            if (produtos.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-store"></i>
+                        <p>Nenhum produto criado ainda</p>
+                        <p style="font-size: 13px;">Preencha o formulário acima para começar</p>
+                    </div>
+                `;
+                countSpan.innerText = '0 produtos';
+                return;
+            }
+
+            countSpan.innerText = `${produtos.length} ${produtos.length === 1 ? 'produto' : 'produtos'}`;
+
+            container.innerHTML = produtos.map(produto => `
+                <div class="produto-card">
+                    <img src="${produto.imagem}" class="produto-imagem" alt="${produto.nome}">
+                    <div class="produto-info">
+                        <div class="produto-nome">${produto.nome}</div>
+                        <div class="produto-preco">${produto.preco.toLocaleString('pt-MZ', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} MZN</div>
+                        <div class="produto-serial">🔢 Série: ${produto.serial}</div>
+                        <div style="margin-top: 8px;">
+                            <a href="${produto.link_unico}" target="_blank" class="link-produto">
+                                <i class="fas fa-link"></i> ${window.location.origin}/${produto.link_unico}
+                            </a>
+                        </div>
+                    </div>
+                    <div class="produto-actions">
+                        <button class="btn-icon" onclick="copiarLink('${produto.link_unico}')" title="Copiar link">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <button class="btn-icon delete" onclick="deletarProduto(${produto.id})" title="Excluir">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function closePopup() {
+            document.getElementById('popup-overlay').classList.remove('show');
+        }
+
+        // Mostrar popup se não tiver produtos ao carregar
+        function mostrarPopupSeNecessario() {
+            if (produtos.length === 0) {
+                setTimeout(() => {
+                    document.getElementById('popup-overlay').classList.add('show');
+                }, 500);
+            }
+        }
+
+        // Inicializar
+        renderizarProdutos();
+        mostrarPopupSeNecessario();
+    </script>
+</body>
+</html>
