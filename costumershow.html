@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>ZentroPay — Visualizar Produto</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #0a0a0c;
+            font-family: 'Inter', sans-serif;
+            padding: 20px;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(40px, 40px); }
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(18, 18, 24, 0.8);
+            backdrop-filter: blur(16px);
+            border-radius: 60px;
+            padding: 12px 24px;
+            margin-bottom: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .logo-image {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+        }
+
+        .logo-text {
+            font-weight: 700;
+            font-size: 16px;
+            background: linear-gradient(135deg, #fff, #a0a0c0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .btn-back {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px 18px;
+            border-radius: 40px;
+            color: rgba(255,255,255,0.7);
+            font-weight: 500;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-back:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        /* Banner */
+        .banner-container {
+            width: 100%;
+            border-radius: 24px;
+            overflow: hidden;
+            margin-bottom: 32px;
+            background: rgba(0,0,0,0.3);
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .banner-img {
+            width: 100%;
+            max-height: 250px;
+            object-fit: cover;
+        }
+
+        .no-banner {
+            padding: 60px;
+            text-align: center;
+            color: rgba(255,255,255,0.3);
+        }
+
+        /* Produto Card */
+        .produto-card {
+            background: rgba(18, 18, 24, 0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            overflow: hidden;
+        }
+
+        .produto-main {
+            display: flex;
+            gap: 32px;
+            padding: 32px;
+            flex-wrap: wrap;
+        }
+
+        .produto-imagem {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .produto-imagem img {
+            width: 100%;
+            border-radius: 20px;
+            background: rgba(0,0,0,0.3);
+        }
+
+        .produto-info {
+            flex: 2;
+        }
+
+        .produto-categoria {
+            display: inline-block;
+            background: rgba(16,185,129,0.15);
+            color: #10b981;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .produto-nome {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .produto-preco {
+            font-size: 32px;
+            font-weight: 800;
+            color: #10b981;
+            margin-bottom: 16px;
+        }
+
+        .produto-serial {
+            font-size: 12px;
+            color: rgba(255,255,255,0.4);
+            font-family: monospace;
+            margin-bottom: 20px;
+            padding: 8px 12px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            display: inline-block;
+        }
+
+        .produto-descricao {
+            margin: 20px 0;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .produto-descricao h4 {
+            color: white;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .vendedor-info {
+            margin-top: 20px;
+            padding: 16px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 16px;
+        }
+
+        .vendedor-info h4 {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 8px;
+        }
+
+        .vendedor-contacto {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 16px;
+        }
+
+        .btn-whatsapp {
+            background: #25D366;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 44px;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-whatsapp:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+        }
+
+        /* Link Atual e QR Code */
+        .link-section {
+            padding: 24px 32px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .link-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .current-link {
+            background: rgba(0,0,0,0.5);
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-family: monospace;
+            word-break: break-all;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .btn-copy {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 40px;
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .qr-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            padding: 16px;
+            background: white;
+            border-radius: 16px;
+            display: inline-block;
+        }
+
+        /* Error State */
+        .error-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(18, 18, 24, 0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 32px;
+        }
+
+        .error-state i {
+            font-size: 64px;
+            color: #ef4444;
+            margin-bottom: 20px;
+        }
+
+        .error-state h2 {
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+
+        @media (max-width: 640px) {
+            .produto-main { padding: 20px; flex-direction: column; }
+            .produto-nome { font-size: 22px; }
+            .produto-preco { font-size: 28px; }
+            .link-section { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <div class="logo-area" onclick="window.location.href='dashboard.html'">
+                <img src="ei_1777492717837-removebg-preview.png" alt="Vantix" class="logo-image">
+                <span class="logo-text">Vantix</span>
+            </div>
+            <button class="btn-back" onclick="window.location.href='e-commerce.html'">
+                <i class="fas fa-arrow-left"></i> Voltar Loja
+            </button>
+        </nav>
+
+        <div id="produto-content">
+            <!-- Loading -->
+            <div style="text-align: center; padding: 60px;">
+                <i class="fas fa-spinner fa-spin" style="font-size: 48px; opacity: 0.5;"></i>
+                <p style="margin-top: 16px; color: rgba(255,255,255,0.5);">Carregando produto...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Pegar parâmetros da URL (funciona em localhost e Vercel)
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                id: params.get('id'),
+                hash: params.get('hash')
+            };
+        }
+
+        // Obter URL atual (current link)
+        function getCurrentLink() {
+            return window.location.href;
+        }
+
+        // Carregar produtos do localStorage
+        const produtos = JSON.parse(localStorage.getItem('vantix_produtos_ecommerce')) || [];
+
+        function mostrarProduto() {
+            const { id, hash } = getUrlParams();
+            const container = document.getElementById('produto-content');
+
+            if (!id) {
+                mostrarErro(container, 'Produto não especificado', 'Por favor, use um link válido para acessar o produto.');
+                return;
+            }
+
+            const produto = produtos.find(p => p.id == id);
+
+            if (!produto) {
+                mostrarErro(container, 'Produto não encontrado', 'O produto que você está procurando não existe ou foi removido.');
+                return;
+            }
+
+            // Validar hash (opcional - se o produto tiver hash salvo)
+            if (produto.hash && hash && produto.hash !== hash) {
+                mostrarErro(container, 'Link inválido', 'Este link de acesso é inválido ou expirou.');
+                return;
+            }
+
+            renderizarProduto(container, produto);
+        }
+
+        function mostrarErro(container, titulo, mensagem) {
+            container.innerHTML = `
+                <div class="error-state">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h2>${titulo}</h2>
+                    <p style="color: rgba(255,255,255,0.6);">${mensagem}</p>
+                    <button class="btn-back" onclick="window.location.href='e-commerce.html'" style="margin-top: 24px;">
+                        Ver outros produtos
+                    </button>
+                </div>
+            `;
+        }
+
+        function renderizarProduto(container, produto) {
+            const currentUrl = getCurrentLink();
+            const precoFormatado = produto.preco.toLocaleString('pt-MZ', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+            
+            // Mensagem WhatsApp
+            const mensagemWhatsApp = `Olá! Gostaria de comprar o produto "${produto.nome}" no valor de ${precoFormatado} MZN. (Cash on Delivery)`;
+            const whatsappLink = `https://wa.me/${produto.vendedor_contacto.replace(/\D/g, '')}?text=${encodeURIComponent(mensagemWhatsApp)}`;
+
+            container.innerHTML = `
+                <!-- Banner -->
+                <div class="banner-container">
+                    ${produto.banner ? 
+                        `<img src="${produto.banner}" class="banner-img" alt="Banner">` : 
+                        `<div class="no-banner"><i class="fas fa-image"></i><p>Sem banner</p></div>`
+                    }
+                </div>
+
+                <div class="produto-card">
+                    <div class="produto-main">
+                        <div class="produto-imagem">
+                            <img src="${produto.imagem}" alt="${produto.nome}">
+                        </div>
+                        <div class="produto-info">
+                            <div class="produto-categoria">
+                                <i class="fas fa-tag"></i> ${produto.categoria || 'Produto'}
+                            </div>
+                            <h1 class="produto-nome">${produto.nome}</h1>
+                            <div class="produto-preco">${precoFormatado} MZN</div>
+                            <div class="produto-serial">
+                                <i class="fas fa-barcode"></i> Nº Série: ${produto.serial}
+                            </div>
+                            
+                            <div class="produto-descricao">
+                                <h4><i class="fas fa-info-circle"></i> Sobre o produto</h4>
+                                <p>${produto.descricao_curta || 'Sem descrição disponível'}</p>
+                                ${produto.descricao_longa ? `<p style="margin-top: 12px;">${produto.descricao_longa}</p>` : ''}
+                            </div>
+
+                            <div class="vendedor-info">
+                                <h4><i class="fas fa-store"></i> Vendedor</h4>
+                                <div class="vendedor-contacto">
+                                    <i class="fas fa-user"></i> ${produto.vendedor_nome}
+                                </div>
+                                <div class="vendedor-contacto" style="margin-top: 8px;">
+                                    <i class="fab fa-whatsapp"></i> ${produto.vendedor_contacto}
+                                </div>
+                            </div>
+
+                            <a href="${whatsappLink}" target="_blank" class="btn-whatsapp" style="margin-top: 20px; width: 100%; justify-content: center;">
+                                <i class="fab fa-whatsapp"></i> Comprar Agora (Cash on Delivery)
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="link-section">
+                        <div class="link-title">
+                            <i class="fas fa-link"></i> Link do Produto
+                        </div>
+                        <div class="current-link">
+                            <span id="current-link-text" style="word-break: break-all; flex: 1;">${currentUrl}</span>
+                            <button class="btn-copy" onclick="copiarLink()">
+                                <i class="fas fa-copy"></i> Copiar
+                            </button>
+                        </div>
+                        <div style="text-align: center; margin-top: 20px;">
+                            <div id="qrcode" class="qr-container" style="display: inline-block;"></div>
+                        </div>
+                        <p style="text-align: center; font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 16px;">
+                            Compartilhe este link com seus clientes. Eles podem comprar diretamente pelo WhatsApp.
+                        </p>
+                    </div>
+                </div>
+            `;
+
+            // Gerar QR Code
+            setTimeout(() => {
+                const qrContainer = document.getElementById('qrcode');
+                if (qrContainer) {
+                    qrContainer.innerHTML = '';
+                    new QRCode(qrContainer, {
+                        text: currentUrl,
+                        width: 120,
+                        height: 120,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+                }
+            }, 100);
+        }
+
+        function copiarLink() {
+            const link = window.location.href;
+            navigator.clipboard.writeText(link);
+            alert('✅ Link copiado para a clipboard!');
+        }
+
+        // Iniciar
+        mostrarProduto();
+    </script>
+</body>
+  </html>
