@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>ZentroPay — Produto</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #0a0a0c;
+            font-family: 'Inter', sans-serif;
+            padding: 20px;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(40px, 40px); }
+        }
+
+        .container { max-width: 900px; margin: 0 auto; position: relative; z-index: 2; }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(18, 18, 24, 0.8);
+            backdrop-filter: blur(16px);
+            border-radius: 60px;
+            padding: 12px 24px;
+            margin-bottom: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .logo-image { width: 32px; height: 32px; object-fit: contain; }
+        .logo-text {
+            font-weight: 700;
+            font-size: 16px;
+            background: linear-gradient(135deg, #fff, #a0a0c0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Banner condicional */
+        .banner-container {
+            width: 100%;
+            border-radius: 24px;
+            overflow: hidden;
+            margin-bottom: 32px;
+            background: rgba(0,0,0,0.3);
+        }
+        .banner-img { width: 100%; max-height: 250px; object-fit: cover; }
+        .hidden { display: none; }
+
+        /* Contador de Urgência */
+        .urgent-counter {
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            border-radius: 60px;
+            padding: 12px 24px;
+            text-align: center;
+            margin-bottom: 24px;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.02); opacity: 0.95; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .urgent-text { font-weight: 800; font-size: 18px; color: white; }
+        .urgent-timer { font-size: 28px; font-weight: 800; font-family: monospace; letter-spacing: 2px; }
+
+        /* Produto Card */
+        .produto-card {
+            background: rgba(18, 18, 24, 0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .produto-main {
+            display: flex;
+            gap: 32px;
+            padding: 32px;
+            flex-wrap: wrap;
+        }
+
+        .produto-imagem { flex: 1; min-width: 200px; }
+        .produto-imagem img { width: 100%; border-radius: 20px; background: rgba(0,0,0,0.3); }
+        .produto-info { flex: 2; }
+        .produto-categoria {
+            display: inline-block;
+            background: rgba(16,185,129,0.15);
+            color: #10b981;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .produto-nome { font-size: 28px; font-weight: 800; margin-bottom: 12px; }
+        .produto-preco { font-size: 32px; font-weight: 800; color: #10b981; margin-bottom: 16px; }
+        .produto-serial {
+            font-size: 12px;
+            color: rgba(255,255,255,0.4);
+            font-family: monospace;
+            margin-bottom: 20px;
+            padding: 8px 12px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            display: inline-block;
+        }
+        .produto-descricao { margin: 20px 0; line-height: 1.6; color: rgba(255,255,255,0.7); }
+        .descricao-longa { margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.1); }
+
+        /* Formulário */
+        .form-section {
+            padding: 24px 32px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            background: rgba(0,0,0,0.2);
+        }
+        .form-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: rgba(255,255,255,0.6);
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px 14px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px;
+            font-size: 14px;
+            color: white;
+            font-family: 'Inter', sans-serif;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #10b981;
+        }
+        .btn-whatsapp {
+            width: 100%;
+            background: #25D366;
+            border: none;
+            padding: 14px;
+            border-radius: 44px;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+        .btn-whatsapp:hover { transform: translateY(-2px); filter: brightness(1.05); }
+
+        /* Depoimentos */
+        .depoimentos-section {
+            background: rgba(18, 18, 24, 0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .depoimento-card {
+            background: rgba(0,0,0,0.3);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        .depoimento-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .depoimento-nome { font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .stars { color: #f59e0b; font-size: 14px; }
+        .depoimento-texto { color: rgba(255,255,255,0.7); line-height: 1.5; font-size: 14px; }
+        .depoimento-data { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 8px; }
+
+        /* Link Section */
+        .link-section {
+            padding: 24px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            background: rgba(0,0,0,0.2);
+        }
+        .current-link {
+            background: rgba(0,0,0,0.5);
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-family: monospace;
+            word-break: break-all;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .btn-copy {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 40px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .error-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(18,18,24,0.6);
+            border-radius: 32px;
+        }
+        .error-state i { font-size: 64px; color: #ef4444; margin-bottom: 20px; }
+        .error-state h2 { font-size: 24px; margin-bottom: 12px; }
+        .btn-back {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 10px 24px;
+            border-radius: 40px;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+        .spinner { text-align: center; padding: 60px; }
+        .fa-spinner { font-size: 48px; opacity: 0.5; }
+
+        @media (max-width: 640px) {
+            .produto-main { padding: 20px; flex-direction: column; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <nav class="navbar">
+        <div class="logo-area" onclick="window.location.href='dashboard.html'">
+            <img src="ei_1777492717837-removebg-preview.png" class="logo-image">
+            <span class="logo-text">ZentroPay</span>
+        </div>
+    </nav>
+    <div id="produto-content"><div class="spinner"><i class="fas fa-spinner fa-spin"></i><p>Carregando produto...</p></div></div>
+</div>
+
+<script>
+    const SUPABASE_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let urgentInterval = null;
+
+    function getUrlParams() {
+        const params = new URLSearchParams(window.location.search);
+        return { id: params.get('id') };
+    }
+
+    async function buscarProduto(id) {
+        const { data, error } = await supabase
+            .from('produtos')
+            .select('*')
+            .eq('id', id)
+            .eq('status', 'active')
+            .single();
+        if (error) return null;
+        return data;
+    }
+
+    async function buscarDepoimentos(produtoId) {
+        const { data: texto } = await supabase
+            .from('depoimentos_texto')
+            .select('*')
+            .eq('produto_id', produtoId)
+            .order('criado_em', { ascending: false });
+        return texto || [];
+    }
+
+    async function incrementarVisualizacao(produtoId) {
+        const { data: produto } = await supabase
+            .from('produtos')
+            .select('visualizacoes')
+            .eq('id', produtoId)
+            .single();
+        const novasVis = (produto?.visualizacoes || 0) + 1;
+        await supabase.from('produtos').update({ visualizacoes: novasVis }).eq('id', produtoId);
+    }
+
+    async function salvarLead(produtoId, dados) {
+        const { error } = await supabase.from('leads').insert([{
+            produto_id: produtoId,
+            cliente_nome: dados.nome,
+            cliente_email: dados.email,
+            cliente_telefone: dados.telefone,
+            cliente_endereco: dados.endereco,
+            mensagem: dados.mensagem,
+            status: 'novo'
+        }]);
+        if (error) console.error('Erro ao salvar lead:', error);
+    }
+
+    function startUrgentCounter(produto) {
+        if (!produto.urgent_enabled || !produto.urgent_minutes) return null;
+        let endTime = localStorage.getItem(`urgent_end_${produto.id}`);
+        if (!endTime) {
+            endTime = Date.now() + (produto.urgent_minutes * 60 * 1000);
+            localStorage.setItem(`urgent_end_${produto.id}`, endTime);
+        }
+        function updateTimer() {
+            const remaining = endTime - Date.now();
+            if (remaining <= 0) {
+                if (urgentInterval) clearInterval(urgentInterval);
+                const container = document.getElementById('urgent-container');
+                if (container) container.remove();
+                localStorage.removeItem(`urgent_end_${produto.id}`);
+                return;
+            }
+            const minutes = Math.floor(remaining / 60000);
+            const seconds = Math.floor((remaining % 60000) / 1000);
+            const timerEl = document.getElementById('urgent-timer');
+            if (timerEl) timerEl.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        const interval = setInterval(updateTimer, 1000);
+        updateTimer();
+        return interval;
+    }
+
+    async function mostrarProduto() {
+        const { id } = getUrlParams();
+        const container = document.getElementById('produto-content');
+
+        if (!id) {
+            container.innerHTML = `<div class="error-state"><i class="fas fa-exclamation-triangle"></i><h2>Produto não especificado</h2><p>Verifique o link e tente novamente.</p><div class="btn-back" onclick="window.location.href='e-commerce.html'">Voltar à Loja</div></div>`;
+            return;
+        }
+
+        const produto = await buscarProduto(id);
+        if (!produto) {
+            container.innerHTML = `<div class="error-state"><i class="fas fa-search"></i><h2>Produto não encontrado</h2><p>Este produto pode ter sido removido ou não está mais disponível.</p><div class="btn-back" onclick="window.location.href='e-commerce.html'">Voltar à Loja</div></div>`;
+            return;
+        }
+
+        await incrementarVisualizacao(produto.id);
+        const depoimentos = await buscarDepoimentos(produto.id);
+        renderizarProduto(container, produto, depoimentos);
+    }
+
+    function renderizarProduto(container, produto, depoimentos) {
+        const precoFormatado = produto.preco.toLocaleString('pt-MZ', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+        const currentUrl = window.location.href;
+
+        container.innerHTML = `
+            <div class="banner-container ${!produto.banner ? 'hidden' : ''}">
+                ${produto.banner ? `<img src="${produto.banner}" class="banner-img" alt="Banner">` : ''}
+            </div>
+            <div id="urgent-container"></div>
+            <div class="produto-card">
+                <div class="produto-main">
+                    <div class="produto-imagem">
+                        <img src="${produto.imagem}" alt="${produto.nome}" onerror="this.src='https://placehold.co/400x400?text=Sem+Imagem'">
+                    </div>
+                    <div class="produto-info">
+                        <div class="produto-categoria"><i class="fas fa-tag"></i> ${produto.categoria || 'Produto'}</div>
+                        <h1 class="produto-nome">${produto.nome}</h1>
+                        <div class="produto-preco">${precoFormatado} MZN</div>
+                        <div class="produto-serial"><i class="fas fa-barcode"></i> ${produto.serial}</div>
+                        <div class="produto-descricao">
+                            <p>${produto.descricao_curta || 'Sem descrição'}</p>
+                            ${produto.descricao_longa ? `<div class="descricao-longa"><p>${produto.descricao_longa}</p></div>` : ''}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-section">
+                    <div class="form-title"><i class="fas fa-user-check"></i> Preencha seus dados para comprar</div>
+                    <form id="lead-form">
+                        <div class="form-row">
+                            <div class="form-group"><label>NOME COMPLETO *</label><input type="text" id="lead-nome" required></div>
+                            <div class="form-group"><label>EMAIL *</label><input type="email" id="lead-email" required></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>TELEFONE/WHATSAPP *</label><input type="tel" id="lead-telefone" placeholder="84 123 4567" required></div>
+                            <div class="form-group"><label>ENDEREÇO DE ENTREGA</label><input type="text" id="lead-endereco" placeholder="Cidade, bairro, rua..."></div>
+                        </div>
+                        <div class="form-group"><label>MENSAGEM (opcional)</label><textarea id="lead-mensagem" rows="2" placeholder="Alguma observação?"></textarea></div>
+                        <button type="submit" class="btn-whatsapp"><i class="fab fa-whatsapp"></i> Enviar e Continuar no WhatsApp</button>
+                    </form>
+                </div>
+            </div>
+            <div class="depoimentos-section">
+                <div class="section-title"><i class="fas fa-comment-dots"></i> Depoimentos de Clientes</div>
+                ${depoimentos.length === 0 ? '<p style="text-align:center;color:rgba(255,255,255,0.4);padding:20px;">Nenhum depoimento ainda. Seja o primeiro!</p>' : 
+                    depoimentos.map(d => `
+                        <div class="depoimento-card">
+                            <div class="depoimento-header">
+                                <div class="depoimento-nome"><i class="fas fa-user-circle"></i> ${d.cliente_nome}</div>
+                                <div class="stars">${'⭐'.repeat(d.stars)}</div>
+                            </div>
+                            <div class="depoimento-texto">"${d.depoimento}"</div>
+                            <div class="depoimento-data">${new Date(d.criado_em).toLocaleDateString('pt-MZ')}</div>
+                        </div>
+                    `).join('')}
+            </div>
+            <div class="produto-card">
+                <div class="link-section">
+                    <div class="current-link">
+                        <span style="word-break: break-all; flex: 1;">${currentUrl}</span>
+                        <button class="btn-copy" onclick="copiarLink()"><i class="fas fa-copy"></i> Copiar</button>
+                    </div>
+                    <div style="text-align: center; margin-top: 20px;" id="qrcode-container"></div>
+                </div>
+            </div>
+        `;
+
+        if (produto.urgent_enabled && produto.urgent_minutes) {
+            const urgentContainer = document.getElementById('urgent-container');
+            urgentContainer.innerHTML = `
+                <div class="urgent-counter">
+                    <div class="urgent-text">⚠️ OFERTA POR TEMPO LIMITADO ⚠️</div>
+                    <div class="urgent-timer" id="urgent-timer">--:--</div>
+                    <div class="urgent-text" style="font-size: 12px;">minutos:segundos restantes</div>
+                </div>
+            `;
+            if (urgentInterval) clearInterval(urgentInterval);
+            urgentInterval = startUrgentCounter(produto);
+        }
+
+        document.getElementById('lead-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nome = document.getElementById('lead-nome').value.trim();
+            const email = document.getElementById('lead-email').value.trim();
+            const telefone = document.getElementById('lead-telefone').value.trim();
+            const endereco = document.getElementById('lead-endereco').value.trim();
+            const mensagem = document.getElementById('lead-mensagem').value.trim();
+
+            if (!nome || !email || !telefone) {
+                alert('Preencha nome, email e telefone');
+                return;
+            }
+
+            await salvarLead(produto.id, { nome, email, telefone, endereco, mensagem });
+            await supabase.from('produtos').update({ cliques: (produto.cliques || 0) + 1 }).eq('id', produto.id);
+
+            const msg = `*NOVO PEDIDO - ZENTROPAY*%0A%0A` +
+                `*Produto:* ${produto.nome}%0A` +
+                `*Série:* ${produto.serial}%0A` +
+                `*Preço:* ${precoFormatado} MZN%0A%0A` +
+                `*Dados do Cliente:*%0A` +
+                `Nome: ${nome}%0A` +
+                `Email: ${email}%0A` +
+                `Telefone: ${telefone}%0A` +
+                `Endereço: ${endereco || 'Não informado'}%0A%0A` +
+                `*Mensagem:* ${mensagem || 'Sem mensagem adicional'}`;
+
+            window.open(`https://wa.me/${produto.contacto_vendedor.replace(/\D/g, '')}?text=${msg}`, '_blank');
+            alert('✅ Dados enviados! Redirecionando para WhatsApp...');
+        });
+
+        setTimeout(() => {
+            const qrContainer = document.getElementById('qrcode-container');
+            if (qrContainer && typeof QRCode !== 'undefined') {
+                qrContainer.innerHTML = '';
+                new QRCode(qrContainer, { text: currentUrl, width: 120, height: 120 });
+            }
+        }, 100);
+    }
+
+    function copiarLink() {
+        navigator.clipboard.writeText(window.location.href);
+        alert('✅ Link copiado!');
+    }
+
+    mostrarProduto();
+    window.copiarLink = copiarLink;
+</script>
+</body>
+</html>

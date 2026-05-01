@@ -2,32 +2,48 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Vantix — Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
+            background: #0a0a0c;
             font-family: 'Inter', sans-serif;
-            background: #0a0a0a;
+            color: #fff;
             min-height: 100vh;
             position: relative;
             overflow-x: hidden;
         }
 
+        body.light {
+            background: #f0f0f0;
+            color: #1a1a1a;
+        }
+
+        body.light .navbar,
+        body.light .card,
+        body.light .pedidos-section,
+        body.light .sidebar {
+            background: rgba(255,255,255,0.9);
+            border-color: rgba(0,0,0,0.08);
+        }
+
+        body.light .card-metrica {
+            background: rgba(255,255,255,0.8);
+        }
+
+        body.light .pedido-card {
+            background: rgba(0,0,0,0.05);
+        }
+
         body::before {
             content: '';
             position: fixed;
-            width: 200%;
-            height: 200%;
-            top: -50%;
-            left: -50%;
+            inset: 0;
             background-image: 
                 linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
@@ -62,6 +78,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            cursor: pointer;
         }
 
         .logo-image {
@@ -70,7 +87,6 @@
             filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
         }
 
-        /* Menu Icon (Foto de perfil substituída por ícone de menu) */
         .menu-icon {
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.1);
@@ -83,12 +99,6 @@
             cursor: pointer;
             transition: all 0.3s ease;
             font-size: 20px;
-            color: rgba(255,255,255,0.7);
-        }
-
-        .menu-icon:hover {
-            background: rgba(255,255,255,0.1);
-            color: white;
         }
 
         .user-area {
@@ -97,7 +107,30 @@
             gap: 16px;
         }
 
-        /* Sidebar Menu */
+        .theme-toggle {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            width: 42px;
+            height: 42px;
+            border-radius: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-logout {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px 20px;
+            border-radius: 40px;
+            color: rgba(255,255,255,0.7);
+            font-weight: 500;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        /* Sidebar */
         .sidebar {
             position: fixed;
             top: 0;
@@ -113,20 +146,11 @@
             flex-direction: column;
         }
 
-        .sidebar.open {
-            right: 0;
-        }
-
-        .sidebar-header {
-            padding: 30px 24px;
-            text-align: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
+        .sidebar.open { right: 0; }
+        .sidebar-header { padding: 30px 24px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.08); }
         .profile-avatar {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            width: 80px; height: 80px;
+            background: linear-gradient(135deg, #10b981, #059669);
             border-radius: 60px;
             display: flex;
             align-items: center;
@@ -134,26 +158,10 @@
             margin: 0 auto 16px auto;
             font-size: 36px;
             font-weight: 700;
-            color: white;
         }
-
-        .sidebar-name {
-            font-size: 18px;
-            font-weight: 700;
-            color: white;
-            margin-bottom: 4px;
-        }
-
-        .sidebar-email {
-            font-size: 12px;
-            color: rgba(255,255,255,0.5);
-        }
-
-        .sidebar-menu {
-            flex: 1;
-            padding: 24px;
-        }
-
+        .sidebar-name { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+        .sidebar-email { font-size: 12px; color: rgba(255,255,255,0.5); }
+        .sidebar-menu { flex: 1; padding: 24px; }
         .menu-item {
             display: flex;
             align-items: center;
@@ -165,62 +173,20 @@
             transition: all 0.2s ease;
             color: rgba(255,255,255,0.6);
         }
-
-        .menu-item:hover {
-            background: rgba(255,255,255,0.05);
-            color: white;
-        }
-
-        .menu-item i {
-            width: 24px;
-            font-size: 18px;
-        }
-
-        .menu-item span {
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .menu-item.disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-
-        .menu-item.disabled:hover {
-            background: transparent;
-        }
-
-        .menu-divider {
-            height: 1px;
-            background: rgba(255,255,255,0.08);
-            margin: 16px 0;
-        }
-
-        .logout-item {
-            color: #ff6b62;
-            margin-top: auto;
-        }
-
-        .logout-item:hover {
-            background: rgba(255,59,48,0.1);
-        }
-
-        /* Overlay */
+        .menu-item:hover { background: rgba(255,255,255,0.05); color: white; }
+        .menu-item i { width: 24px; }
+        .menu-divider { height: 1px; background: rgba(255,255,255,0.08); margin: 16px 0; }
+        .logout-item { color: #ff6b62; margin-top: auto; }
         .sidebar-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.5);
             z-index: 199;
             display: none;
         }
+        .sidebar-overlay.show { display: block; }
 
-        .sidebar-overlay.show {
-            display: block;
-        }
-
+        /* Main Content */
         .main-content {
             margin-top: 80px;
             padding: 32px;
@@ -231,10 +197,7 @@
             margin-right: auto;
         }
 
-        .modes-container {
-            margin-bottom: 32px;
-        }
-
+        .modes-container { margin-bottom: 32px; }
         .modes-toggle {
             display: flex;
             gap: 12px;
@@ -245,7 +208,6 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
             width: fit-content;
         }
-
         .mode-btn {
             padding: 10px 28px;
             border: none;
@@ -255,37 +217,17 @@
             font-size: 13px;
             border-radius: 40px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Inter', sans-serif;
         }
-
         .mode-btn.active {
             background: linear-gradient(90deg, #1a1a24 0%, #0d0d14 100%);
             color: white;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             border: 0.5px solid rgba(255,255,255,0.1);
         }
 
-        .resumo-header {
-            margin-bottom: 24px;
-        }
-
-        .resumo-header h1 {
-            color: white;
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .resumo-header p {
-            color: rgba(255,255,255,0.5);
-            font-size: 14px;
-        }
-
-        .resumo-header p span {
-            color: white;
-            font-weight: 600;
-        }
+        .resumo-header { margin-bottom: 24px; }
+        .resumo-header h1 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+        .resumo-header p { color: rgba(255,255,255,0.5); font-size: 14px; }
+        .resumo-header p span { color: white; font-weight: 600; }
 
         .filter-bar {
             display: flex;
@@ -299,28 +241,7 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        .filter-date {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: rgba(255,255,255,0.7);
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .filter-currency {
-            color: rgba(255,255,255,0.5);
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .metricas-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
+        .metricas-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 24px; }
         .card-metrica {
             background: rgba(18, 18, 24, 0.6);
             backdrop-filter: blur(16px);
@@ -330,57 +251,14 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: all 0.3s ease;
         }
-
-        .card-metrica:hover {
-            border-color: rgba(255,255,255,0.15);
-            background: rgba(18, 18, 24, 0.8);
-        }
-
-        .metric-info {
-            flex: 1;
-        }
-
-        .metric-title {
-            color: rgba(255,255,255,0.5);
-            font-size: 13px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-
-        .metric-value {
-            color: white;
-            font-size: 28px;
-            font-weight: 800;
-        }
-
-        .metric-icon {
-            width: 48px;
-            height: 48px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: rgba(255,255,255,0.5);
-        }
-
+        .metric-title { color: rgba(255,255,255,0.5); font-size: 13px; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
+        .metric-value { font-size: 28px; font-weight: 800; }
         .card-destaque {
-            background: linear-gradient(135deg, rgba(102,126,234,0.2) 0%, rgba(118,75,162,0.2) 100%);
-            border: 1px solid rgba(102,126,234,0.3);
+            background: linear-gradient(135deg, rgba(16,185,129,0.2) 0%, rgba(5,150,105,0.2) 100%);
+            border: 1px solid rgba(16,185,129,0.3);
         }
-
-        .card-destaque .metric-value {
-            font-size: 36px;
-            background: linear-gradient(135deg, #ffffff 0%, #a0a0c0 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
+        .card-destaque .metric-value { font-size: 36px; color: #10b981; }
 
         .row-cards {
             display: grid;
@@ -388,7 +266,6 @@
             gap: 12px;
             margin-bottom: 32px;
         }
-
         .card-pequeno {
             background: rgba(18, 18, 24, 0.6);
             backdrop-filter: blur(16px);
@@ -397,15 +274,8 @@
             padding: 16px;
             text-align: center;
         }
-
-        .card-pequeno .metric-title {
-            font-size: 11px;
-            margin-bottom: 6px;
-        }
-
-        .card-pequeno .metric-value {
-            font-size: 20px;
-        }
+        .card-pequeno .metric-title { font-size: 11px; margin-bottom: 6px; }
+        .card-pequeno .metric-value { font-size: 20px; }
 
         .pedidos-section {
             background: rgba(18, 18, 24, 0.6);
@@ -414,7 +284,6 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
             padding: 20px;
         }
-
         .pedidos-header {
             display: flex;
             justify-content: space-between;
@@ -423,177 +292,50 @@
             padding-bottom: 12px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
-
-        .pedidos-header h3 {
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .pedidos-header a {
-            color: rgba(255,255,255,0.5);
-            font-size: 12px;
-            text-decoration: none;
-            transition: color 0.3s ease;
-            cursor: pointer;
-        }
-
-        .pedidos-header a:hover {
-            color: #a0a0c0;
-        }
-
         .pedido-card {
             background: rgba(0, 0, 0, 0.3);
             border-radius: 16px;
             padding: 16px;
             margin-bottom: 12px;
-            transition: all 0.3s ease;
         }
-
-        .pedido-card:hover {
-            background: rgba(0, 0, 0, 0.5);
-        }
-
-        .pedido-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 12px;
-        }
-
-        .metodo-pagamento {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .metodo-pagamento i {
-            font-size: 18px;
-        }
-
-        .metodo-pagamento span {
-            font-size: 12px;
-            color: rgba(255,255,255,0.6);
-        }
-
-        .status-badge {
-            font-size: 11px;
-            font-weight: 600;
-            padding: 4px 12px;
-            border-radius: 20px;
-        }
-
-        .status-pago {
-            background: rgba(16, 185, 129, 0.2);
-            color: #10b981;
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-
-        .status-pendente {
-            background: rgba(245, 158, 11, 0.2);
-            color: #f59e0b;
-            border: 1px solid rgba(245, 158, 11, 0.3);
-        }
-
-        .status-cancelado {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-
-        .status-reembolsado {
-            background: rgba(107, 114, 128, 0.2);
-            color: #9ca3af;
-            border: 1px solid rgba(107, 114, 128, 0.3);
-        }
-
-        .cliente-info {
-            margin-bottom: 12px;
-        }
-
-        .cliente-nome {
-            color: white;
-            font-weight: 600;
-            font-size: 15px;
-            margin-bottom: 4px;
-        }
-
-        .cliente-numero {
-            color: rgba(255,255,255,0.4);
-            font-size: 11px;
-        }
-
-        .pedido-valor {
-            text-align: right;
-        }
-
-        .valor-mzn {
-            color: white;
-            font-weight: 700;
-            font-size: 16px;
-        }
-
-        .valor-label {
-            color: rgba(255,255,255,0.4);
-            font-size: 10px;
-        }
+        .pedido-row { display: flex; justify-content: space-between; margin-bottom: 12px; }
+        .status-pago { background: rgba(16,185,129,0.2); color: #10b981; padding: 2px 10px; border-radius: 20px; font-size: 11px; }
+        .status-pendente { background: rgba(245,158,11,0.2); color: #f59e0b; padding: 2px 10px; border-radius: 20px; font-size: 11px; }
+        .cliente-nome { font-weight: 600; margin-bottom: 4px; }
+        .valor-mzn { font-weight: 700; }
+        .loading { text-align: center; padding: 40px; }
+        .empty-state { text-align: center; padding: 40px; color: rgba(255,255,255,0.4); }
 
         @media (max-width: 480px) {
-            .main-content {
-                padding: 20px;
-            }
-            .sidebar {
-                width: 280px;
-            }
+            .main-content { padding: 20px; }
+            .row-cards { gap: 8px; }
         }
     </style>
 </head>
 <body>
     <nav class="navbar">
-        <div class="logo-area">
-            <img src="ei_1777492717837-removebg-preview.png" alt="Vantix Logo" class="logo-image">
+        <div class="logo-area" onclick="window.location.href='dashboard.html'">
+            <img src="ei_1777492717837-removebg-preview.png" class="logo-image">
         </div>
         <div class="user-area">
-            <div class="menu-icon" id="menuIcon">
-                <i class="fas fa-bars"></i>
-            </div>
+            <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+            <div class="menu-icon" id="menuIcon"><i class="fas fa-bars"></i></div>
         </div>
     </nav>
 
-    <!-- Sidebar Menu -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <div class="profile-avatar" id="profile-avatar">A</div>
+            <div class="profile-avatar" id="profile-avatar">V</div>
             <div class="sidebar-name" id="sidebar-name">Vendedor</div>
-            <div class="sidebar-email" id="sidebar-email">vendedor@email.com</div>
+            <div class="sidebar-email" id="sidebar-email">carregando...</div>
         </div>
         <div class="sidebar-menu">
-            <div class="menu-item" onclick="goToEcommerce()">
-                <i class="fas fa-store"></i>
-                <span>E-COMMERCE</span>
-            </div>
-            <div class="menu-item disabled">
-                <i class="fas fa-info-circle"></i>
-                <span>INFO PRODUTOS (em desenvolvimento)</span>
-            </div>
+            <div class="menu-item" onclick="window.location.href='e-commerce.html'"><i class="fas fa-store"></i><span>E-COMMERCE</span></div>
+            <div class="menu-item" onclick="window.location.href='createproduct.html'"><i class="fas fa-plus-circle"></i><span>Criar Produto</span></div>
+            <div class="menu-item" onclick="window.location.href='loja.html'"><i class="fas fa-shopping-cart"></i><span>Ver Loja</span></div>
+            <div class="menu-item" onclick="window.location.href='meus-pedidos.html'"><i class="fas fa-box"></i><span>Meus Pedidos</span></div>
             <div class="menu-divider"></div>
-            <div class="menu-item" onclick="goToCreateProduct()">
-                <i class="fas fa-plus-circle"></i>
-                <span>Criar Produto</span>
-            </div>
-            <div class="menu-item" onclick="goToLoja()">
-                <i class="fas fa-shopping-cart"></i>
-                <span>Ver Loja</span>
-            </div>
-            <div class="menu-item" onclick="goToPedidos()">
-                <i class="fas fa-box"></i>
-                <span>Meus Pedidos</span>
-            </div>
-            <div class="menu-divider"></div>
-            <div class="menu-item logout-item" onclick="logout()">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Sair</span>
-            </div>
+            <div class="menu-item logout-item" id="logoutBtn"><i class="fas fa-sign-out-alt"></i><span>Sair</span></div>
         </div>
     </div>
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -601,279 +343,184 @@
     <div class="main-content">
         <div class="modes-container">
             <div class="modes-toggle">
-                <button class="mode-btn active" onclick="switchMode('prl')">INFO PRODUTOS</button>
-                <button class="mode-btn" onclick="switchMode('ecommerce')">E-COMMERCE</button>
+                <button class="mode-btn active" onclick="carregarDados()">📊 DASHBOARD</button>
             </div>
         </div>
 
         <div class="resumo-header">
             <h1>Resumo de Vendas</h1>
-            <p>Olá, <span id="user-name-header">Vendedor</span> 🇲🇿</p>
+            <p>Olá, <span id="user-name">Vendedor</span> 🇲🇿</p>
         </div>
 
         <div class="filter-bar">
-            <div class="filter-date">
-                <i class="fas fa-calendar-alt"></i>
-                <span>Hoje ▼</span>
-            </div>
-            <div class="filter-currency">
-                MZN ▼
-            </div>
+            <div><i class="fas fa-calendar-alt"></i> Hoje</div>
+            <div>MZN</div>
         </div>
 
         <div class="metricas-grid">
             <div class="card-metrica card-destaque">
-                <div class="metric-info">
-                    <div class="metric-title">RECEITA TOTAL</div>
-                    <div class="metric-value" id="receita-total">0,00 MZN</div>
-                </div>
-                <div class="metric-icon">
-                    <i class="fas fa-chart-line"></i>
-                </div>
+                <div><div class="metric-title">RECEITA TOTAL</div><div class="metric-value" id="receita-total">0 MZN</div></div>
+                <i class="fas fa-chart-line" style="font-size: 28px; opacity: 0.5;"></i>
             </div>
         </div>
 
         <div class="row-cards">
-            <div class="card-pequeno">
-                <div class="metric-title">VENDAS</div>
-                <div class="metric-value" id="vendas-total">0</div>
-            </div>
-            <div class="card-pequeno">
-                <div class="metric-title">CANCELADAS</div>
-                <div class="metric-value" id="vendas-canceladas">0</div>
-            </div>
-            <div class="card-pequeno">
-                <div class="metric-title">CLIENTES</div>
-                <div class="metric-value" id="clientes-unicos">0</div>
-            </div>
+            <div class="card-pequeno"><div class="metric-title">VENDAS</div><div class="metric-value" id="vendas-total">0</div></div>
+            <div class="card-pequeno"><div class="metric-title">PENDENTES</div><div class="metric-value" id="vendas-pendentes">0</div></div>
+            <div class="card-pequeno"><div class="metric-title">PRODUTOS</div><div class="metric-value" id="produtos-total">0</div></div>
+        </div>
+        <div class="row-cards">
+            <div class="card-pequeno"><div class="metric-title">LEADS</div><div class="metric-value" id="leads-total">0</div></div>
+            <div class="card-pequeno"><div class="metric-title">VISUALIZAÇÕES</div><div class="metric-value" id="visualizacoes-total">0</div></div>
+            <div class="card-pequeno"><div class="metric-title">CLIQUES</div><div class="metric-value" id="cliques-total">0</div></div>
         </div>
 
         <div class="pedidos-section">
-            <div class="pedidos-header">
-                <h3>ÚLTIMOS PEDIDOS</h3>
-                <a onclick="goToPedidos()">Ver todos →</a>
-            </div>
-            <div id="lista-pedidos"></div>
+            <div class="pedidos-header"><h3>📦 ÚLTIMOS PEDIDOS</h3><a style="cursor:pointer;" onclick="window.location.href='meus-pedidos.html'">Ver todos →</a></div>
+            <div id="pedidos-list"><div class="loading"><i class="fas fa-spinner fa-spin"></i> Carregando...</div></div>
         </div>
     </div>
 
     <script>
-        // ================= DADOS REAIS (baseados no localStorage) =================
-        
-        let modoAtual = 'prl';
-        let dadosAtuais = { pedidos: [], receitaTotal: 0, vendasTotal: 0, canceladas: 0, clientesUnicos: 0 };
-        
-        // Produtos para INFO PRODUTOS
-        let produtos = JSON.parse(localStorage.getItem('vantix_produtos')) || [];
-        
-        // Pedidos reais do localStorage
-        let pedidosReais = JSON.parse(localStorage.getItem('vantix_pedidos')) || [];
+        // ================= CONFIGURAÇÃO SUPABASE =================
+        const SUPABASE_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
 
-        // Clientes registrados
-        let usuarios = JSON.parse(localStorage.getItem('vantix_usuarios')) || [];
-        let clientesRegistrados = JSON.parse(localStorage.getItem('vantix_clientes')) || [];
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Sessão do vendedor
-        const sessao = JSON.parse(localStorage.getItem('vantix_session'));
-        
-        // Função para calcular métricas reais dos pedidos
-        function calcularMetricasReais() {
-            // Filtrar pedidos do vendedor atual (se tiver vendedorId)
-            let pedidosFiltrados = pedidosReais;
-            
-            const pedidosPagos = pedidosFiltrados.filter(p => p.status === 'paid' || p.status === 'pago' || p.status === 'success');
-            const pedidosCancelados = pedidosFiltrados.filter(p => p.status === 'cancelado' || p.status === 'cancelled');
-            
-            const receitaTotal = pedidosPagos.reduce((sum, p) => sum + (p.valor || 0), 0);
-            const vendasTotal = pedidosPagos.length;
-            const canceladas = pedidosCancelados.length;
-            
-            // Clientes únicos (por email)
-            const emailsUnicos = new Set(pedidosFiltrados.map(p => p.email).filter(e => e));
-            const clientesUnicos = emailsUnicos.size;
-            
-            return { receitaTotal, vendasTotal, canceladas, clientesUnicos, pedidos: pedidosFiltrados };
+        let usuarioAtual = null;
+
+        // Tema
+        let theme = localStorage.getItem('vantix_theme') || 'dark';
+        function setTheme(t) {
+            document.body.classList[t === 'light' ? 'add' : 'remove']('light');
+            localStorage.setItem('vantix_theme', t);
         }
-        
-        // Dados para INFO PRODUTOS (baseado em produtos criados)
-        function calcularMetricasProdutos() {
-            const produtosAtivos = produtos.filter(p => p.status !== 'deleted');
-            const vendasProdutos = pedidosReais.filter(p => p.status === 'paid' || p.status === 'pago');
-            const receitaProdutos = vendasProdutos.reduce((sum, p) => sum + (p.valor || 0), 0);
-            
-            return {
-                receitaTotal: receitaProdutos,
-                vendasTotal: vendasProdutos.length,
-                canceladas: pedidosReais.filter(p => p.status === 'cancelado').length,
-                clientesUnicos: new Set(pedidosReais.map(p => p.email).filter(e => e)).size,
-                pedidos: pedidosReais.slice(0, 10)
-            };
-        }
-        
-        function atualizarDadosPorModo() {
-            if (modoAtual === 'prl') {
-                dadosAtuais = calcularMetricasProdutos();
-            } else {
-                dadosAtuais = calcularMetricasReais();
-            }
-        }
-        
-        // Atualizar UI com dados reais
-        function updateDashboard() {
-            atualizarDadosPorModo();
-            
-            document.getElementById('receita-total').innerText = dadosAtuais.receitaTotal.toLocaleString('pt-MZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' MZN';
-            document.getElementById('vendas-total').innerText = dadosAtuais.vendasTotal;
-            document.getElementById('vendas-canceladas').innerText = dadosAtuais.canceladas;
-            document.getElementById('clientes-unicos').innerText = dadosAtuais.clientesUnicos;
-            
-            renderPedidos(dadosAtuais.pedidos);
-        }
-        
-        function renderPedidos(pedidos) {
-            const container = document.getElementById('lista-pedidos');
-            
-            if (!pedidos || pedidos.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.4);">Nenhum pedido realizado ainda</div>';
-                return;
-            }
-            
-            const pedidosRecent = pedidos.slice(0, 5);
-            
-            container.innerHTML = pedidosRecent.map(pedido => {
-                const metodoIcon = pedido.metodo === 'M-Pesa' || pedido.metodo === 'mpesa' ? 'fa-mobile-alt' : 
-                                   pedido.metodo === 'Cartão' || pedido.metodo === 'cartao' ? 'fa-credit-card' : 'fa-money-bill';
-                const statusClass = pedido.status === 'paid' || pedido.status === 'pago' || pedido.status === 'success' ? 'status-pago' :
-                                   pedido.status === 'pending' || pedido.status === 'pendente' ? 'status-pendente' : 'status-cancelado';
-                const statusText = pedido.status === 'paid' || pedido.status === 'pago' || pedido.status === 'success' ? 'PAGO' :
-                                  pedido.status === 'pending' || pedido.status === 'pendente' ? 'PENDENTE' : 'CANCELADO';
-                
-                const dataFormatada = pedido.data_pagamento ? new Date(pedido.data_pagamento).toLocaleDateString('pt-MZ') : 
-                                     pedido.data ? new Date(pedido.data).toLocaleDateString('pt-MZ') : 'Data desconhecida';
-                
-                return `
-                    <div class="pedido-card">
-                        <div class="pedido-row">
-                            <div class="metodo-pagamento">
-                                <i class="fas ${metodoIcon}"></i>
-                                <span>${pedido.metodo || 'M-Pesa'}</span>
-                            </div>
-                            <div>
-                                <span class="status-badge ${statusClass}">${statusText}</span>
-                            </div>
-                        </div>
-                        <div class="cliente-info">
-                            <div class="cliente-nome">${pedido.cliente || pedido.cliente_nome || 'Cliente'}</div>
-                            <div class="cliente-numero">${pedido.telefone || pedido.cliente_telefone || '---'}</div>
-                        </div>
-                        <div class="pedido-row">
-                            <div class="valor-label">${dataFormatada}</div>
-                            <div class="pedido-valor">
-                                <div class="valor-mzn">${(pedido.valor || 0).toLocaleString('pt-MZ', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} MZN</div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-        
-        function switchMode(mode) {
-            modoAtual = mode;
-            const buttons = document.querySelectorAll('.mode-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            
-            if (mode === 'prl') {
-                buttons[0].classList.add('active');
-            } else {
-                buttons[1].classList.add('active');
-            }
-            updateDashboard();
-        }
-        
-        // Sidebar functions
+        setTheme(theme);
+        document.getElementById('themeToggle').onclick = () => {
+            theme = theme === 'dark' ? 'light' : 'dark';
+            setTheme(theme);
+            document.getElementById('themeToggle').innerHTML = theme === 'dark' ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
+        };
+
+        // Sidebar
         function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('show');
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('show');
         }
-        
-        function closeSidebar() {
-            document.getElementById('sidebar').classList.remove('open');
-            document.getElementById('sidebarOverlay').classList.remove('show');
-        }
-        
-        function goToEcommerce() {
-            window.location.href = 'e-commerce.html';
-        }
-        
-        function goToCreateProduct() {
-            window.location.href = 'createproduct.html';
-        }
-        
-        function goToLoja() {
-            window.location.href = 'loja.html';
-        }
-        
-        function goToPedidos() {
-            window.location.href = 'meus-pedidos.html';
-        }
-        
-        function logout() {
+        document.getElementById('menuIcon').onclick = toggleSidebar;
+        document.getElementById('sidebarOverlay').onclick = toggleSidebar;
+        document.getElementById('logoutBtn').onclick = async () => {
+            await supabase.auth.signOut();
             localStorage.removeItem('vantix_session');
             window.location.href = 'acesso.html';
-        }
-        
-        // Inicializar dados e UI
-        function init() {
-            // Configurar sidebar
-            document.getElementById('menuIcon').addEventListener('click', toggleSidebar);
-            document.getElementById('sidebarOverlay').addEventListener('click', closeSidebar);
-            
-            // Configurar dados do usuário logado
-            if (sessao && sessao.nome) {
-                const nomeCompleto = sessao.nome;
-                const primeiroNome = nomeCompleto.split(' ')[0];
-                const email = sessao.email || 'vendedor@vantix.com';
-                const inicial = nomeCompleto.charAt(0).toUpperCase();
-                
-                document.getElementById('user-name-header').innerText = primeiroNome;
-                document.getElementById('sidebar-name').innerText = nomeCompleto;
-                document.getElementById('sidebar-email').innerText = email;
-                document.getElementById('profile-avatar').innerText = inicial;
-            } else {
+        };
+
+        // Verificar sessão
+        async function verificarSessao() {
+            const { data: { session }, error } = await supabase.auth.getSession();
+            if (error || !session) {
                 window.location.href = 'acesso.html';
-                return;
+                return null;
             }
-            
-            // Se não houver pedidos reais, criar alguns de demonstração
-            if (pedidosReais.length === 0) {
-                const pedidosDemo = [
-                    { id: Date.now(), cliente: "Maria Amélia", email: "maria@email.com", telefone: "870293855", metodo: "M-Pesa", valor: 270, status: "paid", data_pagamento: new Date().toISOString() },
-                    { id: Date.now()+1, cliente: "João Pedro", email: "joao@email.com", telefone: "840512344", metodo: "Cartão", valor: 189.90, status: "paid", data_pagamento: new Date(Date.now() - 86400000).toISOString() },
-                    { id: Date.now()+2, cliente: "Carla Mendes", email: "carla@email.com", telefone: "823456789", metodo: "Transferência", valor: 450, status: "cancelado", data_pagamento: new Date(Date.now() - 172800000).toISOString() }
-                ];
-                localStorage.setItem('vantix_pedidos', JSON.stringify(pedidosDemo));
-                pedidosReais = pedidosDemo;
-            }
-            
-            // Se não houver produtos, criar um de exemplo
-            if (produtos.length === 0) {
-                const produtoDemo = {
-                    id: Date.now(),
-                    nome: "Ebook Marketing Digital 2025",
-                    descricao: "Guia completo para vendas online",
-                    preco: 270,
-                    capa: null,
-                    dataCriacao: new Date().toISOString()
-                };
-                localStorage.setItem('vantix_produtos', JSON.stringify([produtoDemo]));
-                produtos = [produtoDemo];
-            }
-            
-            updateDashboard();
+            usuarioAtual = session.user;
+            document.getElementById('user-name').innerText = usuarioAtual.user_metadata?.nome?.split(' ')[0] || 'Vendedor';
+            document.getElementById('sidebar-name').innerText = usuarioAtual.user_metadata?.nome || 'Vendedor';
+            document.getElementById('sidebar-email').innerText = usuarioAtual.email;
+            const inicial = (usuarioAtual.user_metadata?.nome?.charAt(0) || 'V').toUpperCase();
+            document.getElementById('profile-avatar').innerText = inicial;
+            return usuarioAtual;
         }
-        
+
+        // Carregar métricas REAIS do Supabase
+        async function carregarDados() {
+            if (!usuarioAtual) return;
+
+            // 1. Produtos do vendedor
+            const { data: produtos, error: prodError } = await supabase
+                .from('produtos')
+                .select('*')
+                .eq('vendedor_id', usuarioAtual.id);
+
+            if (prodError) console.error('Erro produtos:', prodError);
+
+            const totalProdutos = produtos?.length || 0;
+            const totalVisualizacoes = produtos?.reduce((sum, p) => sum + (p.visualizacoes || 0), 0) || 0;
+            const totalCliques = produtos?.reduce((sum, p) => sum + (p.cliques || 0), 0) || 0;
+
+            document.getElementById('produtos-total').innerText = totalProdutos;
+            document.getElementById('visualizacoes-total').innerText = totalVisualizacoes;
+            document.getElementById('cliques-total').innerText = totalCliques;
+
+            // 2. Pedidos
+            let pedidos = [];
+            let totalReceita = 0;
+            let totalVendas = 0;
+            let totalPendentes = 0;
+
+            if (produtos && produtos.length > 0) {
+                const produtoIds = produtos.map(p => p.id);
+                const { data: pedidosData, error: pedError } = await supabase
+                    .from('pedidos')
+                    .select('*')
+                    .in('produto_id', produtoIds)
+                    .order('criado_em', { ascending: false });
+
+                if (!pedError && pedidosData) {
+                    pedidos = pedidosData;
+                    const pagos = pedidosData.filter(p => p.status === 'pago');
+                    totalReceita = pagos.reduce((sum, p) => sum + (p.valor || 0), 0);
+                    totalVendas = pagos.length;
+                    totalPendentes = pedidosData.filter(p => p.status === 'pendente').length;
+                }
+            }
+
+            document.getElementById('receita-total').innerText = totalReceita.toLocaleString('pt-MZ', { minimumFractionDigits: 0 }) + ' MZN';
+            document.getElementById('vendas-total').innerText = totalVendas;
+            document.getElementById('vendas-pendentes').innerText = totalPendentes;
+
+            // 3. Leads
+            let totalLeads = 0;
+            if (produtos && produtos.length > 0) {
+                const produtoIds = produtos.map(p => p.id);
+                const { data: leadsData, error: leadError } = await supabase
+                    .from('leads')
+                    .select('*', { count: 'exact', head: true })
+                    .in('produto_id', produtoIds);
+                if (!leadError) totalLeads = leadsData?.length || 0;
+            }
+            document.getElementById('leads-total').innerText = totalLeads;
+
+            // 4. Renderizar últimos pedidos
+            const pedidosList = document.getElementById('pedidos-list');
+            if (!pedidos || pedidos.length === 0) {
+                pedidosList.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>Nenhum pedido ainda</p></div>';
+            } else {
+                pedidosList.innerHTML = pedidos.slice(0, 5).map(p => `
+                    <div class="pedido-card">
+                        <div class="pedido-row">
+                            <span class="cliente-nome">${p.cliente_nome || 'Cliente'}</span>
+                            <span class="${p.status === 'pago' ? 'status-pago' : 'status-pendente'}">${p.status === 'pago' ? 'PAGO' : 'PENDENTE'}</span>
+                        </div>
+                        <div class="pedido-row">
+                            <span>${p.produto_nome || 'Produto'}</span>
+                            <span class="valor-mzn">${(p.valor || 0).toLocaleString()} MZN</span>
+                        </div>
+                        <div style="font-size: 11px; color: rgba(255,255,255,0.4);">${new Date(p.criado_em).toLocaleDateString('pt-MZ')}</div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        async function init() {
+            await verificarSessao();
+            if (usuarioAtual) {
+                await carregarDados();
+                // Atualizar a cada 30 segundos
+                setInterval(carregarDados, 30000);
+            }
+        }
+
         init();
     </script>
 </body>

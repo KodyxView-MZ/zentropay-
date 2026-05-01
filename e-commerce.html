@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Vantix — E-Commerce | Painel do Vendedor</title>
+    <title>ZentroPay — E-Commerce | Painel do Vendedor</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -29,11 +30,6 @@
         body.light .welcome-card {
             background: rgba(255,255,255,0.9);
             border-color: rgba(0,0,0,0.08);
-        }
-
-        body.light .btn-close-form {
-            background: rgba(0,0,0,0.05);
-            color: #1a1a1a;
         }
 
         body::before {
@@ -60,7 +56,6 @@
             z-index: 2;
         }
 
-        /* Navbar */
         .navbar {
             background: rgba(18, 18, 24, 0.8);
             backdrop-filter: blur(16px);
@@ -99,7 +94,6 @@
             border-radius: 40px;
             margin: 0 12px;
         }
-        body.light .datetime { background: rgba(0,0,0,0.05); }
 
         .theme-toggle {
             background: rgba(255,255,255,0.1);
@@ -114,8 +108,6 @@
             margin-right: 12px;
         }
         .theme-toggle svg { width: 22px; height: 22px; fill: white; }
-        body.light .theme-toggle { background: rgba(0,0,0,0.08); }
-        body.light .theme-toggle svg { fill: #1a1a1a; }
 
         .btn-back {
             background: rgba(255,255,255,0.05);
@@ -125,14 +117,9 @@
             color: rgba(255,255,255,0.7);
             cursor: pointer;
         }
-        body.light .btn-back {
-            background: rgba(0,0,0,0.05);
-            border-color: rgba(0,0,0,0.1);
-            color: #1a1a1a;
-        }
+
         .nav-actions { display: flex; align-items: center; gap: 8px; }
 
-        /* Welcome Card */
         .welcome-card {
             background: rgba(18, 18, 24, 0.6);
             backdrop-filter: blur(20px);
@@ -160,7 +147,6 @@
         .stat-number { font-size: 24px; font-weight: 800; color: #10b981; }
         .stat-label { font-size: 11px; color: rgba(255,255,255,0.5); }
 
-        /* Tabs */
         .tabs {
             display: flex;
             gap: 12px;
@@ -186,12 +172,7 @@
             color: white;
             border: 0.5px solid rgba(255,255,255,0.1);
         }
-        body.light .tab-btn.active {
-            background: linear-gradient(90deg, #e0e0e0 0%, #cccccc 100%);
-            color: #1a1a1a;
-        }
 
-        /* Botão Novo Produto */
         .btn-new-product {
             background: linear-gradient(90deg, #10b981, #059669);
             border: none;
@@ -208,7 +189,6 @@
         }
         .btn-new-product:hover { transform: scale(1.02); }
 
-        /* Formulário Float */
         .form-overlay {
             position: fixed;
             top: 0;
@@ -235,8 +215,6 @@
             overflow-y: auto;
             position: relative;
         }
-        .form-container h3 { font-size: 24px; margin-bottom: 8px; }
-        .form-container p { color: rgba(255,255,255,0.5); margin-bottom: 24px; }
         .btn-close-form {
             position: absolute;
             top: 20px;
@@ -274,13 +252,6 @@
             color: white;
             font-family: 'Inter', sans-serif;
         }
-        body.light .form-group input,
-        body.light .form-group textarea,
-        body.light .form-group select {
-            background: rgba(0,0,0,0.05);
-            border-color: rgba(0,0,0,0.1);
-            color: #1a1a1a;
-        }
         .upload-area {
             border: 2px dashed rgba(255,255,255,0.2);
             border-radius: 20px;
@@ -308,7 +279,6 @@
             width: 100%;
         }
 
-        /* Produtos Grid */
         .produtos-header {
             display: flex;
             justify-content: space-between;
@@ -349,7 +319,6 @@
         .btn-icon.delete:hover { background: rgba(239,68,68,0.2); color: #ef4444; }
         .empty-state { text-align: center; padding: 60px; color: rgba(255,255,255,0.4); }
 
-        /* Depoimentos e Leads */
         .depoimentos-grid, .leads-grid { display: grid; gap: 16px; }
         .depoimento-card, .lead-item {
             background: rgba(0,0,0,0.3);
@@ -371,6 +340,7 @@
             color: #10b981;
             margin-bottom: 24px;
         }
+        .loading { text-align: center; padding: 40px; }
 
         @media (max-width: 640px) {
             .form-row { grid-template-columns: 1fr; }
@@ -386,7 +356,7 @@
     <nav class="navbar">
         <div class="logo-area" onclick="window.location.href='dashboard.html'">
             <img src="ei_1777492717837-removebg-preview.png" class="logo-image">
-            <span class="logo-text">Vantix</span>
+            <span class="logo-text">ZentroPay</span>
         </div>
         <div class="datetime" id="datetime">Carregando...</div>
         <div class="nav-actions">
@@ -397,7 +367,6 @@
         </div>
     </nav>
 
-    <!-- Welcome Card -->
     <div class="welcome-card">
         <div class="welcome-text">
             <h2>Olá, <span id="user-name">Vendedor</span>! 👋</h2>
@@ -411,21 +380,19 @@
     </div>
 
     <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('produtos')"> Meus Produtos</button>
-        <button class="tab-btn" onclick="switchTab('depoimentos')"> Depoimentos</button>
-        <button class="tab-btn" onclick="switchTab('leads')"> Leads</button>
+        <button class="tab-btn active" onclick="switchTab('produtos')">📦 Meus Produtos</button>
+        <button class="tab-btn" onclick="switchTab('depoimentos')">⭐ Depoimentos</button>
+        <button class="tab-btn" onclick="switchTab('leads')">📋 Leads</button>
     </div>
 
-    <!-- Tab Produtos -->
     <div id="tab-produtos">
         <div class="produtos-header">
             <h3><i class="fas fa-box"></i> Seus Produtos</h3>
             <button class="btn-new-product" id="showFormBtn"><i class="fas fa-plus-circle"></i> Criar Novo Produto</button>
         </div>
-        <div id="produtos-list" class="produtos-grid"><div class="empty-state"><i class="fas fa-store"></i><p>Nenhum produto criado ainda</p><p style="font-size:13px;">Clique no botão acima para começar</p></div></div>
+        <div id="produtos-list" class="produtos-grid"><div class="loading"><i class="fas fa-spinner fa-spin"></i> Carregando...</div></div>
     </div>
 
-    <!-- Tab Depoimentos -->
     <div id="tab-depoimentos" style="display: none;">
         <div class="card" style="padding: 24px; background: rgba(18,18,24,0.6); border-radius: 28px;">
             <h3 style="margin-bottom: 24px;"><i class="fas fa-star"></i> Gerenciar Depoimentos</h3>
@@ -436,16 +403,14 @@
         </div>
     </div>
 
-    <!-- Tab Leads -->
     <div id="tab-leads" style="display: none;">
         <div class="card" style="padding: 24px; background: rgba(18,18,24,0.6); border-radius: 28px;">
             <h3 style="margin-bottom: 24px;"><i class="fas fa-users"></i> Clientes Interessados</h3>
-            <div id="leads-list" class="leads-grid"><div class="empty-state">Nenhum lead ainda</div></div>
+            <div id="leads-list" class="leads-grid"><div class="loading"><i class="fas fa-spinner fa-spin"></i> Carregando...</div></div>
         </div>
     </div>
 </div>
 
-<!-- Formulário Float -->
 <div id="form-overlay" class="form-overlay">
     <div class="form-container">
         <button class="btn-close-form" onclick="closeForm()"><i class="fas fa-times"></i></button>
@@ -455,17 +420,16 @@
             <div class="form-row">
                 <div class="form-group">
                     <label>📷 IMAGEM DO PRODUTO *</label>
-                    <div class="upload-area" onclick="doc('imagem-input').click()">
+                    <div class="upload-area" onclick="document.getElementById('imagem-input').click()">
                         <i class="fas fa-cloud-upload-alt"></i>
                         <p>Clique para fazer upload da capa</p>
-                        <p style="font-size:11px;">PNG, JPG até 5MB</p>
                     </div>
                     <input type="file" id="imagem-input" accept="image/*" style="display: none;">
                     <img id="preview-imagem" class="preview-image">
                 </div>
                 <div class="form-group">
                     <label>🎨 BANNER (opcional)</label>
-                    <div class="upload-area" onclick="doc('banner-input').click()">
+                    <div class="upload-area" onclick="document.getElementById('banner-input').click()">
                         <i class="fas fa-image"></i>
                         <p>Imagem de destaque no topo</p>
                     </div>
@@ -473,213 +437,256 @@
                     <img id="preview-banner" class="preview-banner">
                 </div>
             </div>
-
             <div class="form-row">
-                <div class="form-group"><label>🏷️ NOME DO PRODUTO *</label><input type="text" id="produto-nome" placeholder="Ex: Ebook Marketing Digital" required></div>
-                <div class="form-group"><label>💰 PREÇO (MZN) *</label><input type="number" id="produto-preco" step="0.01" placeholder="270" required></div>
+                <div class="form-group"><label>🏷️ NOME DO PRODUTO *</label><input type="text" id="produto-nome" required></div>
+                <div class="form-group"><label>💰 PREÇO (MZN) *</label><input type="number" id="produto-preco" step="0.01" required></div>
             </div>
-
-            <div class="form-group"><label>📝 DESCRIÇÃO CURTA *</label><textarea id="produto-descricao-curta" rows="2" placeholder="Resumo do produto..."></textarea></div>
-            <div class="form-group"><label>📖 DESCRIÇÃO LONGA</label><textarea id="produto-descricao-longa" rows="4" placeholder="Detalhes completos do produto..."></textarea></div>
-
+            <div class="form-group"><label>📝 DESCRIÇÃO CURTA *</label><textarea id="produto-descricao-curta" rows="2"></textarea></div>
+            <div class="form-group"><label>📖 DESCRIÇÃO LONGA</label><textarea id="produto-descricao-longa" rows="4"></textarea></div>
             <div class="form-row">
                 <div class="form-group"><label>📂 CATEGORIA</label><select id="produto-categoria"><option>Ebooks</option><option>Cursos</option><option>Serviços</option><option>Produtos Físicos</option></select></div>
-                <div class="form-group"><label>📞 CONTACTO (WhatsApp) *</label><input type="tel" id="produto-contacto" placeholder="84 123 4567" required></div>
+                <div class="form-group"><label>📞 CONTACTO (WhatsApp) *</label><input type="tel" id="produto-contacto" required></div>
             </div>
-
             <div class="form-row">
-                <div class="form-group"><label>⚠️ CONTADOR DE URGÊNCIA</label><select id="urgent-enabled"><option value="0">❌ Desativado</option><option value="1">✅ Ativado (mostrar timer vermelho)</option></select></div>
+                <div class="form-group"><label>⚠️ CONTADOR DE URGÊNCIA</label><select id="urgent-enabled"><option value="false">❌ Desativado</option><option value="true">✅ Ativado</option></select></div>
                 <div class="form-group"><label>⏱️ TEMPO (minutos)</label><input type="number" id="urgent-minutes" value="5" min="1" max="60"></div>
             </div>
-
             <button type="submit" class="btn-submit"><i class="fas fa-check"></i> Publicar Produto</button>
         </form>
     </div>
 </div>
 
-<!-- Modais Depoimentos -->
-<div id="modal-depoimento-texto" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 1001; align-items: center; justify-content: center;">
-    <div style="background: #1a1a24; border-radius: 28px; padding: 32px; max-width: 500px; width: 90%;"><h3>Adicionar Depoimento</h3><select id="depoimento-produto" style="width:100%;padding:12px;margin:16px 0;background:#2a2a38;border:none;border-radius:12px;color:white;"></select><input type="text" id="depoimento-nome" placeholder="Nome do cliente" style="width:100%;padding:12px;margin-bottom:16px;background:#2a2a38;border:none;border-radius:12px;color:white;"><select id="depoimento-stars" style="width:100%;padding:12px;margin-bottom:16px;background:#2a2a38;border:none;border-radius:12px;color:white;"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select><textarea id="depoimento-texto" rows="3" placeholder="Depoimento..." style="width:100%;padding:12px;margin-bottom:16px;background:#2a2a38;border:none;border-radius:12px;color:white;"></textarea><button onclick="saveDepoimentoTexto()" style="background:#10b981;border:none;padding:12px;border-radius:40px;color:white;width:100%;">Salvar</button><button onclick="closeModal('modal-depoimento-texto')" style="margin-top:12px;background:transparent;border:none;color:white;width:100%;">Cancelar</button></div>
-</div>
-
-<div id="modal-depoimento-imagem" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 1001; align-items: center; justify-content: center;">
-    <div style="background: #1a1a24; border-radius: 28px; padding: 32px; max-width: 500px; width: 90%;"><h3>Adicionar Imagem</h3><select id="depoimento-img-produto" style="width:100%;padding:12px;margin:16px 0;background:#2a2a38;border:none;border-radius:12px;color:white;"></select><div class="upload-area" onclick="doc('depoimento-imagem-input').click()" style="margin-bottom:16px;"><i class="fas fa-image"></i><p>Selecionar imagem</p></div><input type="file" id="depoimento-imagem-input" accept="image/*" style="display:none;"><img id="preview-depoimento-img" style="width:100%;border-radius:12px;margin-bottom:16px;display:none;"><input type="text" id="depoimento-legenda" placeholder="Legenda" style="width:100%;padding:12px;margin-bottom:16px;background:#2a2a38;border:none;border-radius:12px;color:white;"><button onclick="saveDepoimentoImagem()" style="background:#10b981;border:none;padding:12px;border-radius:40px;color:white;width:100%;">Salvar</button><button onclick="closeModal('modal-depoimento-imagem')" style="margin-top:12px;background:transparent;border:none;color:white;width:100%;">Cancelar</button></div>
-</div>
-
 <script>
-    function doc(id) { return document.getElementById(id); }
+    const SUPABASE_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let produtos = JSON.parse(localStorage.getItem('vantix_produtos_ecommerce')) || [];
-    let depoimentosTexto = JSON.parse(localStorage.getItem('vantix_depoimentos_texto')) || [];
-    let depoimentosImagem = JSON.parse(localStorage.getItem('vantix_depoimentos_imagem')) || [];
-
-    // Relógio Moçambique
-    function updateClock() {
-        const now = new Date();
-        const options = { timeZone: 'Africa/Maputo', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
-        const time = now.toLocaleTimeString('pt-MZ', options);
-        const date = now.toLocaleDateString('pt-MZ', { timeZone: 'Africa/Maputo', day: '2-digit', month: '2-digit', year: 'numeric' });
-        doc('datetime').innerHTML = `<i class="far fa-clock"></i> ${date} | ${time}`;
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
-
-    // Tema
-    let theme = localStorage.getItem('vantix_theme') || 'dark';
-    function setTheme(t) { document.body.classList[t === 'light' ? 'add' : 'remove']('light'); localStorage.setItem('vantix_theme', t); }
-    setTheme(theme);
-    doc('themeToggle').onclick = () => { setTheme(theme === 'dark' ? 'light' : 'dark'); theme = theme === 'dark' ? 'light' : 'dark'; };
-
-    // Nome do vendedor
-    const sessao = JSON.parse(localStorage.getItem('vantix_session')) || {};
-    doc('user-name').innerText = sessao.nome?.split(' ')[0] || 'Vendedor';
-
-    function updateStats() {
-        let totalLeads = 0;
-        produtos.forEach(p => { const leads = JSON.parse(localStorage.getItem(`vantix_leads_${p.id}`)) || []; totalLeads += leads.length; });
-        doc('prod-count').innerText = produtos.length;
-        doc('lead-count').innerText = totalLeads;
-        const totalVendas = produtos.reduce((sum, p) => sum + (p.vendas || 0), 0);
-        doc('sales-count').innerText = totalVendas;
-    }
-
-    // Tabs
-    function switchTab(tab) {
-        ['produtos', 'depoimentos', 'leads'].forEach(t => doc(`tab-${t}`).style.display = 'none');
-        doc(`tab-${tab}`).style.display = 'block';
-        document.querySelectorAll('.tab-btn').forEach((btn, i) => btn.classList[i === (tab === 'produtos' ? 0 : tab === 'depoimentos' ? 1 : 2) ? 'add' : 'remove']('active'));
-        if (tab === 'leads') renderLeads();
-        if (tab === 'depoimentos') renderDepoimentos();
-    }
-
-    // Formulário Float
-    function openForm() { doc('form-overlay').classList.add('show'); }
-    function closeForm() { doc('form-overlay').classList.remove('show'); resetForm(); }
-    doc('showFormBtn').onclick = openForm;
-
-    function resetForm() {
-        doc('produto-nome').value = '';
-        doc('produto-preco').value = '';
-        doc('produto-descricao-curta').value = '';
-        doc('produto-descricao-longa').value = '';
-        doc('produto-contacto').value = '';
-        imagemBase64 = null; bannerBase64 = null;
-        doc('preview-imagem').style.display = 'none';
-        doc('preview-banner').style.display = 'none';
-        doc('imagem-input').value = '';
-        doc('banner-input').value = '';
-    }
-
-    function gerarSerial() { return 'VAN' + Date.now().toString().slice(-10) + Math.floor(Math.random() * 1000); }
-    function gerarHash() { return Math.random().toString(36).substring(2, 10); }
-
+    let usuarioAtual = null;
+    let produtos = [];
+    let depoimentosTexto = [];
+    let depoimentosImagem = [];
     let imagemBase64 = null, bannerBase64 = null;
-    doc('imagem-input').onchange = (e) => { const reader = new FileReader(); reader.onload = (ev) => { imagemBase64 = ev.target.result; doc('preview-imagem').src = imagemBase64; doc('preview-imagem').style.display = 'block'; }; reader.readAsDataURL(e.target.files[0]); };
-    doc('banner-input').onchange = (e) => { const reader = new FileReader(); reader.onload = (ev) => { bannerBase64 = ev.target.result; doc('preview-banner').src = bannerBase64; doc('preview-banner').style.display = 'block'; }; reader.readAsDataURL(e.target.files[0]); };
 
-    doc('product-form').onsubmit = (e) => {
-        e.preventDefault();
-        const nome = doc('produto-nome').value.trim();
-        const preco = parseFloat(doc('produto-preco').value);
-        if (!nome || !preco || !imagemBase64) { alert('Preencha nome, preço e imagem'); return; }
-        const produto = {
-            id: Date.now(), serial: gerarSerial(), link_unico: `customershow.html?id=${Date.now()}&hash=${gerarHash()}`,
-            vendedor_nome: sessao.nome || 'Vendedor', vendedor_contacto: doc('produto-contacto').value,
-            nome, preco, descricao_curta: doc('produto-descricao-curta').value, descricao_longa: doc('produto-descricao-longa').value,
-            categoria: doc('produto-categoria').value, imagem: imagemBase64, banner: bannerBase64,
-            urgent_enabled: doc('urgent-enabled').value === '1', urgent_minutes: parseInt(doc('urgent-minutes').value) || 0,
-            visualizacoes: 0, cliques: 0, vendas: 0, data_criacao: new Date().toISOString()
-        };
-        produtos.unshift(produto);
-        localStorage.setItem('vantix_produtos_ecommerce', JSON.stringify(produtos));
-        alert('✅ Produto criado com sucesso!');
-        closeForm();
+    async function verificarSessao() {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error || !session) {
+            window.location.href = 'acesso.html';
+            return null;
+        }
+        usuarioAtual = session.user;
+        document.getElementById('user-name').innerText = usuarioAtual.user_metadata?.nome?.split(' ')[0] || 'Vendedor';
+        return usuarioAtual;
+    }
+
+    async function carregarProdutos() {
+        if (!usuarioAtual) return;
+        const { data, error } = await supabase.from('produtos').select('*').eq('vendedor_id', usuarioAtual.id).order('criado_em', { ascending: false });
+        if (error) { console.error(error); return; }
+        produtos = data || [];
         renderProdutos();
-        updateStats();
-    };
+        atualizarStats();
+    }
+
+    async function carregarDepoimentos() {
+        if (!usuarioAtual || produtos.length === 0) return;
+        const produtoIds = produtos.map(p => p.id);
+        const { data: texto, error: err1 } = await supabase.from('depoimentos_texto').select('*').in('produto_id', produtoIds);
+        const { data: imagem, error: err2 } = await supabase.from('depoimentos_imagem').select('*').in('produto_id', produtoIds);
+        if (!err1) depoimentosTexto = texto || [];
+        if (!err2) depoimentosImagem = imagem || [];
+        renderDepoimentos();
+    }
+
+    async function carregarLeads() {
+        if (!usuarioAtual || produtos.length === 0) { document.getElementById('leads-list').innerHTML = '<div class="empty-state">Nenhum lead ainda</div>'; return; }
+        const produtoIds = produtos.map(p => p.id);
+        let allLeads = [];
+        for (const id of produtoIds) {
+            const { data } = await supabase.from('leads').select('*').eq('produto_id', id);
+            if (data) allLeads.push(...data.map(l => ({ ...l, produto_nome: produtos.find(p => p.id === l.produto_id)?.nome || 'Produto' })));
+        }
+        allLeads.sort((a, b) => new Date(b.criado_em) - new Date(a.criado_em));
+        const container = document.getElementById('leads-list');
+        if (allLeads.length === 0) { container.innerHTML = '<div class="empty-state">Nenhum lead ainda</div>'; return; }
+        container.innerHTML = allLeads.map(l => `<div class="lead-item"><strong>${l.cliente_nome}</strong> - ${l.cliente_telefone}<br><small>📧 ${l.cliente_email} | 📍 ${l.cliente_endereco || 'Sem endereço'}<br>📦 Produto: ${l.produto_nome}<br>📅 ${new Date(l.criado_em).toLocaleString()}</small></div>`).join('');
+    }
+
+    async function atualizarStats() {
+        document.getElementById('prod-count').innerText = produtos.length;
+        let totalVendas = produtos.reduce((sum, p) => sum + (p.vendas || 0), 0);
+        document.getElementById('sales-count').innerText = totalVendas;
+        let totalLeads = 0;
+        for (const p of produtos) {
+            const { count } = await supabase.from('leads').select('*', { count: 'exact', head: true }).eq('produto_id', p.id);
+            totalLeads += count || 0;
+        }
+        document.getElementById('lead-count').innerText = totalLeads;
+    }
 
     function renderProdutos() {
-        if (produtos.length === 0) { doc('produtos-list').innerHTML = '<div class="empty-state"><i class="fas fa-store"></i><p>Nenhum produto criado</p></div>'; return; }
-        doc('produtos-list').innerHTML = produtos.map(p => `
+        const container = document.getElementById('produtos-list');
+        if (produtos.length === 0) { container.innerHTML = '<div class="empty-state"><i class="fas fa-store"></i><p>Nenhum produto criado</p></div>'; return; }
+        container.innerHTML = produtos.map(p => `
             <div class="produto-card">
-                <img src="${p.imagem}" class="produto-imagem">
+                <img src="${p.imagem}" class="produto-imagem" onerror="this.src='https://placehold.co/80x80?text=Sem+Imagem'">
                 <div class="produto-info">
                     <div class="produto-nome">${p.nome}</div>
-                    <div class="produto-preco">${p.preco.toLocaleString()} MZN</div>
+                    <div class="produto-preco">${Number(p.preco).toLocaleString()} MZN</div>
                     <div class="produto-serial"><i class="fas fa-barcode"></i> ${p.serial}</div>
                     ${p.urgent_enabled ? '<span style="background:#dc2626; padding:2px 8px; border-radius:40px; font-size:10px;">⏰ Urgência Ativada</span>' : ''}
                 </div>
                 <div class="produto-actions">
-                    <button class="btn-icon" onclick="copiarLink('${p.link_unico}')" title="Copiar link"><i class="fas fa-copy"></i></button>
-                    <button class="btn-icon" onclick="verEstatisticas(${p.id})" title="Estatísticas"><i class="fas fa-chart-line"></i></button>
-                    <button class="btn-icon delete" onclick="deletarProduto(${p.id})" title="Excluir"><i class="fas fa-trash"></i></button>
+                    <button class="btn-icon" onclick="copiarLink('customershow.html?id=${p.id}')" title="Copiar link"><i class="fas fa-copy"></i></button>
+                    <button class="btn-icon" onclick="verEstatisticas('${p.id}')" title="Estatísticas"><i class="fas fa-chart-line"></i></button>
+                    <button class="btn-icon delete" onclick="deletarProduto('${p.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
                 </div>
             </div>
         `).join('');
     }
 
-    function verEstatisticas(id) {
+    async function verEstatisticas(id) {
         const p = produtos.find(p => p.id === id);
-        const leads = JSON.parse(localStorage.getItem(`vantix_leads_${id}`)) || [];
-        alert(`📊 Estatísticas de "${p.nome}"\n\n👁️ Visualizações: ${p.visualizacoes || 0}\n🖱️ Cliques: ${p.cliques || 0}\n💰 Vendas: ${p.vendas || 0}\n📋 Leads: ${leads.length}`);
+        const { count } = await supabase.from('leads').select('*', { count: 'exact', head: true }).eq('produto_id', id);
+        alert(`📊 Estatísticas de "${p.nome}"\n\n👁️ Visualizações: ${p.visualizacoes || 0}\n🖱️ Cliques: ${p.cliques || 0}\n💰 Vendas: ${p.vendas || 0}\n📋 Leads: ${count || 0}`);
+    }
+
+    async function deletarProduto(id) {
+        if (!confirm('Deletar produto?')) return;
+        const { error } = await supabase.from('produtos').delete().eq('id', id);
+        if (error) { alert('Erro ao deletar'); return; }
+        await carregarProdutos();
+        await carregarDepoimentos();
     }
 
     function copiarLink(link) { navigator.clipboard.writeText(window.location.origin + '/' + link); alert('✅ Link copiado!'); }
-    function deletarProduto(id) { if (confirm('Deletar produto?')) { produtos = produtos.filter(p => p.id !== id); localStorage.setItem('vantix_produtos_ecommerce', JSON.stringify(produtos)); renderProdutos(); updateStats(); } }
 
     function renderDepoimentos() {
-        doc('depoimentos-texto-list').innerHTML = depoimentosTexto.length ? depoimentosTexto.map(d => `<div class="depoimento-card"><div><strong>${d.nome}</strong> ${'⭐'.repeat(d.stars)}<br>${d.texto}<br><small>${new Date(d.data).toLocaleDateString()}</small></div><button class="btn-icon delete" onclick="deletarDepoimentoTexto(${d.id})"><i class="fas fa-trash"></i></button></div>`).join('') : '<div class="empty-state">Sem depoimentos</div>';
-        doc('depoimentos-imagem-list').innerHTML = depoimentosImagem.length ? depoimentosImagem.map(d => `<div class="depoimento-card"><img src="${d.imagem}" class="depoimento-img-preview" onclick="window.open('${d.imagem}')"><div>${d.legenda || ''}</div><button class="btn-icon delete" onclick="deletarDepoimentoImagem(${d.id})"><i class="fas fa-trash"></i></button></div>`).join('') : '<div class="empty-state">Sem imagens</div>';
+        const textoDiv = document.getElementById('depoimentos-texto-list');
+        const imagemDiv = document.getElementById('depoimentos-imagem-list');
+        textoDiv.innerHTML = depoimentosTexto.length ? depoimentosTexto.map(d => `<div class="depoimento-card"><div><strong>${d.cliente_nome}</strong> ${'⭐'.repeat(d.stars)}<br>${d.depoimento}<br><small>${new Date(d.criado_em).toLocaleDateString()}</small></div><button class="btn-icon delete" onclick="deletarDepoimentoTexto('${d.id}')"><i class="fas fa-trash"></i></button></div>`).join('') : '<div class="empty-state">Sem depoimentos</div>';
+        imagemDiv.innerHTML = depoimentosImagem.length ? depoimentosImagem.map(d => `<div class="depoimento-card"><img src="${d.imagem_url}" class="depoimento-img-preview" onclick="window.open('${d.imagem_url}')"><div>${d.legenda || ''}</div><button class="btn-icon delete" onclick="deletarDepoimentoImagem('${d.id}')"><i class="fas fa-trash"></i></button></div>`).join('') : '<div class="empty-state">Sem imagens</div>';
     }
 
-    function carregarProdutosSelect() { doc('depoimento-produto').innerHTML = produtos.map(p => `<option value="${p.id}">${p.nome}</option>`).join(''); }
-    function carregarProdutosSelectImg() { doc('depoimento-img-produto').innerHTML = produtos.map(p => `<option value="${p.id}">${p.nome}</option>`).join(''); }
+    async function deletarDepoimentoTexto(id) {
+        await supabase.from('depoimentos_texto').delete().eq('id', id);
+        await carregarDepoimentos();
+    }
+    async function deletarDepoimentoImagem(id) {
+        await supabase.from('depoimentos_imagem').delete().eq('id', id);
+        await carregarDepoimentos();
+    }
+
+    document.getElementById('imagem-input').onchange = (e) => { const reader = new FileReader(); reader.onload = (ev) => { imagemBase64 = ev.target.result; document.getElementById('preview-imagem').src = imagemBase64; document.getElementById('preview-imagem').style.display = 'block'; }; reader.readAsDataURL(e.target.files[0]); };
+    document.getElementById('banner-input').onchange = (e) => { const reader = new FileReader(); reader.onload = (ev) => { bannerBase64 = ev.target.result; document.getElementById('preview-banner').src = bannerBase64; document.getElementById('preview-banner').style.display = 'block'; }; reader.readAsDataURL(e.target.files[0]); };
+
+    document.getElementById('product-form').onsubmit = async (e) => {
+        e.preventDefault();
+        if (!usuarioAtual) { alert('Faça login primeiro'); return; }
+        const nome = document.getElementById('produto-nome').value.trim();
+        const preco = parseFloat(document.getElementById('produto-preco').value);
+        if (!nome || !preco || !imagemBase64) { alert('Preencha nome, preço e imagem'); return; }
+        const serial = 'ZEN' + Date.now().toString().slice(-8) + Math.floor(Math.random() * 1000);
+        const { data, error } = await supabase.from('produtos').insert([{
+            vendedor_id: usuarioAtual.id, serial, nome, preco,
+            descricao_curta: document.getElementById('produto-descricao-curta').value,
+            descricao_longa: document.getElementById('produto-descricao-longa').value,
+            categoria: document.getElementById('produto-categoria').value,
+            contacto_vendedor: document.getElementById('produto-contacto').value,
+            imagem: imagemBase64, banner: bannerBase64,
+            urgent_enabled: document.getElementById('urgent-enabled').value === 'true',
+            urgent_minutes: parseInt(document.getElementById('urgent-minutes').value) || 0,
+            status: 'active', visualizacoes: 0, cliques: 0, vendas: 0
+        }]).select();
+        if (error) { alert('Erro: ' + error.message); return; }
+        alert('✅ Produto criado com sucesso!');
+        closeForm(); resetForm();
+        await carregarProdutos();
+    };
+
+    function resetForm() {
+        document.getElementById('produto-nome').value = '';
+        document.getElementById('produto-preco').value = '';
+        document.getElementById('produto-descricao-curta').value = '';
+        document.getElementById('produto-descricao-longa').value = '';
+        document.getElementById('produto-contacto').value = '';
+        imagemBase64 = null; bannerBase64 = null;
+        document.getElementById('preview-imagem').style.display = 'none';
+        document.getElementById('preview-banner').style.display = 'none';
+    }
+
+    function openForm() { document.getElementById('form-overlay').classList.add('show'); }
+    function closeForm() { document.getElementById('form-overlay').classList.remove('show'); resetForm(); }
+    document.getElementById('showFormBtn').onclick = openForm;
+
+    function carregarProdutosSelect() {
+        const select = document.getElementById('depoimento-produto');
+        select.innerHTML = produtos.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
+    }
+    function carregarProdutosSelectImg() {
+        const select = document.getElementById('depoimento-img-produto');
+        select.innerHTML = produtos.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
+    }
+
+    async function saveDepoimentoTexto() {
+        const produto_id = document.getElementById('depoimento-produto').value;
+        const nome = document.getElementById('depoimento-nome').value;
+        const stars = parseInt(document.getElementById('depoimento-stars').value);
+        const texto = document.getElementById('depoimento-texto').value;
+        if (!nome || !texto) { alert('Preencha nome e texto'); return; }
+        const { error } = await supabase.from('depoimentos_texto').insert([{ produto_id, cliente_nome: nome, stars, depoimento: texto }]);
+        if (error) { alert('Erro: ' + error.message); return; }
+        closeModal('modal-depoimento-texto');
+        await carregarDepoimentos();
+    }
+
+    let depoimentoImagemBase64 = null;
+    document.getElementById('depoimento-imagem-input').onchange = (e) => { const reader = new FileReader(); reader.onload = (ev) => { depoimentoImagemBase64 = ev.target.result; document.getElementById('preview-depoimento-img').src = depoimentoImagemBase64; document.getElementById('preview-depoimento-img').style.display = 'block'; }; reader.readAsDataURL(e.target.files[0]); };
+
+    async function saveDepoimentoImagem() {
+        if (!depoimentoImagemBase64) { alert('Selecione uma imagem'); return; }
+        const produto_id = document.getElementById('depoimento-img-produto').value;
+        const legenda = document.getElementById('depoimento-legenda').value;
+        const { error } = await supabase.from('depoimentos_imagem').insert([{ produto_id, imagem_url: depoimentoImagemBase64, legenda }]);
+        if (error) { alert('Erro: ' + error.message); return; }
+        closeModal('modal-depoimento-imagem'); depoimentoImagemBase64 = null;
+        await carregarDepoimentos();
+    }
+
+    function showModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; depoimentoImagemBase64 = null; }
+
     function showAddDepoimentoModal() { carregarProdutosSelect(); showModal('modal-depoimento-texto'); }
     function showAddImagemModal() { carregarProdutosSelectImg(); showModal('modal-depoimento-imagem'); }
-    function saveDepoimentoTexto() {
-        const produto_id = parseInt(doc('depoimento-produto').value);
-        const nome = doc('depoimento-nome').value, stars = parseInt(doc('depoimento-stars').value), texto = doc('depoimento-texto').value;
-        if (!nome || !texto) { alert('Preencha nome e texto'); return; }
-        depoimentosTexto.push({ id: Date.now(), produto_id, nome, stars, texto, data: new Date().toISOString() });
-        localStorage.setItem('vantix_depoimentos_texto', JSON.stringify(depoimentosTexto));
-        closeModal('modal-depoimento-texto'); renderDepoimentos();
-    }
-    let depoimentoImagemBase64 = null;
-    doc('depoimento-imagem-input').onchange = (e) => { const reader = new FileReader(); reader.onload = (ev) => { depoimentoImagemBase64 = ev.target.result; doc('preview-depoimento-img').src = depoimentoImagemBase64; doc('preview-depoimento-img').style.display = 'block'; }; reader.readAsDataURL(e.target.files[0]); };
-    function saveDepoimentoImagem() {
-        if (!depoimentoImagemBase64) { alert('Selecione uma imagem'); return; }
-        depoimentosImagem.push({ id: Date.now(), produto_id: parseInt(doc('depoimento-img-produto').value), imagem: depoimentoImagemBase64, legenda: doc('depoimento-legenda').value, data: new Date().toISOString() });
-        localStorage.setItem('vantix_depoimentos_imagem', JSON.stringify(depoimentosImagem));
-        closeModal('modal-depoimento-imagem'); renderDepoimentos();
-    }
-    function deletarDepoimentoTexto(id) { depoimentosTexto = depoimentosTexto.filter(d => d.id !== id); localStorage.setItem('vantix_depoimentos_texto', JSON.stringify(depoimentosTexto)); renderDepoimentos(); }
-    function deletarDepoimentoImagem(id) { depoimentosImagem = depoimentosImagem.filter(d => d.id !== id); localStorage.setItem('vantix_depoimentos_imagem', JSON.stringify(depoimentosImagem)); renderDepoimentos(); }
 
-    function renderLeads() {
-        let allLeads = [];
-        produtos.forEach(p => { const leads = JSON.parse(localStorage.getItem(`vantix_leads_${p.id}`)) || []; allLeads.push(...leads.map(l => ({ ...l, produto_nome: p.nome }))); });
-        allLeads.sort((a, b) => b.id - a.id);
-        doc('leads-list').innerHTML = allLeads.length ? allLeads.map(l => `<div class="lead-item"><strong>${l.nome}</strong> - ${l.telefone}<br><small>📧 ${l.email} | 📍 ${l.endereco || 'Sem endereço'}<br>📦 Produto: ${l.produto_nome}<br>📅 ${new Date(l.data).toLocaleString()}</small></div>`).join('') : '<div class="empty-state">Nenhum lead ainda</div>';
+    async function switchTab(tab) {
+        document.getElementById('tab-produtos').style.display = tab === 'produtos' ? 'block' : 'none';
+        document.getElementById('tab-depoimentos').style.display = tab === 'depoimentos' ? 'block' : 'none';
+        document.getElementById('tab-leads').style.display = tab === 'leads' ? 'block' : 'none';
+        document.querySelectorAll('.tab-btn').forEach((btn, i) => btn.classList[i === (tab === 'produtos' ? 0 : tab === 'depoimentos' ? 1 : 2) ? 'add' : 'remove']('active'));
+        if (tab === 'leads') await carregarLeads();
+        if (tab === 'depoimentos') await carregarDepoimentos();
     }
 
-    function showModal(id) { doc(id).style.display = 'flex'; }
-    function closeModal(id) { doc(id).style.display = 'none'; depoimentoImagemBase64 = null; doc('preview-depoimento-img').style.display = 'none'; }
+    function updateClock() {
+        const now = new Date();
+        const time = now.toLocaleTimeString('pt-MZ', { timeZone: 'Africa/Maputo', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const date = now.toLocaleDateString('pt-MZ', { timeZone: 'Africa/Maputo' });
+        document.getElementById('datetime').innerHTML = `<i class="far fa-clock"></i> ${date} | ${time}`;
+    }
+    setInterval(updateClock, 1000); updateClock();
 
-    renderProdutos();
-    renderDepoimentos();
-    updateStats();
-    window.switchTab = switchTab;
-    window.copiarLink = copiarLink;
-    window.deletarProduto = deletarProduto;
-    window.showAddDepoimentoModal = showAddDepoimentoModal;
-    window.showAddImagemModal = showAddImagemModal;
-    window.saveDepoimentoTexto = saveDepoimentoTexto;
-    window.saveDepoimentoImagem = saveDepoimentoImagem;
-    window.deletarDepoimentoTexto = deletarDepoimentoTexto;
-    window.deletarDepoimentoImagem = deletarDepoimentoImagem;
-    window.closeModal = closeModal;
-    window.closeForm = closeForm;
-    window.verEstatisticas = verEstatisticas;
+    let theme = localStorage.getItem('vantix_theme') || 'dark';
+    function setTheme(t) { document.body.classList[t === 'light' ? 'add' : 'remove']('light'); localStorage.setItem('vantix_theme', t); document.getElementById('themeToggle').innerHTML = t === 'dark' ? '<svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>' : '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>'; }
+    setTheme(theme);
+    document.getElementById('themeToggle').onclick = () => setTheme(theme === 'dark' ? 'light' : 'dark');
+
+    async function init() { await verificarSessao(); if (usuarioAtual) { await carregarProdutos(); await carregarDepoimentos(); } }
+    init();
+    window.switchTab = switchTab; window.copiarLink = copiarLink; window.deletarProduto = deletarProduto; window.verEstatisticas = verEstatisticas;
+    window.showAddDepoimentoModal = showAddDepoimentoModal; window.showAddImagemModal = showAddImagemModal;
+    window.saveDepoimentoTexto = saveDepoimentoTexto; window.saveDepoimentoImagem = saveDepoimentoImagem;
+    window.deletarDepoimentoTexto = deletarDepoimentoTexto; window.deletarDepoimentoImagem = deletarDepoimentoImagem;
+    window.closeModal = closeModal; window.closeForm = closeForm;
 </script>
 </body>
-    </html>
+</html>

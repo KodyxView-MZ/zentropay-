@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>ZentroPay — Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #0a0a0c;
+            font-family: 'Inter', sans-serif;
+            color: #fff;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(40px, 40px); }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(18, 18, 24, 0.8);
+            backdrop-filter: blur(16px);
+            border-radius: 60px;
+            padding: 12px 24px;
+            margin-bottom: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .logo-image { width: 32px; height: 32px; object-fit: contain; }
+        .logo-text {
+            font-weight: 700;
+            font-size: 18px;
+            background: linear-gradient(135deg, #fff, #a0a0c0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .admin-badge {
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .datetime {
+            font-size: 13px;
+            background: rgba(255,255,255,0.05);
+            padding: 6px 16px;
+            border-radius: 40px;
+        }
+
+        .btn-logout {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            color: rgba(255,255,255,0.7);
+            transition: all 0.3s;
+        }
+        .btn-logout:hover { background: rgba(239,68,68,0.2); color: #ef4444; }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+        .stat-card {
+            background: rgba(18, 18, 24, 0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 24px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .stat-card:hover { transform: translateY(-4px); background: rgba(18,18,24,0.8); }
+        .stat-icon { font-size: 32px; color: #10b981; margin-bottom: 12px; }
+        .stat-value { font-size: 32px; font-weight: 800; margin-bottom: 4px; }
+        .stat-label { font-size: 12px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 32px;
+            background: rgba(18,18,24,0.6);
+            backdrop-filter: blur(16px);
+            padding: 6px;
+            border-radius: 60px;
+            width: fit-content;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            padding: 10px 28px;
+            border: none;
+            background: transparent;
+            color: rgba(255,255,255,0.5);
+            font-weight: 600;
+            font-size: 13px;
+            border-radius: 40px;
+            cursor: pointer;
+        }
+        .tab-btn.active {
+            background: linear-gradient(90deg, #1a1a24 0%, #0d0d14 100%);
+            color: white;
+            border: 0.5px solid rgba(255,255,255,0.1);
+        }
+
+        /* Tables */
+        .table-container {
+            background: rgba(18, 18, 24, 0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 24px;
+            overflow-x: auto;
+        }
+        .table-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 14px 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        th { color: rgba(255,255,255,0.5); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        td { font-size: 14px; }
+        .status-active { color: #10b981; }
+        .status-inactive { color: #ef4444; }
+        .badge {
+            background: rgba(16,185,129,0.15);
+            color: #10b981;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .btn-icon {
+            background: rgba(255,255,255,0.05);
+            border: none;
+            padding: 6px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 0 2px;
+        }
+        .btn-icon:hover { background: rgba(255,255,255,0.1); }
+        .btn-danger:hover { background: rgba(239,68,68,0.2); color: #ef4444; }
+
+        .empty-state { text-align: center; padding: 60px; color: rgba(255,255,255,0.4); }
+
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            th, td { padding: 10px 8px; font-size: 12px; }
+            .tabs { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <nav class="navbar">
+        <div class="logo-area" onclick="window.location.href='dashboard.html'">
+            <img src="ei_1777492717837-removebg-preview.png" class="logo-image">
+            <span class="logo-text">ZentroPay</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <div class="admin-badge"><i class="fas fa-crown"></i> ADMIN</div>
+            <div class="datetime" id="datetime">Carregando...</div>
+            <button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+        </div>
+    </nav>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-value" id="total-users">0</div><div class="stat-label">Usuários</div></div>
+        <div class="stat-card"><div class="stat-icon"><i class="fas fa-box"></i></div><div class="stat-value" id="total-produtos">0</div><div class="stat-label">Produtos</div></div>
+        <div class="stat-card"><div class="stat-icon"><i class="fas fa-shopping-cart"></i></div><div class="stat-value" id="total-pedidos">0</div><div class="stat-label">Pedidos</div></div>
+        <div class="stat-card"><div class="stat-icon"><i class="fas fa-chart-line"></i></div><div class="stat-value" id="total-receita">0 MZN</div><div class="stat-label">Receita Total</div></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('usuarios')">👥 Usuários</button>
+        <button class="tab-btn" onclick="switchTab('produtos')">📦 Produtos</button>
+        <button class="tab-btn" onclick="switchTab('pedidos')">🛒 Pedidos</button>
+        <button class="tab-btn" onclick="switchTab('depoimentos')">⭐ Depoimentos</button>
+        <button class="tab-btn" onclick="switchTab('leads')">📋 Leads</button>
+    </div>
+
+    <!-- Tab Usuários -->
+    <div id="tab-usuarios" class="table-container">
+        <div class="table-title"><i class="fas fa-users"></i> Todos os Usuários</div>
+        <div id="usuarios-table"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Carregando...</div></div>
+    </div>
+
+    <!-- Tab Produtos -->
+    <div id="tab-produtos" class="table-container" style="display: none;">
+        <div class="table-title"><i class="fas fa-box"></i> Todos os Produtos</div>
+        <div id="produtos-table"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Carregando...</div></div>
+    </div>
+
+    <!-- Tab Pedidos -->
+    <div id="tab-pedidos" class="table-container" style="display: none;">
+        <div class="table-title"><i class="fas fa-shopping-cart"></i> Todos os Pedidos</div>
+        <div id="pedidos-table"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Carregando...</div></div>
+    </div>
+
+    <!-- Tab Depoimentos -->
+    <div id="tab-depoimentos" class="table-container" style="display: none;">
+        <div class="table-title"><i class="fas fa-star"></i> Todos os Depoimentos</div>
+        <div id="depoimentos-table"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Carregando...</div></div>
+    </div>
+
+    <!-- Tab Leads -->
+    <div id="tab-leads" class="table-container" style="display: none;">
+        <div class="table-title"><i class="fas fa-envelope"></i> Todos os Leads</div>
+        <div id="leads-table"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Carregando...</div></div>
+    </div>
+</div>
+
+<script>
+    const SUPABASE_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let usuarioAtual = null;
+
+    async function verificarAdmin() {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        const sessaoLocal = JSON.parse(localStorage.getItem('zentropay_session'));
+        
+        if (!sessaoLocal?.isAdmin && (!session || !session.user)) {
+            window.location.href = 'acesso.html';
+            return false;
+        }
+        usuarioAtual = session?.user || sessaoLocal;
+        return true;
+    }
+
+    async function carregarStats() {
+        const { data: usuarios } = await supabase.from('usuarios').select('*', { count: 'exact' });
+        const { data: produtos } = await supabase.from('produtos').select('*', { count: 'exact' });
+        const { data: pedidos } = await supabase.from('pedidos').select('*');
+        
+        document.getElementById('total-users').innerText = usuarios?.length || 0;
+        document.getElementById('total-produtos').innerText = produtos?.length || 0;
+        document.getElementById('total-pedidos').innerText = pedidos?.length || 0;
+        
+        const receitaTotal = pedidos?.filter(p => p.status === 'pago').reduce((sum, p) => sum + (p.valor || 0), 0) || 0;
+        document.getElementById('total-receita').innerText = receitaTotal.toLocaleString('pt-MZ') + ' MZN';
+    }
+
+    async function carregarUsuarios() {
+        const { data, error } = await supabase.from('usuarios').select('*').order('criado_em', { ascending: false });
+        if (error) { document.getElementById('usuarios-table').innerHTML = '<div class="empty-state">Erro ao carregar</div>'; return; }
+        if (!data || data.length === 0) { document.getElementById('usuarios-table').innerHTML = '<div class="empty-state">Nenhum usuário cadastrado</div>'; return; }
+        
+        document.getElementById('usuarios-table').innerHTML = `
+            <table>
+                <thead><tr><th>Nome</th><th>Email</th><th>Telefone</th><th>Tipo</th><th>Data Cadastro</th><th>Ações</th></tr></thead>
+                <tbody>
+                    ${data.map(u => `
+                        <tr>
+                            <td>${u.nome || '-'}</td>
+                            <td>${u.email}</td>
+                            <td>${u.telefone || '-'}</td>
+                            <td><span class="badge">${u.tipo || 'vendedor'}</span></td>
+                            <td>${new Date(u.criado_em).toLocaleDateString('pt-MZ')}</td>
+                            <td><button class="btn-icon btn-danger" onclick="deletarUsuario('${u.id}')"><i class="fas fa-trash"></i></button></td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+    }
+
+    async function carregarProdutos() {
+        const { data, error } = await supabase.from('produtos').select('*, usuarios(nome)').order('criado_em', { ascending: false });
+        if (error) { document.getElementById('produtos-table').innerHTML = '<div class="empty-state">Erro ao carregar</div>'; return; }
+        if (!data || data.length === 0) { document.getElementById('produtos-table').innerHTML = '<div class="empty-state">Nenhum produto cadastrado</div>'; return; }
+        
+        document.getElementById('produtos-table').innerHTML = `
+            <table>
+                <thead><tr><th>Produto</th><th>Vendedor</th><th>Preço</th><th>Status</th><th>Visualizações</th><th>Vendas</th><th>Ações</th></tr></thead>
+                <tbody>
+                    ${data.map(p => `
+                        <tr>
+                            <td>${p.nome}</td>
+                            <td>${p.usuarios?.nome || p.vendedor_id?.slice(0,8) || '-'}</td>
+                            <td>${p.preco.toLocaleString('pt-MZ')} MZN</td>
+                            <td><span class="badge ${p.status === 'active' ? 'status-active' : 'status-inactive'}">${p.status || 'active'}</span></td>
+                            <td>${p.visualizacoes || 0}</td>
+                            <td>${p.vendas || 0}</td>
+                            <td><button class="btn-icon" onclick="toggleProdutoStatus('${p.id}', '${p.status}')"><i class="fas fa-toggle-${p.status === 'active' ? 'off' : 'on'}"></i></button><button class="btn-icon btn-danger" onclick="deletarProduto('${p.id}')"><i class="fas fa-trash"></i></button></td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+    }
+
+    async function carregarPedidos() {
+        const { data, error } = await supabase.from('pedidos').select('*, produtos(nome)').order('criado_em', { ascending: false });
+        if (error) { document.getElementById('pedidos-table').innerHTML = '<div class="empty-state">Erro ao carregar</div>'; return; }
+        if (!data || data.length === 0) { document.getElementById('pedidos-table').innerHTML = '<div class="empty-state">Nenhum pedido realizado</div>'; return; }
+        
+        document.getElementById('pedidos-table').innerHTML = `
+            <table>
+                <thead><tr><th>Produto</th><th>Cliente</th><th>Valor</th><th>Status</th><th>Método</th><th>Data</th><th>Ações</th></tr></thead>
+                <tbody>
+                    ${data.map(p => `
+                        <tr>
+                            <td>${p.produtos?.nome || p.produto_nome || '-'}</td>
+                            <td>${p.cliente_nome}</td>
+                            <td>${p.valor.toLocaleString('pt-MZ')} MZN</td>
+                            <td><span class="badge ${p.status === 'pago' ? 'status-active' : 'status-inactive'}">${p.status || 'pendente'}</span></td>
+                            <td>${p.metodo_pagamento || '-'}</td>
+                            <td>${new Date(p.criado_em).toLocaleDateString('pt-MZ')}</td>
+                            <td><button class="btn-icon" onclick="atualizarStatusPedido('${p.id}', '${p.status}')"><i class="fas fa-edit"></i></button></td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+    }
+
+    async function carregarDepoimentos() {
+        const { data, error } = await supabase.from('depoimentos_texto').select('*, produtos(nome)').order('criado_em', { ascending: false });
+        if (error) { document.getElementById('depoimentos-table').innerHTML = '<div class="empty-state">Erro ao carregar</div>'; return; }
+        if (!data || data.length === 0) { document.getElementById('depoimentos-table').innerHTML = '<div class="empty-state">Nenhum depoimento</div>'; return; }
+        
+        document.getElementById('depoimentos-table').innerHTML = `
+            <table>
+                <thead><tr><th>Produto</th><th>Cliente</th><th>Depoimento</th><th>Estrelas</th><th>Data</th><th>Ações</th></tr></thead>
+                <tbody>
+                    ${data.map(d => `
+                        <tr>
+                            <td>${d.produtos?.nome || '-'}</td>
+                            <td>${d.cliente_nome}</td>
+                            <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${d.depoimento?.substring(0, 50)}...</td>
+                            <td>${'⭐'.repeat(d.stars)}</td>
+                            <td>${new Date(d.criado_em).toLocaleDateString('pt-MZ')}</td>
+                            <td><button class="btn-icon btn-danger" onclick="deletarDepoimento('${d.id}')"><i class="fas fa-trash"></i></button></td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+    }
+
+    async function carregarLeads() {
+        const { data, error } = await supabase.from('leads').select('*, produtos(nome)').order('criado_em', { ascending: false });
+        if (error) { document.getElementById('leads-table').innerHTML = '<div class="empty-state">Erro ao carregar</div>'; return; }
+        if (!data || data.length === 0) { document.getElementById('leads-table').innerHTML = '<div class="empty-state">Nenhum lead</div>'; return; }
+        
+        document.getElementById('leads-table').innerHTML = `
+            <table>
+                <thead><tr><th>Produto</th><th>Cliente</th><th>Telefone</th><th>Email</th><th>Mensagem</th><th>Data</th></tr></thead>
+                <tbody>
+                    ${data.map(l => `
+                        <tr>
+                            <td>${l.produtos?.nome || '-'}</td>
+                            <td>${l.cliente_nome}</td>
+                            <td>${l.cliente_telefone}</td>
+                            <td>${l.cliente_email}</td>
+                            <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis;">${l.mensagem?.substring(0, 30) || '-'}</td>
+                            <td>${new Date(l.criado_em).toLocaleDateString('pt-MZ')}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+    }
+
+    async function deletarUsuario(id) {
+        if (!confirm('Excluir este usuário? Todas as vendas serão perdidas.')) return;
+        await supabase.from('usuarios').delete().eq('id', id);
+        await carregarUsuarios();
+        await carregarStats();
+    }
+
+    async function deletarProduto(id) {
+        if (!confirm('Excluir este produto?')) return;
+        await supabase.from('produtos').delete().eq('id', id);
+        await carregarProdutos();
+        await carregarStats();
+    }
+
+    async function toggleProdutoStatus(id, statusAtual) {
+        const novoStatus = statusAtual === 'active' ? 'inactive' : 'active';
+        await supabase.from('produtos').update({ status: novoStatus }).eq('id', id);
+        await carregarProdutos();
+    }
+
+    async function deletarDepoimento(id) {
+        if (!confirm('Excluir depoimento?')) return;
+        await supabase.from('depoimentos_texto').delete().eq('id', id);
+        await carregarDepoimentos();
+    }
+
+    function switchTab(tab) {
+        ['usuarios', 'produtos', 'pedidos', 'depoimentos', 'leads'].forEach(t => {
+            const el = document.getElementById(`tab-${t}`);
+            if (el) el.style.display = 'none';
+        });
+        document.getElementById(`tab-${tab}`).style.display = 'block';
+        document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+            const tabs = ['usuarios', 'produtos', 'pedidos', 'depoimentos', 'leads'];
+            btn.classList[i === tabs.indexOf(tab) ? 'add' : 'remove']('active');
+        });
+        
+        if (tab === 'usuarios') carregarUsuarios();
+        if (tab === 'produtos') carregarProdutos();
+        if (tab === 'pedidos') carregarPedidos();
+        if (tab === 'depoimentos') carregarDepoimentos();
+        if (tab === 'leads') carregarLeads();
+    }
+
+    function updateClock() {
+        const now = new Date();
+        const time = now.toLocaleTimeString('pt-MZ', { timeZone: 'Africa/Maputo', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const date = now.toLocaleDateString('pt-MZ', { timeZone: 'Africa/Maputo' });
+        document.getElementById('datetime').innerHTML = `<i class="far fa-clock"></i> ${date} | ${time}`;
+    }
+
+    function logout() {
+        localStorage.removeItem('zentropay_session');
+        supabase.auth.signOut();
+        window.location.href = 'acesso.html';
+    }
+
+    async function init() {
+        const isAdmin = await verificarAdmin();
+        if (!isAdmin) return;
+        await carregarStats();
+        await carregarUsuarios();
+        setInterval(updateClock, 1000);
+        updateClock();
+    }
+
+    window.switchTab = switchTab;
+    window.deletarUsuario = deletarUsuario;
+    window.deletarProduto = deletarProduto;
+    window.toggleProdutoStatus = toggleProdutoStatus;
+    window.deletarDepoimento = deletarDepoimento;
+    window.logout = logout;
+    window.atualizarStatusPedido = async (id, statusAtual) => {
+        const novoStatus = statusAtual === 'pago' ? 'pendente' : 'pago';
+        await supabase.from('pedidos').update({ status: novoStatus }).eq('id', id);
+        await carregarPedidos();
+        await carregarStats();
+    };
+
+    init();
+</script>
+</body>
+</html>
