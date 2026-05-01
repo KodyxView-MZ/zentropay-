@@ -456,237 +456,308 @@
     </div>
 </div>
 
+<!-- Modais para Depoimentos -->
+<div id="modal-depoimento-texto" style="display: none; position: fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.9); z-index:1001; align-items:center; justify-content:center;">
+    <div style="background:#1a1a24; border-radius:28px; padding:32px; max-width:500px; width:90%;">
+        <h3>Adicionar Depoimento</h3>
+        <select id="depoimento-produto" style="width:100%; padding:12px; margin:16px 0; background:#2a2a38; border:none; border-radius:12px; color:white;"></select>
+        <input type="text" id="depoimento-nome" placeholder="Nome do cliente" style="width:100%; padding:12px; margin-bottom:16px; background:#2a2a38; border:none; border-radius:12px; color:white;">
+        <select id="depoimento-stars" style="width:100%; padding:12px; margin-bottom:16px; background:#2a2a38; border:none; border-radius:12px; color:white;"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select>
+        <textarea id="depoimento-texto" rows="3" placeholder="Depoimento..." style="width:100%; padding:12px; margin-bottom:16px; background:#2a2a38; border:none; border-radius:12px; color:white;"></textarea>
+        <button onclick="saveDepoimentoTexto()" style="background:#10b981; border:none; padding:12px; border-radius:40px; color:white; width:100%;">Salvar</button>
+        <button onclick="closeModal('modal-depoimento-texto')" style="margin-top:12px; background:transparent; border:none; color:white; width:100%;">Cancelar</button>
+    </div>
+</div>
+
+<div id="modal-depoimento-imagem" style="display: none; position: fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.9); z-index:1001; align-items:center; justify-content:center;">
+    <div style="background:#1a1a24; border-radius:28px; padding:32px; max-width:500px; width:90%;">
+        <h3>Adicionar Imagem</h3>
+        <select id="depoimento-img-produto" style="width:100%; padding:12px; margin:16px 0; background:#2a2a38; border:none; border-radius:12px; color:white;"></select>
+        <div class="upload-area" onclick="document.getElementById('depoimento-imagem-input').click()" style="margin-bottom:16px;">
+            <i class="fas fa-image"></i><p>Selecionar imagem</p>
+        </div>
+        <input type="file" id="depoimento-imagem-input" accept="image/*" style="display:none;">
+        <img id="preview-depoimento-img" style="width:100%; border-radius:12px; margin-bottom:16px; display:none;">
+        <input type="text" id="depoimento-legenda" placeholder="Legenda" style="width:100%; padding:12px; margin-bottom:16px; background:#2a2a38; border:none; border-radius:12px; color:white;">
+        <button onclick="saveDepoimentoImagem()" style="background:#10b981; border:none; padding:12px; border-radius:40px; color:white; width:100%;">Salvar</button>
+        <button onclick="closeModal('modal-depoimento-imagem')" style="margin-top:12px; background:transparent; border:none; color:white; width:100%;">Cancelar</button>
+    </div>
+</div>
+
 <script>
-    const SUPABASE_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    (function() {
+        // ================= CONFIGURAÇÃO SUPABASE =================
+        const SUPABASE_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
 
-    let usuarioAtual = null;
-    let produtos = [];
-    let depoimentosTexto = [];
-    let depoimentosImagem = [];
-    let imagemBase64 = null, bannerBase64 = null;
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    async function verificarSessao() {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        if (error || !session) {
-            window.location.href = 'acesso.html';
-            return null;
+        let usuarioAtual = null;
+        let produtos = [];
+        let depoimentosTexto = [];
+        let depoimentosImagem = [];
+        let imagemBase64 = null, bannerBase64 = null;
+
+        // Tema
+        let theme = localStorage.getItem('zentropay_theme') || 'dark';
+        function setTheme(t) {
+            document.body.classList[t === 'light' ? 'add' : 'remove']('light');
+            localStorage.setItem('zentropay_theme', t);
+            document.getElementById('themeToggle').innerHTML = t === 'dark' ? '<svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>' : '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
         }
-        usuarioAtual = session.user;
-        document.getElementById('user-name').innerText = usuarioAtual.user_metadata?.nome?.split(' ')[0] || 'Vendedor';
-        return usuarioAtual;
-    }
+        setTheme(theme);
+        document.getElementById('themeToggle').onclick = () => setTheme(theme === 'dark' ? 'light' : 'dark');
 
-    async function carregarProdutos() {
-        if (!usuarioAtual) return;
-        const { data, error } = await supabase.from('produtos').select('*').eq('vendedor_id', usuarioAtual.id).order('criado_em', { ascending: false });
-        if (error) { console.error(error); return; }
-        produtos = data || [];
-        renderProdutos();
-        atualizarStats();
-    }
-
-    async function carregarDepoimentos() {
-        if (!usuarioAtual || produtos.length === 0) return;
-        const produtoIds = produtos.map(p => p.id);
-        const { data: texto, error: err1 } = await supabase.from('depoimentos_texto').select('*').in('produto_id', produtoIds);
-        const { data: imagem, error: err2 } = await supabase.from('depoimentos_imagem').select('*').in('produto_id', produtoIds);
-        if (!err1) depoimentosTexto = texto || [];
-        if (!err2) depoimentosImagem = imagem || [];
-        renderDepoimentos();
-    }
-
-    async function carregarLeads() {
-        if (!usuarioAtual || produtos.length === 0) { document.getElementById('leads-list').innerHTML = '<div class="empty-state">Nenhum lead ainda</div>'; return; }
-        const produtoIds = produtos.map(p => p.id);
-        let allLeads = [];
-        for (const id of produtoIds) {
-            const { data } = await supabase.from('leads').select('*').eq('produto_id', id);
-            if (data) allLeads.push(...data.map(l => ({ ...l, produto_nome: produtos.find(p => p.id === l.produto_id)?.nome || 'Produto' })));
+        // Relógio
+        function updateClock() {
+            const now = new Date();
+            const time = now.toLocaleTimeString('pt-MZ', { timeZone: 'Africa/Maputo', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const date = now.toLocaleDateString('pt-MZ', { timeZone: 'Africa/Maputo' });
+            document.getElementById('datetime').innerHTML = `<i class="far fa-clock"></i> ${date} | ${time}`;
         }
-        allLeads.sort((a, b) => new Date(b.criado_em) - new Date(a.criado_em));
-        const container = document.getElementById('leads-list');
-        if (allLeads.length === 0) { container.innerHTML = '<div class="empty-state">Nenhum lead ainda</div>'; return; }
-        container.innerHTML = allLeads.map(l => `<div class="lead-item"><strong>${l.cliente_nome}</strong> - ${l.cliente_telefone}<br><small>📧 ${l.cliente_email} | 📍 ${l.cliente_endereco || 'Sem endereço'}<br>📦 Produto: ${l.produto_nome}<br>📅 ${new Date(l.criado_em).toLocaleString()}</small></div>`).join('');
-    }
+        setInterval(updateClock, 1000);
+        updateClock();
 
-    async function atualizarStats() {
-        document.getElementById('prod-count').innerText = produtos.length;
-        let totalVendas = produtos.reduce((sum, p) => sum + (p.vendas || 0), 0);
-        document.getElementById('sales-count').innerText = totalVendas;
-        let totalLeads = 0;
-        for (const p of produtos) {
-            const { count } = await supabase.from('leads').select('*', { count: 'exact', head: true }).eq('produto_id', p.id);
-            totalLeads += count || 0;
+        async function verificarSessao() {
+            const { data: { session }, error } = await supabase.auth.getSession();
+            if (error || !session) {
+                window.location.href = 'acesso.html';
+                return null;
+            }
+            usuarioAtual = session.user;
+            const nome = usuarioAtual.user_metadata?.nome || usuarioAtual.email?.split('@')[0] || 'Vendedor';
+            document.getElementById('user-name').innerText = nome.split(' ')[0];
+            return usuarioAtual;
         }
-        document.getElementById('lead-count').innerText = totalLeads;
-    }
 
-    function renderProdutos() {
-        const container = document.getElementById('produtos-list');
-        if (produtos.length === 0) { container.innerHTML = '<div class="empty-state"><i class="fas fa-store"></i><p>Nenhum produto criado</p></div>'; return; }
-        container.innerHTML = produtos.map(p => `
-            <div class="produto-card">
-                <img src="${p.imagem}" class="produto-imagem" onerror="this.src='https://placehold.co/80x80?text=Sem+Imagem'">
-                <div class="produto-info">
-                    <div class="produto-nome">${p.nome}</div>
-                    <div class="produto-preco">${Number(p.preco).toLocaleString()} MZN</div>
-                    <div class="produto-serial"><i class="fas fa-barcode"></i> ${p.serial}</div>
-                    ${p.urgent_enabled ? '<span style="background:#dc2626; padding:2px 8px; border-radius:40px; font-size:10px;">⏰ Urgência Ativada</span>' : ''}
+        async function carregarProdutos() {
+            if (!usuarioAtual) return;
+            const { data, error } = await supabase.from('produtos').select('*').eq('vendedor_id', usuarioAtual.id).order('criado_em', { ascending: false });
+            if (error) { console.error(error); return; }
+            produtos = data || [];
+            renderProdutos();
+            atualizarStats();
+        }
+
+        async function carregarDepoimentos() {
+            if (!usuarioAtual || produtos.length === 0) return;
+            const produtoIds = produtos.map(p => p.id);
+            const { data: texto } = await supabase.from('depoimentos_texto').select('*').in('produto_id', produtoIds);
+            const { data: imagem } = await supabase.from('depoimentos_imagem').select('*').in('produto_id', produtoIds);
+            depoimentosTexto = texto || [];
+            depoimentosImagem = imagem || [];
+            renderDepoimentos();
+        }
+
+        async function carregarLeads() {
+            if (!usuarioAtual || produtos.length === 0) { 
+                document.getElementById('leads-list').innerHTML = '<div class="empty-state">Nenhum lead ainda</div>'; 
+                return; 
+            }
+            const produtoIds = produtos.map(p => p.id);
+            let allLeads = [];
+            for (const id of produtoIds) {
+                const { data } = await supabase.from('leads').select('*').eq('produto_id', id);
+                if (data) allLeads.push(...data.map(l => ({ ...l, produto_nome: produtos.find(p => p.id === l.produto_id)?.nome || 'Produto' })));
+            }
+            allLeads.sort((a, b) => new Date(b.criado_em) - new Date(a.criado_em));
+            const container = document.getElementById('leads-list');
+            if (allLeads.length === 0) { container.innerHTML = '<div class="empty-state">Nenhum lead ainda</div>'; return; }
+            container.innerHTML = allLeads.map(l => `<div class="lead-item"><strong>${l.cliente_nome}</strong> - ${l.cliente_telefone}<br><small>📧 ${l.cliente_email} | 📍 ${l.cliente_endereco || 'Sem endereço'}<br>📦 Produto: ${l.produto_nome}<br>📅 ${new Date(l.criado_em).toLocaleString()}</small></div>`).join('');
+        }
+
+        async function atualizarStats() {
+            document.getElementById('prod-count').innerText = produtos.length;
+            let totalVendas = produtos.reduce((sum, p) => sum + (p.vendas || 0), 0);
+            document.getElementById('sales-count').innerText = totalVendas;
+            let totalLeads = 0;
+            for (const p of produtos) {
+                const { count } = await supabase.from('leads').select('*', { count: 'exact', head: true }).eq('produto_id', p.id);
+                totalLeads += count || 0;
+            }
+            document.getElementById('lead-count').innerText = totalLeads;
+        }
+
+        function renderProdutos() {
+            const container = document.getElementById('produtos-list');
+            if (produtos.length === 0) { container.innerHTML = '<div class="empty-state"><i class="fas fa-store"></i><p>Nenhum produto criado</p></div>'; return; }
+            container.innerHTML = produtos.map(p => `
+                <div class="produto-card">
+                    <img src="${p.imagem}" class="produto-imagem" onerror="this.src='https://placehold.co/80x80?text=Sem+Imagem'">
+                    <div class="produto-info">
+                        <div class="produto-nome">${p.nome}</div>
+                        <div class="produto-preco">${Number(p.preco).toLocaleString()} MZN</div>
+                        <div class="produto-serial"><i class="fas fa-barcode"></i> ${p.serial}</div>
+                        ${p.urgent_enabled ? '<span style="background:#dc2626; padding:2px 8px; border-radius:40px; font-size:10px;">⏰ Urgência Ativada</span>' : ''}
+                    </div>
+                    <div class="produto-actions">
+                        <button class="btn-icon" onclick="copiarLink('customershow.html?id=${p.id}')" title="Copiar link"><i class="fas fa-copy"></i></button>
+                        <button class="btn-icon" onclick="verEstatisticas('${p.id}')" title="Estatísticas"><i class="fas fa-chart-line"></i></button>
+                        <button class="btn-icon delete" onclick="deletarProduto('${p.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
+                    </div>
                 </div>
-                <div class="produto-actions">
-                    <button class="btn-icon" onclick="copiarLink('customershow.html?id=${p.id}')" title="Copiar link"><i class="fas fa-copy"></i></button>
-                    <button class="btn-icon" onclick="verEstatisticas('${p.id}')" title="Estatísticas"><i class="fas fa-chart-line"></i></button>
-                    <button class="btn-icon delete" onclick="deletarProduto('${p.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
-                </div>
-            </div>
-        `).join('');
-    }
+            `).join('');
+        }
 
-    async function verEstatisticas(id) {
-        const p = produtos.find(p => p.id === id);
-        const { count } = await supabase.from('leads').select('*', { count: 'exact', head: true }).eq('produto_id', id);
-        alert(`📊 Estatísticas de "${p.nome}"\n\n👁️ Visualizações: ${p.visualizacoes || 0}\n🖱️ Cliques: ${p.cliques || 0}\n💰 Vendas: ${p.vendas || 0}\n📋 Leads: ${count || 0}`);
-    }
+        async function verEstatisticas(id) {
+            const p = produtos.find(p => p.id === id);
+            const { count } = await supabase.from('leads').select('*', { count: 'exact', head: true }).eq('produto_id', id);
+            alert(`📊 Estatísticas de "${p.nome}"\n\n👁️ Visualizações: ${p.visualizacoes || 0}\n🖱️ Cliques: ${p.cliques || 0}\n💰 Vendas: ${p.vendas || 0}\n📋 Leads: ${count || 0}`);
+        }
 
-    async function deletarProduto(id) {
-        if (!confirm('Deletar produto?')) return;
-        const { error } = await supabase.from('produtos').delete().eq('id', id);
-        if (error) { alert('Erro ao deletar'); return; }
-        await carregarProdutos();
-        await carregarDepoimentos();
-    }
+        async function deletarProduto(id) {
+            if (!confirm('Deletar produto?')) return;
+            const { error } = await supabase.from('produtos').delete().eq('id', id);
+            if (error) { alert('Erro ao deletar'); return; }
+            await carregarProdutos();
+            await carregarDepoimentos();
+        }
 
-    function copiarLink(link) { navigator.clipboard.writeText(window.location.origin + '/' + link); alert('✅ Link copiado!'); }
+        function copiarLink(link) { navigator.clipboard.writeText(window.location.origin + '/' + link); alert('✅ Link copiado!'); }
 
-    function renderDepoimentos() {
-        const textoDiv = document.getElementById('depoimentos-texto-list');
-        const imagemDiv = document.getElementById('depoimentos-imagem-list');
-        textoDiv.innerHTML = depoimentosTexto.length ? depoimentosTexto.map(d => `<div class="depoimento-card"><div><strong>${d.cliente_nome}</strong> ${'⭐'.repeat(d.stars)}<br>${d.depoimento}<br><small>${new Date(d.criado_em).toLocaleDateString()}</small></div><button class="btn-icon delete" onclick="deletarDepoimentoTexto('${d.id}')"><i class="fas fa-trash"></i></button></div>`).join('') : '<div class="empty-state">Sem depoimentos</div>';
-        imagemDiv.innerHTML = depoimentosImagem.length ? depoimentosImagem.map(d => `<div class="depoimento-card"><img src="${d.imagem_url}" class="depoimento-img-preview" onclick="window.open('${d.imagem_url}')"><div>${d.legenda || ''}</div><button class="btn-icon delete" onclick="deletarDepoimentoImagem('${d.id}')"><i class="fas fa-trash"></i></button></div>`).join('') : '<div class="empty-state">Sem imagens</div>';
-    }
+        function renderDepoimentos() {
+            const textoDiv = document.getElementById('depoimentos-texto-list');
+            const imagemDiv = document.getElementById('depoimentos-imagem-list');
+            textoDiv.innerHTML = depoimentosTexto.length ? depoimentosTexto.map(d => `<div class="depoimento-card"><div><strong>${d.cliente_nome}</strong> ${'⭐'.repeat(d.stars)}<br>${d.depoimento}<br><small>${new Date(d.criado_em).toLocaleDateString()}</small></div><button class="btn-icon delete" onclick="deletarDepoimentoTexto('${d.id}')"><i class="fas fa-trash"></i></button></div>`).join('') : '<div class="empty-state">Sem depoimentos</div>';
+            imagemDiv.innerHTML = depoimentosImagem.length ? depoimentosImagem.map(d => `<div class="depoimento-card"><img src="${d.imagem_url}" class="depoimento-img-preview" onclick="window.open('${d.imagem_url}')"><div>${d.legenda || ''}</div><button class="btn-icon delete" onclick="deletarDepoimentoImagem('${d.id}')"><i class="fas fa-trash"></i></button></div>`).join('') : '<div class="empty-state">Sem imagens</div>';
+        }
 
-    async function deletarDepoimentoTexto(id) {
-        await supabase.from('depoimentos_texto').delete().eq('id', id);
-        await carregarDepoimentos();
-    }
-    async function deletarDepoimentoImagem(id) {
-        await supabase.from('depoimentos_imagem').delete().eq('id', id);
-        await carregarDepoimentos();
-    }
+        async function deletarDepoimentoTexto(id) {
+            await supabase.from('depoimentos_texto').delete().eq('id', id);
+            await carregarDepoimentos();
+        }
+        async function deletarDepoimentoImagem(id) {
+            await supabase.from('depoimentos_imagem').delete().eq('id', id);
+            await carregarDepoimentos();
+        }
 
-    document.getElementById('imagem-input').onchange = (e) => { const reader = new FileReader(); reader.onload = (ev) => { imagemBase64 = ev.target.result; document.getElementById('preview-imagem').src = imagemBase64; document.getElementById('preview-imagem').style.display = 'block'; }; reader.readAsDataURL(e.target.files[0]); };
-    document.getElementById('banner-input').onchange = (e) => { const reader = new FileReader(); reader.onload = (ev) => { bannerBase64 = ev.target.result; document.getElementById('preview-banner').src = bannerBase64; document.getElementById('preview-banner').style.display = 'block'; }; reader.readAsDataURL(e.target.files[0]); };
+        // Upload de imagens
+        document.getElementById('imagem-input').onchange = (e) => { 
+            const reader = new FileReader(); 
+            reader.onload = (ev) => { imagemBase64 = ev.target.result; document.getElementById('preview-imagem').src = imagemBase64; document.getElementById('preview-imagem').style.display = 'block'; }; 
+            reader.readAsDataURL(e.target.files[0]); 
+        };
+        document.getElementById('banner-input').onchange = (e) => { 
+            const reader = new FileReader(); 
+            reader.onload = (ev) => { bannerBase64 = ev.target.result; document.getElementById('preview-banner').src = bannerBase64; document.getElementById('preview-banner').style.display = 'block'; }; 
+            reader.readAsDataURL(e.target.files[0]); 
+        };
 
-    document.getElementById('product-form').onsubmit = async (e) => {
-        e.preventDefault();
-        if (!usuarioAtual) { alert('Faça login primeiro'); return; }
-        const nome = document.getElementById('produto-nome').value.trim();
-        const preco = parseFloat(document.getElementById('produto-preco').value);
-        if (!nome || !preco || !imagemBase64) { alert('Preencha nome, preço e imagem'); return; }
-        const serial = 'ZEN' + Date.now().toString().slice(-8) + Math.floor(Math.random() * 1000);
-        const { data, error } = await supabase.from('produtos').insert([{
-            vendedor_id: usuarioAtual.id, serial, nome, preco,
-            descricao_curta: document.getElementById('produto-descricao-curta').value,
-            descricao_longa: document.getElementById('produto-descricao-longa').value,
-            categoria: document.getElementById('produto-categoria').value,
-            contacto_vendedor: document.getElementById('produto-contacto').value,
-            imagem: imagemBase64, banner: bannerBase64,
-            urgent_enabled: document.getElementById('urgent-enabled').value === 'true',
-            urgent_minutes: parseInt(document.getElementById('urgent-minutes').value) || 0,
-            status: 'active', visualizacoes: 0, cliques: 0, vendas: 0
-        }]).select();
-        if (error) { alert('Erro: ' + error.message); return; }
-        alert('✅ Produto criado com sucesso!');
-        closeForm(); resetForm();
-        await carregarProdutos();
-    };
+        document.getElementById('product-form').onsubmit = async (e) => {
+            e.preventDefault();
+            if (!usuarioAtual) { alert('Faça login primeiro'); return; }
+            const nome = document.getElementById('produto-nome').value.trim();
+            const preco = parseFloat(document.getElementById('produto-preco').value);
+            if (!nome || !preco || !imagemBase64) { alert('Preencha nome, preço e imagem'); return; }
+            const serial = 'ZEN' + Date.now().toString().slice(-8) + Math.floor(Math.random() * 1000);
+            const { error } = await supabase.from('produtos').insert([{
+                vendedor_id: usuarioAtual.id, serial, nome, preco,
+                descricao_curta: document.getElementById('produto-descricao-curta').value,
+                descricao_longa: document.getElementById('produto-descricao-longa').value,
+                categoria: document.getElementById('produto-categoria').value,
+                contacto_vendedor: document.getElementById('produto-contacto').value,
+                imagem: imagemBase64, banner: bannerBase64,
+                urgent_enabled: document.getElementById('urgent-enabled').value === 'true',
+                urgent_minutes: parseInt(document.getElementById('urgent-minutes').value) || 0,
+                status: 'active', visualizacoes: 0, cliques: 0, vendas: 0
+            }]);
+            if (error) { alert('Erro: ' + error.message); return; }
+            alert('✅ Produto criado com sucesso!');
+            closeForm(); resetForm();
+            await carregarProdutos();
+        };
 
-    function resetForm() {
-        document.getElementById('produto-nome').value = '';
-        document.getElementById('produto-preco').value = '';
-        document.getElementById('produto-descricao-curta').value = '';
-        document.getElementById('produto-descricao-longa').value = '';
-        document.getElementById('produto-contacto').value = '';
-        imagemBase64 = null; bannerBase64 = null;
-        document.getElementById('preview-imagem').style.display = 'none';
-        document.getElementById('preview-banner').style.display = 'none';
-    }
+        function resetForm() {
+            document.getElementById('produto-nome').value = '';
+            document.getElementById('produto-preco').value = '';
+            document.getElementById('produto-descricao-curta').value = '';
+            document.getElementById('produto-descricao-longa').value = '';
+            document.getElementById('produto-contacto').value = '';
+            imagemBase64 = null; bannerBase64 = null;
+            document.getElementById('preview-imagem').style.display = 'none';
+            document.getElementById('preview-banner').style.display = 'none';
+        }
 
-    function openForm() { document.getElementById('form-overlay').classList.add('show'); }
-    function closeForm() { document.getElementById('form-overlay').classList.remove('show'); resetForm(); }
-    document.getElementById('showFormBtn').onclick = openForm;
+        function openForm() { document.getElementById('form-overlay').classList.add('show'); }
+        function closeForm() { document.getElementById('form-overlay').classList.remove('show'); resetForm(); }
+        document.getElementById('showFormBtn').onclick = openForm;
 
-    function carregarProdutosSelect() {
-        const select = document.getElementById('depoimento-produto');
-        select.innerHTML = produtos.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
-    }
-    function carregarProdutosSelectImg() {
-        const select = document.getElementById('depoimento-img-produto');
-        select.innerHTML = produtos.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
-    }
+        function carregarProdutosSelect() {
+            const select = document.getElementById('depoimento-produto');
+            select.innerHTML = produtos.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
+        }
+        function carregarProdutosSelectImg() {
+            const select = document.getElementById('depoimento-img-produto');
+            select.innerHTML = produtos.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
+        }
 
-    async function saveDepoimentoTexto() {
-        const produto_id = document.getElementById('depoimento-produto').value;
-        const nome = document.getElementById('depoimento-nome').value;
-        const stars = parseInt(document.getElementById('depoimento-stars').value);
-        const texto = document.getElementById('depoimento-texto').value;
-        if (!nome || !texto) { alert('Preencha nome e texto'); return; }
-        const { error } = await supabase.from('depoimentos_texto').insert([{ produto_id, cliente_nome: nome, stars, depoimento: texto }]);
-        if (error) { alert('Erro: ' + error.message); return; }
-        closeModal('modal-depoimento-texto');
-        await carregarDepoimentos();
-    }
+        async function saveDepoimentoTexto() {
+            const produto_id = document.getElementById('depoimento-produto').value;
+            const nome = document.getElementById('depoimento-nome').value;
+            const stars = parseInt(document.getElementById('depoimento-stars').value);
+            const texto = document.getElementById('depoimento-texto').value;
+            if (!nome || !texto) { alert('Preencha nome e texto'); return; }
+            const { error } = await supabase.from('depoimentos_texto').insert([{ produto_id, cliente_nome: nome, stars, depoimento: texto }]);
+            if (error) { alert('Erro: ' + error.message); return; }
+            closeModal('modal-depoimento-texto');
+            await carregarDepoimentos();
+        }
 
-    let depoimentoImagemBase64 = null;
-    document.getElementById('depoimento-imagem-input').onchange = (e) => { const reader = new FileReader(); reader.onload = (ev) => { depoimentoImagemBase64 = ev.target.result; document.getElementById('preview-depoimento-img').src = depoimentoImagemBase64; document.getElementById('preview-depoimento-img').style.display = 'block'; }; reader.readAsDataURL(e.target.files[0]); };
+        let depoimentoImagemBase64 = null;
+        document.getElementById('depoimento-imagem-input').onchange = (e) => { 
+            const reader = new FileReader(); 
+            reader.onload = (ev) => { depoimentoImagemBase64 = ev.target.result; document.getElementById('preview-depoimento-img').src = depoimentoImagemBase64; document.getElementById('preview-depoimento-img').style.display = 'block'; }; 
+            reader.readAsDataURL(e.target.files[0]); 
+        };
 
-    async function saveDepoimentoImagem() {
-        if (!depoimentoImagemBase64) { alert('Selecione uma imagem'); return; }
-        const produto_id = document.getElementById('depoimento-img-produto').value;
-        const legenda = document.getElementById('depoimento-legenda').value;
-        const { error } = await supabase.from('depoimentos_imagem').insert([{ produto_id, imagem_url: depoimentoImagemBase64, legenda }]);
-        if (error) { alert('Erro: ' + error.message); return; }
-        closeModal('modal-depoimento-imagem'); depoimentoImagemBase64 = null;
-        await carregarDepoimentos();
-    }
+        async function saveDepoimentoImagem() {
+            if (!depoimentoImagemBase64) { alert('Selecione uma imagem'); return; }
+            const produto_id = document.getElementById('depoimento-img-produto').value;
+            const legenda = document.getElementById('depoimento-legenda').value;
+            const { error } = await supabase.from('depoimentos_imagem').insert([{ produto_id, imagem_url: depoimentoImagemBase64, legenda }]);
+            if (error) { alert('Erro: ' + error.message); return; }
+            closeModal('modal-depoimento-imagem'); depoimentoImagemBase64 = null;
+            await carregarDepoimentos();
+        }
 
-    function showModal(id) { document.getElementById(id).style.display = 'flex'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; depoimentoImagemBase64 = null; }
+        function showModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; depoimentoImagemBase64 = null; }
 
-    function showAddDepoimentoModal() { carregarProdutosSelect(); showModal('modal-depoimento-texto'); }
-    function showAddImagemModal() { carregarProdutosSelectImg(); showModal('modal-depoimento-imagem'); }
+        function showAddDepoimentoModal() { carregarProdutosSelect(); showModal('modal-depoimento-texto'); }
+        function showAddImagemModal() { carregarProdutosSelectImg(); showModal('modal-depoimento-imagem'); }
 
-    async function switchTab(tab) {
-        document.getElementById('tab-produtos').style.display = tab === 'produtos' ? 'block' : 'none';
-        document.getElementById('tab-depoimentos').style.display = tab === 'depoimentos' ? 'block' : 'none';
-        document.getElementById('tab-leads').style.display = tab === 'leads' ? 'block' : 'none';
-        document.querySelectorAll('.tab-btn').forEach((btn, i) => btn.classList[i === (tab === 'produtos' ? 0 : tab === 'depoimentos' ? 1 : 2) ? 'add' : 'remove']('active'));
-        if (tab === 'leads') await carregarLeads();
-        if (tab === 'depoimentos') await carregarDepoimentos();
-    }
+        async function switchTab(tab) {
+            document.getElementById('tab-produtos').style.display = tab === 'produtos' ? 'block' : 'none';
+            document.getElementById('tab-depoimentos').style.display = tab === 'depoimentos' ? 'block' : 'none';
+            document.getElementById('tab-leads').style.display = tab === 'leads' ? 'block' : 'none';
+            document.querySelectorAll('.tab-btn').forEach((btn, i) => btn.classList[i === (tab === 'produtos' ? 0 : tab === 'depoimentos' ? 1 : 2) ? 'add' : 'remove']('active'));
+            if (tab === 'leads') await carregarLeads();
+            if (tab === 'depoimentos') await carregarDepoimentos();
+        }
 
-    function updateClock() {
-        const now = new Date();
-        const time = now.toLocaleTimeString('pt-MZ', { timeZone: 'Africa/Maputo', hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        const date = now.toLocaleDateString('pt-MZ', { timeZone: 'Africa/Maputo' });
-        document.getElementById('datetime').innerHTML = `<i class="far fa-clock"></i> ${date} | ${time}`;
-    }
-    setInterval(updateClock, 1000); updateClock();
+        async function init() { 
+            await verificarSessao(); 
+            if (usuarioAtual) { 
+                await carregarProdutos(); 
+                await carregarDepoimentos(); 
+            } 
+        }
+        init();
 
-    let theme = localStorage.getItem('vantix_theme') || 'dark';
-    function setTheme(t) { document.body.classList[t === 'light' ? 'add' : 'remove']('light'); localStorage.setItem('vantix_theme', t); document.getElementById('themeToggle').innerHTML = t === 'dark' ? '<svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>' : '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>'; }
-    setTheme(theme);
-    document.getElementById('themeToggle').onclick = () => setTheme(theme === 'dark' ? 'light' : 'dark');
-
-    async function init() { await verificarSessao(); if (usuarioAtual) { await carregarProdutos(); await carregarDepoimentos(); } }
-    init();
-    window.switchTab = switchTab; window.copiarLink = copiarLink; window.deletarProduto = deletarProduto; window.verEstatisticas = verEstatisticas;
-    window.showAddDepoimentoModal = showAddDepoimentoModal; window.showAddImagemModal = showAddImagemModal;
-    window.saveDepoimentoTexto = saveDepoimentoTexto; window.saveDepoimentoImagem = saveDepoimentoImagem;
-    window.deletarDepoimentoTexto = deletarDepoimentoTexto; window.deletarDepoimentoImagem = deletarDepoimentoImagem;
-    window.closeModal = closeModal; window.closeForm = closeForm;
+        // Expor funções globais
+        window.switchTab = switchTab;
+        window.copiarLink = copiarLink;
+        window.deletarProduto = deletarProduto;
+        window.verEstatisticas = verEstatisticas;
+        window.showAddDepoimentoModal = showAddDepoimentoModal;
+        window.showAddImagemModal = showAddImagemModal;
+        window.saveDepoimentoTexto = saveDepoimentoTexto;
+        window.saveDepoimentoImagem = saveDepoimentoImagem;
+        window.deletarDepoimentoTexto = deletarDepoimentoTexto;
+        window.deletarDepoimentoImagem = deletarDepoimentoImagem;
+        window.closeModal = closeModal;
+        window.closeForm = closeForm;
+    })();
 </script>
 </body>
 </html>

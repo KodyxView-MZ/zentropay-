@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Vantix — Dashboard</title>
+    <title>ZentroPay — Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -343,7 +343,7 @@
     <div class="main-content">
         <div class="modes-container">
             <div class="modes-toggle">
-                <button class="mode-btn active" onclick="carregarDados()">📊 DASHBOARD</button>
+                <button class="mode-btn active" onclick="carregarDados()"> DASHBOARD</button>
             </div>
         </div>
 
@@ -382,146 +382,149 @@
     </div>
 
     <script>
-        // ================= CONFIGURAÇÃO SUPABASE =================
-        const SUPABASE_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
+        (function() {
+            // CONFIGURAÇÃO SUPABASE
+            const SUPABASE_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
+            const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
 
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        let usuarioAtual = null;
+            let usuarioAtual = null;
 
-        // Tema
-        let theme = localStorage.getItem('vantix_theme') || 'dark';
-        function setTheme(t) {
-            document.body.classList[t === 'light' ? 'add' : 'remove']('light');
-            localStorage.setItem('vantix_theme', t);
-        }
-        setTheme(theme);
-        document.getElementById('themeToggle').onclick = () => {
-            theme = theme === 'dark' ? 'light' : 'dark';
-            setTheme(theme);
-            document.getElementById('themeToggle').innerHTML = theme === 'dark' ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
-        };
-
-        // Sidebar
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('open');
-            document.getElementById('sidebarOverlay').classList.toggle('show');
-        }
-        document.getElementById('menuIcon').onclick = toggleSidebar;
-        document.getElementById('sidebarOverlay').onclick = toggleSidebar;
-        document.getElementById('logoutBtn').onclick = async () => {
-            await supabase.auth.signOut();
-            localStorage.removeItem('vantix_session');
-            window.location.href = 'acesso.html';
-        };
-
-        // Verificar sessão
-        async function verificarSessao() {
-            const { data: { session }, error } = await supabase.auth.getSession();
-            if (error || !session) {
-                window.location.href = 'acesso.html';
-                return null;
+            // Tema
+            let theme = localStorage.getItem('zentropay_theme') || 'dark';
+            function setTheme(t) {
+                document.body.classList[t === 'light' ? 'add' : 'remove']('light');
+                localStorage.setItem('zentropay_theme', t);
             }
-            usuarioAtual = session.user;
-            document.getElementById('user-name').innerText = usuarioAtual.user_metadata?.nome?.split(' ')[0] || 'Vendedor';
-            document.getElementById('sidebar-name').innerText = usuarioAtual.user_metadata?.nome || 'Vendedor';
-            document.getElementById('sidebar-email').innerText = usuarioAtual.email;
-            const inicial = (usuarioAtual.user_metadata?.nome?.charAt(0) || 'V').toUpperCase();
-            document.getElementById('profile-avatar').innerText = inicial;
-            return usuarioAtual;
-        }
+            setTheme(theme);
+            document.getElementById('themeToggle').onclick = () => {
+                theme = theme === 'dark' ? 'light' : 'dark';
+                setTheme(theme);
+                document.getElementById('themeToggle').innerHTML = theme === 'dark' ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
+            };
 
-        // Carregar métricas REAIS do Supabase
-        async function carregarDados() {
-            if (!usuarioAtual) return;
+            // Sidebar
+            function toggleSidebar() {
+                document.getElementById('sidebar').classList.toggle('open');
+                document.getElementById('sidebarOverlay').classList.toggle('show');
+            }
+            document.getElementById('menuIcon').onclick = toggleSidebar;
+            document.getElementById('sidebarOverlay').onclick = toggleSidebar;
+            document.getElementById('logoutBtn').onclick = async () => {
+                await supabase.auth.signOut();
+                localStorage.removeItem('zentropay_session');
+                window.location.href = 'acesso.html';
+            };
 
-            // 1. Produtos do vendedor
-            const { data: produtos, error: prodError } = await supabase
-                .from('produtos')
-                .select('*')
-                .eq('vendedor_id', usuarioAtual.id);
+            // Verificar sessão
+            async function verificarSessao() {
+                const { data: { session }, error } = await supabase.auth.getSession();
+                if (error || !session) {
+                    window.location.href = 'acesso.html';
+                    return null;
+                }
+                usuarioAtual = session.user;
+                const nome = usuarioAtual.user_metadata?.nome || usuarioAtual.email?.split('@')[0] || 'Vendedor';
+                document.getElementById('user-name').innerText = nome.split(' ')[0];
+                document.getElementById('sidebar-name').innerText = nome;
+                document.getElementById('sidebar-email').innerText = usuarioAtual.email;
+                const inicial = (nome.charAt(0) || 'V').toUpperCase();
+                document.getElementById('profile-avatar').innerText = inicial;
+                return usuarioAtual;
+            }
 
-            if (prodError) console.error('Erro produtos:', prodError);
+            // Carregar métricas REAIS do Supabase
+            async function carregarDados() {
+                if (!usuarioAtual) return;
 
-            const totalProdutos = produtos?.length || 0;
-            const totalVisualizacoes = produtos?.reduce((sum, p) => sum + (p.visualizacoes || 0), 0) || 0;
-            const totalCliques = produtos?.reduce((sum, p) => sum + (p.cliques || 0), 0) || 0;
-
-            document.getElementById('produtos-total').innerText = totalProdutos;
-            document.getElementById('visualizacoes-total').innerText = totalVisualizacoes;
-            document.getElementById('cliques-total').innerText = totalCliques;
-
-            // 2. Pedidos
-            let pedidos = [];
-            let totalReceita = 0;
-            let totalVendas = 0;
-            let totalPendentes = 0;
-
-            if (produtos && produtos.length > 0) {
-                const produtoIds = produtos.map(p => p.id);
-                const { data: pedidosData, error: pedError } = await supabase
-                    .from('pedidos')
+                // 1. Produtos do vendedor
+                const { data: produtos, error: prodError } = await supabase
+                    .from('produtos')
                     .select('*')
-                    .in('produto_id', produtoIds)
-                    .order('criado_em', { ascending: false });
+                    .eq('vendedor_id', usuarioAtual.id);
 
-                if (!pedError && pedidosData) {
-                    pedidos = pedidosData;
-                    const pagos = pedidosData.filter(p => p.status === 'pago');
-                    totalReceita = pagos.reduce((sum, p) => sum + (p.valor || 0), 0);
-                    totalVendas = pagos.length;
-                    totalPendentes = pedidosData.filter(p => p.status === 'pendente').length;
+                if (prodError) console.error('Erro produtos:', prodError);
+
+                const totalProdutos = produtos?.length || 0;
+                const totalVisualizacoes = produtos?.reduce((sum, p) => sum + (p.visualizacoes || 0), 0) || 0;
+                const totalCliques = produtos?.reduce((sum, p) => sum + (p.cliques || 0), 0) || 0;
+
+                document.getElementById('produtos-total').innerText = totalProdutos;
+                document.getElementById('visualizacoes-total').innerText = totalVisualizacoes;
+                document.getElementById('cliques-total').innerText = totalCliques;
+
+                // 2. Pedidos
+                let pedidos = [];
+                let totalReceita = 0;
+                let totalVendas = 0;
+                let totalPendentes = 0;
+
+                if (produtos && produtos.length > 0) {
+                    const produtoIds = produtos.map(p => p.id);
+                    const { data: pedidosData, error: pedError } = await supabase
+                        .from('pedidos')
+                        .select('*')
+                        .in('produto_id', produtoIds)
+                        .order('criado_em', { ascending: false });
+
+                    if (!pedError && pedidosData) {
+                        pedidos = pedidosData;
+                        const pagos = pedidosData.filter(p => p.status === 'pago');
+                        totalReceita = pagos.reduce((sum, p) => sum + (p.valor || 0), 0);
+                        totalVendas = pagos.length;
+                        totalPendentes = pedidosData.filter(p => p.status === 'pendente').length;
+                    }
+                }
+
+                document.getElementById('receita-total').innerText = totalReceita.toLocaleString('pt-MZ', { minimumFractionDigits: 0 }) + ' MZN';
+                document.getElementById('vendas-total').innerText = totalVendas;
+                document.getElementById('vendas-pendentes').innerText = totalPendentes;
+
+                // 3. Leads
+                let totalLeads = 0;
+                if (produtos && produtos.length > 0) {
+                    const produtoIds = produtos.map(p => p.id);
+                    const { count, error: leadError } = await supabase
+                        .from('leads')
+                        .select('*', { count: 'exact', head: true })
+                        .in('produto_id', produtoIds);
+                    if (!leadError) totalLeads = count || 0;
+                }
+                document.getElementById('leads-total').innerText = totalLeads;
+
+                // 4. Renderizar últimos pedidos
+                const pedidosList = document.getElementById('pedidos-list');
+                if (!pedidos || pedidos.length === 0) {
+                    pedidosList.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>Nenhum pedido ainda</p></div>';
+                } else {
+                    pedidosList.innerHTML = pedidos.slice(0, 5).map(p => `
+                        <div class="pedido-card">
+                            <div class="pedido-row">
+                                <span class="cliente-nome">${p.cliente_nome || 'Cliente'}</span>
+                                <span class="${p.status === 'pago' ? 'status-pago' : 'status-pendente'}">${p.status === 'pago' ? 'PAGO' : 'PENDENTE'}</span>
+                            </div>
+                            <div class="pedido-row">
+                                <span>${p.produto_nome || 'Produto'}</span>
+                                <span class="valor-mzn">${(p.valor || 0).toLocaleString()} MZN</span>
+                            </div>
+                            <div style="font-size: 11px; color: rgba(255,255,255,0.4);">${new Date(p.criado_em).toLocaleDateString('pt-MZ')}</div>
+                        </div>
+                    `).join('');
                 }
             }
 
-            document.getElementById('receita-total').innerText = totalReceita.toLocaleString('pt-MZ', { minimumFractionDigits: 0 }) + ' MZN';
-            document.getElementById('vendas-total').innerText = totalVendas;
-            document.getElementById('vendas-pendentes').innerText = totalPendentes;
-
-            // 3. Leads
-            let totalLeads = 0;
-            if (produtos && produtos.length > 0) {
-                const produtoIds = produtos.map(p => p.id);
-                const { data: leadsData, error: leadError } = await supabase
-                    .from('leads')
-                    .select('*', { count: 'exact', head: true })
-                    .in('produto_id', produtoIds);
-                if (!leadError) totalLeads = leadsData?.length || 0;
+            async function init() {
+                await verificarSessao();
+                if (usuarioAtual) {
+                    await carregarDados();
+                    setInterval(carregarDados, 30000);
+                }
             }
-            document.getElementById('leads-total').innerText = totalLeads;
 
-            // 4. Renderizar últimos pedidos
-            const pedidosList = document.getElementById('pedidos-list');
-            if (!pedidos || pedidos.length === 0) {
-                pedidosList.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>Nenhum pedido ainda</p></div>';
-            } else {
-                pedidosList.innerHTML = pedidos.slice(0, 5).map(p => `
-                    <div class="pedido-card">
-                        <div class="pedido-row">
-                            <span class="cliente-nome">${p.cliente_nome || 'Cliente'}</span>
-                            <span class="${p.status === 'pago' ? 'status-pago' : 'status-pendente'}">${p.status === 'pago' ? 'PAGO' : 'PENDENTE'}</span>
-                        </div>
-                        <div class="pedido-row">
-                            <span>${p.produto_nome || 'Produto'}</span>
-                            <span class="valor-mzn">${(p.valor || 0).toLocaleString()} MZN</span>
-                        </div>
-                        <div style="font-size: 11px; color: rgba(255,255,255,0.4);">${new Date(p.criado_em).toLocaleDateString('pt-MZ')}</div>
-                    </div>
-                `).join('');
-            }
-        }
-
-        async function init() {
-            await verificarSessao();
-            if (usuarioAtual) {
-                await carregarDados();
-                // Atualizar a cada 30 segundos
-                setInterval(carregarDados, 30000);
-            }
-        }
-
-        init();
+            init();
+            window.carregarDados = carregarDados;
+        })();
     </script>
 </body>
 </html>

@@ -3,14 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vantix — Secure Access</title>
+    <title>ZentroPay — Acesso</title>
+    <link rel="icon" type="image/png" href="ei_1777492717837-removebg-preview.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Inter', sans-serif;
@@ -24,7 +22,6 @@
             overflow: hidden;
         }
 
-        /* Grade futurista de fundo */
         body::before {
             content: '';
             position: absolute;
@@ -32,9 +29,8 @@
             height: 200%;
             top: -50%;
             left: -50%;
-            background-image: 
-                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
             background-size: 40px 40px;
             animation: gridMove 20s linear infinite;
             pointer-events: none;
@@ -45,198 +41,127 @@
             100% { transform: translate(40px, 40px); }
         }
 
-        .container {
-            width: 100%;
-            max-width: 420px;
-            position: relative;
-            z-index: 2;
-        }
-
-        /* Glassmorphism líquido */
+        .container { width: 100%; max-width: 440px; position: relative; z-index: 2; }
         .glass-panel {
-            background: rgba(18, 18, 24, 0.65);
-            backdrop-filter: blur(16px);
-            border-radius: 28px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 48px 32px;
-            box-shadow: 0 25px 45px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
-            transition: all 0.3s ease;
+            background: rgba(18, 18, 24, 0.75);
+            backdrop-filter: blur(20px);
+            border-radius: 32px;
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 48px 36px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
         }
 
-        .logo-area {
-            text-align: center;
-            margin-bottom: 48px;
-        }
-
-        /* Logo imagem - maior e com mais destaque */
-        .logo-image {
-            width: 160px;
-            height: auto;
-            margin: 0 auto 0 auto;
-            display: block;
-            filter: drop-shadow(0 6px 16px rgba(0,0,0,0.4));
-            transition: transform 0.3s ease;
-        }
-
-        .logo-image:hover {
-            transform: scale(1.02);
-        }
-
-        .tagline {
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            color: rgba(255,255,255,0.35);
-            margin-top: 16px;
-        }
+        .logo-area { text-align: center; margin-bottom: 40px; }
+        .logo-image { width: 140px; height: auto; margin: 0 auto 16px auto; display: block; }
+        .tagline { font-size: 11px; text-transform: uppercase; letter-spacing: 4px; color: rgba(255,255,255,0.35); margin-top: 8px; }
 
         .tabs {
             display: flex;
-            gap: 12px;
-            background: rgba(0,0,0,0.3);
-            padding: 5px;
+            gap: 8px;
+            background: rgba(0,0,0,0.4);
+            padding: 6px;
             border-radius: 60px;
             margin-bottom: 32px;
         }
-
         .tab-btn {
             flex: 1;
             background: transparent;
             border: none;
-            padding: 8px 0;
+            padding: 10px 0;
             font-size: 14px;
-            font-weight: 500;
-            color: rgba(255,255,255,0.5);
+            font-weight: 600;
+            color: rgba(255,255,255,0.4);
             cursor: pointer;
             border-radius: 40px;
-            transition: 0.2s;
+            transition: 0.3s;
         }
-
         .tab-btn.active {
-            background: rgba(255,255,255,0.1);
+            background: linear-gradient(90deg, #1a1a24 0%, #0d0d14 100%);
             color: white;
-            backdrop-filter: blur(4px);
+            border: 0.5px solid rgba(255,255,255,0.08);
         }
 
-        .form-container {
-            display: none;
-            animation: fadeIn 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-        }
+        .form-container { display: none; animation: fadeIn 0.4s ease; }
+        .form-container.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-        .form-container.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-        }
-
+        .input-group { margin-bottom: 24px; }
         .input-group label {
             display: block;
             font-size: 11px;
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             color: rgba(255,255,255,0.5);
             margin-bottom: 8px;
         }
-
         .input-group input {
             width: 100%;
             padding: 14px 0;
             background: transparent;
             border: none;
-            border-bottom: 1.5px solid rgba(255,255,255,0.15);
+            border-bottom: 1.5px solid rgba(255,255,255,0.12);
             font-size: 15px;
             color: white;
             outline: none;
-            transition: 0.2s;
         }
+        .input-group input:focus { border-bottom-color: #10b981; }
+        .input-group input::placeholder { color: rgba(255,255,255,0.2); }
 
-        .input-group input:focus {
-            border-bottom-color: rgba(255,255,255,0.7);
+        .phone-prefix {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1.5px solid rgba(255,255,255,0.12);
+            padding: 14px 0;
         }
-
-        .input-group input::placeholder {
-            color: rgba(255,255,255,0.2);
-            font-weight: 300;
+        .phone-prefix span {
+            color: rgba(255,255,255,0.6);
+            background: rgba(255,255,255,0.05);
+            padding: 4px 12px;
+            border-radius: 40px;
         }
+        .phone-prefix input { flex: 1; background: transparent; border: none; color: white; outline: none; }
 
-        /* Botão líquido escuro refinado */
         .btn-liquid-premium {
             width: 100%;
             padding: 14px;
-            margin-top: 16px;
+            margin-top: 20px;
             border: none;
-            border-radius: 40px;
+            border-radius: 44px;
             background: linear-gradient(90deg, #1a1a24 0%, #0d0d14 100%);
             color: white;
-            font-weight: 600;
+            font-weight: 700;
             font-size: 14px;
             cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.2s;
+            transition: all 0.3s;
             border: 0.5px solid rgba(255,255,255,0.1);
         }
+        .btn-liquid-premium:hover { background: linear-gradient(90deg, #2a2a38 0%, #1a1a24 100%); transform: translateY(-1px); }
+        .btn-liquid-premium:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        .btn-liquid-premium::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.1), transparent);
-            transform: translateX(-100%);
-            transition: 0.6s;
-        }
-
-        .btn-liquid-premium:hover::after {
-            transform: translateX(100%);
-        }
-
-        .btn-liquid-premium:hover {
-            background: linear-gradient(90deg, #2a2a38 0%, #1a1a24 100%);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
-        }
-
-        .footer-note {
-            text-align: center;
-            margin-top: 32px;
-            font-size: 11px;
-            color: rgba(255,255,255,0.25);
-            letter-spacing: 0.5px;
-        }
-
-        .footer-note a {
-            color: rgba(255,255,255,0.6);
-            text-decoration: none;
-            font-weight: 500;
-        }
+        .footer-note { text-align: center; margin-top: 32px; font-size: 10px; color: rgba(255,255,255,0.2); }
 
         .message {
-            margin-top: 16px;
-            font-size: 12px;
+            margin-top: 20px;
+            padding: 14px 16px;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 500;
             text-align: center;
-            padding: 8px;
-            border-radius: 40px;
+            backdrop-filter: blur(12px);
             display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
+        .message.show { display: flex; }
+        .message.error { background: rgba(220,38,38,0.2); border: 1px solid rgba(220,38,38,0.4); color: #f87171; }
+        .message.success { background: rgba(16,185,129,0.2); border: 1px solid rgba(16,185,129,0.4); color: #34d399; }
 
-        .message.show {
-            display: block;
-        }
-
-        .message.error {
-            background: rgba(255,59,48,0.15);
-            color: #ff6b62;
-            backdrop-filter: blur(4px);
+        @media (max-width: 480px) {
+            .glass-panel { padding: 32px 24px; }
+            .logo-image { width: 120px; }
         }
     </style>
 </head>
@@ -244,149 +169,194 @@
     <div class="container">
         <div class="glass-panel">
             <div class="logo-area">
-                <!-- Logo centralizado e maior -->
-                <img src="ei_1777492717837-removebg-preview.png" alt="Vantix Logo" class="logo-image">
-                <p class="tagline">Getaway de Pagamentos</p>
+                <img src="ei_1777492717837-removebg-preview.png" alt="ZentroPay Logo" class="logo-image">
+                <p class="tagline">SECURE PAYMENT GATEWAY</p>
             </div>
 
             <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab('login')">⟡ entrar</button>
-                <button class="tab-btn" onclick="switchTab('cadastro')">⟡ criar</button>
+                <button class="tab-btn active" id="tab-login-btn">⟡ ENTRAR</button>
+                <button class="tab-btn" id="tab-cadastro-btn">⟡ CRIAR</button>
             </div>
 
             <div id="login-container" class="form-container active">
-                <form onsubmit="handleAuth(event, 'login')">
+                <form id="login-form">
                     <div class="input-group">
                         <label>E-MAIL</label>
-                        <input type="email" placeholder="vantix.mz@gmail.com" required>
+                        <input type="email" id="login-email" placeholder="vendedor@zentropay.com" required>
                     </div>
                     <div class="input-group">
                         <label>SENHA</label>
-                        <input type="password" placeholder="••••••••" required>
+                        <input type="password" id="login-senha" placeholder="••••••••" required>
                     </div>
-                    <button type="submit" class="btn-liquid-premium">ACESSAR PAINEL →</button>
-                    <div class="message" id="login-error"></div>
+                    <button type="submit" class="btn-liquid-premium" id="login-btn">ACESSAR PAINEL →</button>
+                    <div class="message" id="login-message"></div>
                 </form>
             </div>
 
             <div id="cadastro-container" class="form-container">
-                <form onsubmit="handleAuth(event, 'cadastro')">
+                <form id="cadastro-form">
                     <div class="input-group">
-                        <label>NOME</label>
-                        <input type="text" placeholder="identidade" required>
+                        <label>NOME COMPLETO</label>
+                        <input type="text" id="cadastro-nome" required>
                     </div>
                     <div class="input-group">
                         <label>E-MAIL</label>
-                        <input type="email" placeholder="contato@vantix.com" required>
+                        <input type="email" id="cadastro-email" required>
+                    </div>
+                    <div class="input-group">
+                        <label>NÚMERO DE CELULAR</label>
+                        <div class="phone-prefix">
+                            <span>+258</span>
+                            <input type="tel" id="cadastro-telefone" placeholder="84 123 4567" required>
+                        </div>
                     </div>
                     <div class="input-group">
                         <label>SENHA</label>
-                        <input type="password" placeholder="mínimo 6 caracteres" required>
+                        <input type="password" id="cadastro-senha" placeholder="mínimo 6 caracteres" required>
                     </div>
-                    <button type="submit" class="btn-liquid-premium">CRIAR CONTA →</button>
-                    <div class="message" id="cadastro-error"></div>
+                    <div class="input-group">
+                        <label>CONFIRMAR SENHA</label>
+                        <input type="password" id="cadastro-confirmar" required>
+                    </div>
+                    <button type="submit" class="btn-liquid-premium" id="cadastro-btn">CRIAR CONTA →</button>
+                    <div class="message" id="cadastro-message"></div>
                 </form>
             </div>
 
             <div class="footer-note">
-                <p>✦ Vantix secure layer ✦</p>
+                <p>✦ ENCRYPTED BY ZENTROPAY SECURE LAYER ✦</p>
             </div>
         </div>
     </div>
 
     <script>
-        let usuarios = JSON.parse(localStorage.getItem('vantix_users')) || [];
+        (function() {
+            // CREDENCIAIS DO SEU SUPABASE
+            const SUPABASE_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
+            const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
 
-        function switchTab(type) {
-            const tabs = document.querySelectorAll('.tab-btn');
-            const loginDiv = document.getElementById('login-container');
-            const cadastroDiv = document.getElementById('cadastro-container');
-            
-            tabs.forEach(t => t.classList.remove('active'));
-            loginDiv.classList.remove('active');
-            cadastroDiv.classList.remove('active');
+            const ADMIN_EMAILS = ['blazeryannick@gmail.com', 'vantix.mz@gmail.com'];
+            const ADMIN_PASSWORD = 'ZentroPayAdMIN';
 
-            if(type === 'login') {
-                tabs[0].classList.add('active');
-                loginDiv.classList.add('active');
-            } else {
-                tabs[1].classList.add('active');
-                cadastroDiv.classList.add('active');
+            const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+            function showMessage(elementId, message, type) {
+                const msgDiv = document.getElementById(elementId);
+                if (!msgDiv) return;
+                msgDiv.innerHTML = `<span>${message}</span>`;
+                msgDiv.className = `message ${type} show`;
+                setTimeout(() => msgDiv.classList.remove('show'), 5000);
             }
-            
-            document.querySelectorAll('.message').forEach(m => {
-                m.classList.remove('show');
-                m.innerText = '';
-            });
-        }
 
-        function showMessage(elementId, text, isError = true) {
-            const msg = document.getElementById(elementId);
-            msg.innerText = text;
-            msg.classList.add('show');
-            if(isError) msg.classList.add('error');
-            setTimeout(() => msg.classList.remove('show'), 2800);
-        }
+            // Alternar abas UI
+            document.getElementById('tab-login-btn').onclick = () => {
+                document.getElementById('tab-login-btn').classList.add('active');
+                document.getElementById('tab-cadastro-btn').classList.remove('active');
+                document.getElementById('login-container').classList.add('active');
+                document.getElementById('cadastro-container').classList.remove('active');
+            };
+            document.getElementById('tab-cadastro-btn').onclick = () => {
+                document.getElementById('tab-cadastro-btn').classList.add('active');
+                document.getElementById('tab-login-btn').classList.remove('active');
+                document.getElementById('cadastro-container').classList.add('active');
+                document.getElementById('login-container').classList.remove('active');
+            };
 
-        function handleAuth(e, mode) {
-            e.preventDefault();
-            const form = e.target;
-            const inputs = form.querySelectorAll('input');
-            const btn = form.querySelector('button');
-            const originalText = btn.innerText;
-            
-            btn.innerText = '⏳ processando...';
-            btn.style.opacity = '0.6';
-
-            setTimeout(() => {
-                if(mode === 'cadastro') {
-                    const nome = inputs[0].value.trim();
-                    const email = inputs[1].value.trim();
-                    const senha = inputs[2].value;
-                    
-                    if(!nome || !email || !senha) {
-                        showMessage('cadastro-error', 'preencha todos os campos');
-                        btn.innerText = originalText;
-                        btn.style.opacity = '1';
-                        return;
-                    }
-                    if(senha.length < 6) {
-                        showMessage('cadastro-error', 'senha deve ter 6+ caracteres');
-                        btn.innerText = originalText;
-                        btn.style.opacity = '1';
-                        return;
-                    }
-                    if(usuarios.find(u => u.email === email)) {
-                        showMessage('cadastro-error', 'email já cadastrado');
-                        btn.innerText = originalText;
-                        btn.style.opacity = '1';
-                        return;
-                    }
-                    
-                    usuarios.push({ id: Date.now(), nome, email, senha });
-                    localStorage.setItem('vantix_users', JSON.stringify(usuarios));
-                    showMessage('cadastro-error', '✓ conta criada! faça login', true);
-                    form.reset();
-                    setTimeout(() => switchTab('login'), 1300);
-                    
-                } else {
-                    const email = inputs[0].value.trim();
-                    const senha = inputs[1].value;
-                    const user = usuarios.find(u => u.email === email && u.senha === senha);
-                    
-                    if(user) {
-                        showMessage('login-error', `✨ bem-vindo, ${user.nome} ✨`, true);
-                        localStorage.setItem('vantix_session', JSON.stringify({ nome: user.nome, email: user.email }));
-                        setTimeout(() => alert('🔐 redirecionando para dashboard segura'), 800);
-                    } else {
-                        showMessage('login-error', 'credenciais inválidas');
-                    }
+            // Verificar sessão existente
+            async function checkSession() {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session) {
+                    const email = session.user.email;
+                    window.location.href = ADMIN_EMAILS.includes(email) ? 'zentroadmin.html' : 'dashboard.html';
                 }
+            }
+
+            // LOGIN
+            document.getElementById('login-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('login-email').value.trim();
+                const senha = document.getElementById('login-senha').value;
+                const btn = document.getElementById('login-btn');
+
+                btn.innerText = '⏳ AUTENTICANDO...';
+                btn.disabled = true;
+
+                // Fluxo Admin Local
+                if (ADMIN_EMAILS.includes(email) && senha === ADMIN_PASSWORD) {
+                    window.location.href = 'zentroadmin.html';
+                    return;
+                }
+
+                // Autenticação Supabase
+                const { data, error } = await supabase.auth.signInWithPassword({ email, password: senha });
+
+                if (error) {
+                    showMessage('login-message', 'E-mail ou senha inválidos', 'error');
+                    btn.innerText = 'ACESSAR PAINEL →';
+                    btn.disabled = false;
+                } else {
+                    window.location.href = ADMIN_EMAILS.includes(email) ? 'zentroadmin.html' : 'dashboard.html';
+                }
+            });
+
+            // CADASTRO
+            document.getElementById('cadastro-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
                 
-                btn.innerText = originalText;
-                btn.style.opacity = '1';
-            }, 800);
-        }
+                const nome = document.getElementById('cadastro-nome').value.trim();
+                const email = document.getElementById('cadastro-email').value.trim();
+                const telefone = document.getElementById('cadastro-telefone').value.trim();
+                const senha = document.getElementById('cadastro-senha').value;
+                const confirmar = document.getElementById('cadastro-confirmar').value;
+                const btn = document.getElementById('cadastro-btn');
+
+                if (senha !== confirmar) {
+                    showMessage('cadastro-message', 'As senhas não coincidem', 'error');
+                    return;
+                }
+
+                btn.innerText = '⏳ CRIANDO CONTA...';
+                btn.disabled = true;
+
+                try {
+                    // 1. Criar na Auth do Supabase
+                    const { data, error: authError } = await supabase.auth.signUp({
+                        email: email,
+                        password: senha,
+                        options: {
+                            data: { nome: nome, telefone: '+258' + telefone.replace(/\D/g, '') }
+                        }
+                    });
+
+                    if (authError) throw authError;
+
+                    if (data.user) {
+                        // 2. Inserir na tabela 'usuarios' do seu Banco de Dados
+                        const { error: dbError } = await supabase.from('usuarios').insert([{
+                            id: data.user.id,
+                            email: email,
+                            nome: nome,
+                            telefone: '+258' + telefone.replace(/\D/g, ''),
+                            tipo: 'vendedor'
+                        }]);
+
+                        showMessage('cadastro-message', '✅ Conta criada! Redirecionando...', 'success');
+                        
+                        // Login automático para levar ao dashboard
+                        setTimeout(async () => {
+                            await supabase.auth.signInWithPassword({ email, password: senha });
+                            window.location.href = 'dashboard.html';
+                        }, 1500);
+                    }
+                } catch (err) {
+                    showMessage('cadastro-message', err.message, 'error');
+                    btn.innerText = 'CRIAR CONTA →';
+                    btn.disabled = false;
+                }
+            });
+
+            checkSession();
+        })();
     </script>
 </body>
 </html>
