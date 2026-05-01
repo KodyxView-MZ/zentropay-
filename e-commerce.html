@@ -9,7 +9,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
             background: #0a0a0c;
             font-family: 'Inter', sans-serif;
@@ -18,20 +17,11 @@
             min-height: 100vh;
             transition: background 0.3s;
         }
-
-        body.light {
-            background: #f0f0f0;
-            color: #1a1a1a;
-        }
-
-        body.light .card,
-        body.light .form-container,
-        body.light .produto-card,
-        body.light .welcome-card {
+        body.light { background: #f0f0f0; color: #1a1a1a; }
+        body.light .card, body.light .form-container, body.light .produto-card, body.light .welcome-card {
             background: rgba(255,255,255,0.9);
             border-color: rgba(0,0,0,0.08);
         }
-
         body::before {
             content: '';
             position: fixed;
@@ -43,19 +33,11 @@
             pointer-events: none;
             z-index: 0;
         }
-
         @keyframes gridMove {
             0% { transform: translate(0, 0); }
             100% { transform: translate(40px, 40px); }
         }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 2;
-        }
-
+        .container { max-width: 1200px; margin: 0 auto; position: relative; z-index: 2; }
         .navbar {
             background: rgba(18, 18, 24, 0.8);
             backdrop-filter: blur(16px);
@@ -67,14 +49,7 @@
             align-items: center;
             border: 1px solid rgba(255,255,255,0.08);
         }
-
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-        }
-
+        .logo-area { display: flex; align-items: center; gap: 10px; cursor: pointer; }
         .logo-image { width: 32px; height: 32px; object-fit: contain; }
         .logo-text {
             font-weight: 700;
@@ -84,7 +59,6 @@
             background-clip: text;
             color: transparent;
         }
-
         .datetime {
             text-align: center;
             font-size: 13px;
@@ -94,7 +68,6 @@
             border-radius: 40px;
             margin: 0 12px;
         }
-
         .theme-toggle {
             background: rgba(255,255,255,0.1);
             border: none;
@@ -108,7 +81,6 @@
             margin-right: 12px;
         }
         .theme-toggle svg { width: 22px; height: 22px; fill: white; }
-
         .btn-back {
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.1);
@@ -117,9 +89,7 @@
             color: rgba(255,255,255,0.7);
             cursor: pointer;
         }
-
         .nav-actions { display: flex; align-items: center; gap: 8px; }
-
         .welcome-card {
             background: rgba(18, 18, 24, 0.6);
             backdrop-filter: blur(20px);
@@ -146,7 +116,6 @@
         .stat-badge { text-align: center; }
         .stat-number { font-size: 24px; font-weight: 800; color: #10b981; }
         .stat-label { font-size: 11px; color: rgba(255,255,255,0.5); }
-
         .tabs {
             display: flex;
             gap: 12px;
@@ -172,7 +141,6 @@
             color: white;
             border: 0.5px solid rgba(255,255,255,0.1);
         }
-
         .btn-new-product {
             background: linear-gradient(90deg, #10b981, #059669);
             border: none;
@@ -188,7 +156,6 @@
             transition: transform 0.2s;
         }
         .btn-new-product:hover { transform: scale(1.02); }
-
         .form-overlay {
             position: fixed;
             top: 0;
@@ -227,7 +194,6 @@
             cursor: pointer;
             color: white;
         }
-
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -278,7 +244,6 @@
             cursor: pointer;
             width: 100%;
         }
-
         .produtos-header {
             display: flex;
             justify-content: space-between;
@@ -318,7 +283,6 @@
         }
         .btn-icon.delete:hover { background: rgba(239,68,68,0.2); color: #ef4444; }
         .empty-state { text-align: center; padding: 60px; color: rgba(255,255,255,0.4); }
-
         .depoimentos-grid, .leads-grid { display: grid; gap: 16px; }
         .depoimento-card, .lead-item {
             background: rgba(0,0,0,0.3);
@@ -341,7 +305,6 @@
             margin-bottom: 24px;
         }
         .loading { text-align: center; padding: 40px; }
-
         @media (max-width: 640px) {
             .form-row { grid-template-columns: 1fr; }
             .produto-card { flex-direction: column; }
@@ -486,7 +449,6 @@
 
 <script>
     (function() {
-        // ================= CONFIGURAÇÃO SUPABASE =================
         const SUPABASE_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
 
@@ -508,12 +470,9 @@
         setTheme(theme);
         document.getElementById('themeToggle').onclick = () => setTheme(theme === 'dark' ? 'light' : 'dark');
 
-        // Relógio
         function updateClock() {
             const now = new Date();
-            const time = now.toLocaleTimeString('pt-MZ', { timeZone: 'Africa/Maputo', hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            const date = now.toLocaleDateString('pt-MZ', { timeZone: 'Africa/Maputo' });
-            document.getElementById('datetime').innerHTML = `<i class="far fa-clock"></i> ${date} | ${time}`;
+            document.getElementById('datetime').innerHTML = `<i class="far fa-clock"></i> ${now.toLocaleDateString('pt-MZ')} | ${now.toLocaleTimeString('pt-MZ', { timeZone: 'Africa/Maputo' })}`;
         }
         setInterval(updateClock, 1000);
         updateClock();
@@ -525,6 +484,26 @@
                 return null;
             }
             usuarioAtual = session.user;
+            
+            // VERIFICAR SE USUÁRIO EXISTE NA TABELA usuarios
+            const { data: usuarioDB, error: dbError } = await supabase
+                .from('usuarios')
+                .select('*')
+                .eq('id', usuarioAtual.id)
+                .single();
+            
+            if (dbError || !usuarioDB) {
+                // Criar usuário na tabela usuarios
+                await supabase.from('usuarios').insert([{
+                    id: usuarioAtual.id,
+                    email: usuarioAtual.email,
+                    nome: usuarioAtual.user_metadata?.nome || usuarioAtual.email?.split('@')[0] || 'Vendedor',
+                    telefone: usuarioAtual.user_metadata?.telefone || '',
+                    tipo: 'vendedor',
+                    criado_em: new Date().toISOString()
+                }]);
+            }
+            
             const nome = usuarioAtual.user_metadata?.nome || usuarioAtual.email?.split('@')[0] || 'Vendedor';
             document.getElementById('user-name').innerText = nome.split(' ')[0];
             return usuarioAtual;
@@ -631,7 +610,6 @@
             await carregarDepoimentos();
         }
 
-        // Upload de imagens
         document.getElementById('imagem-input').onchange = (e) => { 
             const reader = new FileReader(); 
             reader.onload = (ev) => { imagemBase64 = ev.target.result; document.getElementById('preview-imagem').src = imagemBase64; document.getElementById('preview-imagem').style.display = 'block'; }; 
@@ -646,24 +624,42 @@
         document.getElementById('product-form').onsubmit = async (e) => {
             e.preventDefault();
             if (!usuarioAtual) { alert('Faça login primeiro'); return; }
+            
             const nome = document.getElementById('produto-nome').value.trim();
             const preco = parseFloat(document.getElementById('produto-preco').value);
             if (!nome || !preco || !imagemBase64) { alert('Preencha nome, preço e imagem'); return; }
+            
             const serial = 'ZEN' + Date.now().toString().slice(-8) + Math.floor(Math.random() * 1000);
+            
             const { error } = await supabase.from('produtos').insert([{
-                vendedor_id: usuarioAtual.id, serial, nome, preco,
+                vendedor_id: usuarioAtual.id,
+                serial: serial,
+                nome: nome,
+                preco: preco,
                 descricao_curta: document.getElementById('produto-descricao-curta').value,
                 descricao_longa: document.getElementById('produto-descricao-longa').value,
                 categoria: document.getElementById('produto-categoria').value,
                 contacto_vendedor: document.getElementById('produto-contacto').value,
-                imagem: imagemBase64, banner: bannerBase64,
+                imagem: imagemBase64,
+                banner: bannerBase64,
                 urgent_enabled: document.getElementById('urgent-enabled').value === 'true',
                 urgent_minutes: parseInt(document.getElementById('urgent-minutes').value) || 0,
-                status: 'active', visualizacoes: 0, cliques: 0, vendas: 0
+                status: 'active',
+                visualizacoes: 0,
+                cliques: 0,
+                vendas: 0,
+                criado_em: new Date().toISOString()
             }]);
-            if (error) { alert('Erro: ' + error.message); return; }
+            
+            if (error) { 
+                alert('Erro: ' + error.message); 
+                console.error(error);
+                return; 
+            }
+            
             alert('✅ Produto criado com sucesso!');
-            closeForm(); resetForm();
+            closeForm(); 
+            resetForm();
             await carregarProdutos();
         };
 
@@ -697,7 +693,7 @@
             const stars = parseInt(document.getElementById('depoimento-stars').value);
             const texto = document.getElementById('depoimento-texto').value;
             if (!nome || !texto) { alert('Preencha nome e texto'); return; }
-            const { error } = await supabase.from('depoimentos_texto').insert([{ produto_id, cliente_nome: nome, stars, depoimento: texto }]);
+            const { error } = await supabase.from('depoimentos_texto').insert([{ produto_id, cliente_nome: nome, stars, depoimento: texto, criado_em: new Date().toISOString() }]);
             if (error) { alert('Erro: ' + error.message); return; }
             closeModal('modal-depoimento-texto');
             await carregarDepoimentos();
@@ -714,7 +710,7 @@
             if (!depoimentoImagemBase64) { alert('Selecione uma imagem'); return; }
             const produto_id = document.getElementById('depoimento-img-produto').value;
             const legenda = document.getElementById('depoimento-legenda').value;
-            const { error } = await supabase.from('depoimentos_imagem').insert([{ produto_id, imagem_url: depoimentoImagemBase64, legenda }]);
+            const { error } = await supabase.from('depoimentos_imagem').insert([{ produto_id, imagem_url: depoimentoImagemBase64, legenda, criado_em: new Date().toISOString() }]);
             if (error) { alert('Erro: ' + error.message); return; }
             closeModal('modal-depoimento-imagem'); depoimentoImagemBase64 = null;
             await carregarDepoimentos();
@@ -744,7 +740,6 @@
         }
         init();
 
-        // Expor funções globais
         window.switchTab = switchTab;
         window.copiarLink = copiarLink;
         window.deletarProduto = deletarProduto;
@@ -760,4 +755,4 @@
     })();
 </script>
 </body>
-</html>
+    </html>
