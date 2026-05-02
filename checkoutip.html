@@ -67,7 +67,6 @@
     const S_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
     const S_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
     
-    // Proteção contra erro de redeclaração
     if (!window._supabase) window._supabase = supabase.createClient(S_URL, S_KEY);
     const db = window._supabase;
 
@@ -118,7 +117,8 @@
                 description: "Compra: " + currentProd.nome
             };
 
-            const response = await fetch('processar.php', {
+            // ALTERADO: Apontando para a Serverless Function da Vercel
+            const response = await fetch('/api/processar', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -129,7 +129,7 @@
             if (response.ok) {
                 msg.className = "status success";
                 msg.innerText = "✅ Solicitação enviada! Digite seu PIN para concluir.";
-                // Opcional: Salvar pedido no Supabase
+                
                 await db.from('pedidos').insert([{ 
                     cliente: payload.customer.name, 
                     valor: payload.amount, 
@@ -137,6 +137,7 @@
                     ref: payload.reference 
                 }]);
             } else {
+                // Captura a mensagem de erro vinda da API da DebitoPay
                 throw new Error(result.message || "Erro na operadora");
             }
         } catch (err) {
