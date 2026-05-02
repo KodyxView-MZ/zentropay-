@@ -1,29 +1,19 @@
 export default async function handler(req, res) {
-    // Configuração de CORS para permitir que o site fale com a API
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
     if (req.method === 'OPTIONS') return res.status(200).end();
 
-    if (req.method !== 'POST') {
-        return res.status(405).json({ message: "Apenas POST permitido" });
-    }
-
     try {
-        // GARANTIA: Se o body vier como string, a gente transforma em objeto
         const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-
-        if (!body || !body.customer) {
-            throw new Error("Dados do formulário não foram recebidos corretamente.");
-        }
-
-        // Formatação do Telefone (Essencial: Adiciona 258 se não tiver)
-        let phone = body.customer.phone.replace(/\s/g, '');
-        if (!phone.startsWith('258')) phone = '258' + phone;
 
         const merchantId = "f2a41c3a-4ed7-482c-8d16-4fd9c376f9c8";
         const apiKey = "sk_sandbox_sM9q5NuDelfYwKSrV1xzORYoha0inrIq";
+
+        // Formatação do telefone para garantir o 258
+        let phone = body.customer.phone.replace(/\s/g, '');
+        if (!phone.startsWith('258')) phone = '258' + phone;
 
         const payload = {
             merchant_id: merchantId,
@@ -40,26 +30,29 @@ export default async function handler(req, res) {
             }
         };
 
+        // Adicionamos um timeout e um cabeçalho de User-Agent para a API não bloquear a Vercel
         const response = await fetch("https://api.debito.co.mz/v1/transactions", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${apiKey}`,
-                'X-Merchant-Id': merchantId
+                'X-Merchant-Id': merchantId,
+                'User-Agent': 'VantixTech/1.0'
             },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(payload),
+            signal: AbortSignal.timeout(10000) // 10 segundos de espera
         });
 
         const result = await response.json();
-        
         return res.status(response.status).json(result);
 
     } catch (error) {
-        console.error("ERRO NO BACKEND:", error.message);
+        console.error("FALHA NA CONEXÃO:", error.message);
+        
+        // Resposta amigável para o erro "fetch failed"
         return res.status(500).json({ 
             status: "error", 
-            message: "Erro interno: " + error.message 
+            message: "A API da operadora (M-Pesa/e-Mola) não respondeu. Tente novamente em instantes." 
         });
     }
 }
-
