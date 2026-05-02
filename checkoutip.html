@@ -8,639 +8,228 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        /* Estilos mantidos conforme seu padrão visual de alta conversão */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            background: #0a0a0c;
-            font-family: 'Inter', sans-serif;
-            padding: 20px;
-            color: #fff;
-            min-height: 100vh;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-                              linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-            background-size: 40px 40px;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .container {
-            max-width: 550px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 2;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 24px;
-        }
-        .logo {
-            width: 80px;
-            margin-bottom: 16px;
-        }
-        .header h1 {
-            font-size: 20px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #fff, #a855f7);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .timer-card {
-            background: linear-gradient(135deg, #dc2626, #991b1b);
-            border-radius: 24px;
-            padding: 20px;
-            text-align: center;
-            margin-bottom: 24px;
-            animation: pulse 1s infinite;
-            display: none;
-        }
-        .timer-card.show { display: block; }
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.01); opacity: 0.95; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .timer-label {
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 8px;
-        }
-        .timer-value {
-            font-size: 36px;
-            font-weight: 800;
-            font-family: monospace;
-            letter-spacing: 4px;
-        }
-
-        .produto-card {
-            background: rgba(18, 18, 24, 0.6);
-            backdrop-filter: blur(20px);
-            border-radius: 28px;
-            border: 1px solid rgba(255,255,255,0.08);
-            overflow: hidden;
-            margin-bottom: 24px;
-        }
-
-        .produto-header {
-            display: flex;
-            gap: 16px;
-            padding: 24px;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-        }
-        .produto-imagem {
-            width: 80px;
-            height: 100px;
-            border-radius: 16px;
-            object-fit: cover;
-            background: rgba(255,255,255,0.05);
-        }
-        .produto-info h2 {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-        .produto-info .preco {
-            font-size: 24px;
-            font-weight: 800;
-            color: #10b981;
-        }
-        .produto-info .description {
-            font-size: 12px;
-            color: rgba(255,255,255,0.5);
-            margin-top: 4px;
-        }
-
-        .resumo {
-            padding: 20px 24px;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-        }
-        .resumo-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            font-size: 14px;
-        }
-        .resumo-total {
-            display: flex;
-            justify-content: space-between;
-            padding-top: 16px;
-            margin-top: 8px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            font-weight: 700;
-            font-size: 18px;
-        }
-
-        .form-section {
-            padding: 24px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-group label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: rgba(255,255,255,0.6);
-            margin-bottom: 8px;
-        }
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 14px 16px;
-            background: rgba(0,0,0,0.4);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px;
-            font-size: 15px;
-            color: white;
-            font-family: 'Inter', sans-serif;
-        }
-        .form-group input:focus, .form-group select:focus {
-            outline: none;
-            border-color: #10b981;
-        }
-
-        .phone-prefix {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .phone-prefix span {
-            background: rgba(255,255,255,0.05);
-            padding: 14px 16px;
-            border-radius: 16px;
-            color: rgba(255,255,255,0.6);
-        }
-        .phone-prefix input {
-            flex: 1;
-        }
-
-        .metodos-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 8px;
-        }
-        .metodo-btn {
-            background: rgba(0,0,0,0.4);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px;
-            padding: 14px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .metodo-btn i {
-            font-size: 24px;
-            margin-bottom: 8px;
-            display: block;
-        }
-        .metodo-btn span {
-            font-size: 13px;
-            font-weight: 500;
-        }
-        .metodo-btn.active {
-            background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(5,150,105,0.2));
-            border-color: #10b981;
-        }
-
-        .campo-extra { display: none; }
-        .campo-extra.show { display: block; }
-
-        .btn-finalizar {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(90deg, #10b981, #059669);
-            border: none;
-            border-radius: 44px;
-            color: white;
-            font-weight: 700;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 16px;
-            transition: all 0.2s;
-        }
-        .btn-finalizar:hover {
-            transform: translateY(-2px);
-            filter: brightness(1.05);
-        }
-        .btn-finalizar:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 24px;
-            font-size: 12px;
-            color: rgba(255,255,255,0.4);
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-        }
-        .footer i {
-            margin-right: 6px;
-        }
-
-        .message {
-            margin-top: 16px;
-            padding: 12px;
-            border-radius: 16px;
-            font-size: 13px;
-            text-align: center;
-            display: none;
-        }
+        body { background: #0a0a0c; font-family: 'Inter', sans-serif; padding: 20px; color: #fff; min-height: 100vh; }
+        body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
+        .container { max-width: 550px; margin: 0 auto; position: relative; z-index: 2; }
+        .header { text-align: center; margin-bottom: 24px; }
+        .logo { width: 80px; margin-bottom: 16px; }
+        .header h1 { font-size: 20px; font-weight: 700; background: linear-gradient(135deg, #fff, #a855f7); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .timer-card { background: linear-gradient(135deg, #dc2626, #991b1b); border-radius: 24px; padding: 20px; text-align: center; margin-bottom: 24px; display: none; }
+        .timer-card.show { display: block; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.01); } 100% { transform: scale(1); } }
+        .produto-card { background: rgba(18, 18, 24, 0.6); backdrop-filter: blur(20px); border-radius: 28px; border: 1px solid rgba(255,255,255,0.08); overflow: hidden; margin-bottom: 24px; }
+        .produto-header { display: flex; gap: 16px; padding: 24px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .produto-imagem { width: 80px; height: 100px; border-radius: 16px; object-fit: cover; background: rgba(255,255,255,0.05); }
+        .produto-info .preco { font-size: 24px; font-weight: 800; color: #10b981; }
+        .form-section { padding: 24px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
+        .form-group input { width: 100%; padding: 14px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; }
+        .metodos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .metodo-btn { border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 15px; text-align: center; cursor: pointer; transition: 0.3s; }
+        .metodo-btn.active { border-color: #10b981; background: rgba(16, 185, 129, 0.1); }
+        .btn-finalizar { width: 100%; padding: 20px; background: #10b981; border: none; border-radius: 50px; color: #fff; font-weight: 800; cursor: pointer; margin-top: 10px; }
+        .message { margin-top: 15px; padding: 12px; border-radius: 10px; display: none; font-size: 13px; text-align: center; }
         .message.show { display: block; }
-        .message.success { background: rgba(16,185,129,0.15); color: #10b981; }
-        .message.error { background: rgba(239,68,68,0.15); color: #ef4444; }
-        .message.info { background: rgba(245,158,11,0.15); color: #f59e0b; }
-
-        .loading {
-            text-align: center;
-            padding: 60px;
-        }
-        .error-state {
-            text-align: center;
-            padding: 60px;
-            background: rgba(18,18,24,0.6);
-            border-radius: 28px;
-        }
-
-        @media (max-width: 480px) {
-            .produto-header { flex-direction: column; text-align: center; }
-            .produto-imagem { margin: 0 auto; }
-            .metodos-grid { grid-template-columns: 1fr; }
-        }
+        .message.error { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+        .message.info { background: rgba(59, 130, 246, 0.2); color: #93c5fd; }
+        .loading-overlay { text-align: center; padding: 40px; }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
-        <img src="ei_1777492717837-removebg-preview.png" class="logo">
         <h1>ZentroPay</h1>
     </div>
 
     <div id="checkout-content">
-        <div class="loading"><i class="fas fa-spinner fa-spin"></i> Carregando produto...</div>
+        <div class="loading-overlay"><i class="fas fa-circle-notch fa-spin"></i> Sincronizando com a rede...</div>
     </div>
 </div>
 
 <script>
     (function() {
-        // CONFIGURAÇÃO SUPABASE
+        // --- CONFIGURAÇÕES ---
         const SUPABASE_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Evita erro de declaração dupla do Supabase
+        let db;
+        if (!window._supabaseClient) {
+            window._supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
+        db = window._supabaseClient;
 
-        // CONFIGURAÇÃO DEBITO PAY
         const DEBITO_CONFIG = {
             merchantId: "f2a41c3a-4ed7-482c-8d16-4fd9c376f9c8",
             apiKey: "sk_sandbox_sM9q5NuDelfYwKSrV1xzORYoha0inrIq",
-            baseUrl: "https://api.debito.co.mz/v1", // Sandbox
-            isSandbox: true
+            baseUrl: "https://api.debito.co.mz/v1"
         };
 
         let produtoAtual = null;
         let metodoSelecionado = 'emola';
-        let timerInterval = null;
 
-        function getUrlParams() {
+        async function init() {
             const params = new URLSearchParams(window.location.search);
-            return { id: params.get('id') };
-        }
-
-        async function carregarProduto() {
-            const { id } = getUrlParams();
+            const id = params.get('id');
             const container = document.getElementById('checkout-content');
 
             if (!id) {
-                container.innerHTML = `
-                    <div class="error-state">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 16px;"></i>
-                        <h3>Produto não especificado</h3>
-                        <p>Verifique o link e tente novamente.</p>
-                    </div>
-                `;
+                container.innerHTML = "<div class='produto-card' style='padding:20px'>Erro: ID do produto ausente.</div>";
                 return;
             }
 
-            const { data, error } = await supabase
-                .from('produtos')
-                .select('*')
-                .eq('id', id)
-                .eq('status', 'active')
-                .single();
-
+            const { data, error } = await db.from('produtos').select('*').eq('id', id).single();
+            
             if (error || !data) {
-                container.innerHTML = `
-                    <div class="error-state">
-                        <i class="fas fa-search" style="font-size: 48px; margin-bottom: 16px;"></i>
-                        <h3>Produto não encontrado</h3>
-                        <p>Este produto pode ter sido removido ou não está disponível.</p>
-                    </div>
-                `;
+                container.innerHTML = "<div class='produto-card' style='padding:20px'>Produto não encontrado.</div>";
                 return;
             }
 
             produtoAtual = data;
-            renderizarCheckout(produtoAtual);
+            render(data);
         }
 
-        function renderizarCheckout(produto) {
-            const precoFormatado = (produto.preco || 0).toLocaleString('pt-MZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            const container = document.getElementById('checkout-content');
-            const imagem = produto.imagem || 'https://placehold.co/80x100/1e1b4b/white?text=ZentroPay';
-
-            container.innerHTML = `
-                <div class="timer-card ${produto.urgent_enabled ? 'show' : ''}" id="timer-card">
-                    <div class="timer-label">⚠️ OFERTA ESPECIAL TERMINA EM:</div>
-                    <div class="timer-value" id="timer">${produto.urgent_enabled ? '--:--:--' : ''}</div>
+        function render(p) {
+            const valorMz = p.preco.toLocaleString('pt-MZ', { minimumFractionDigits: 2 });
+            document.getElementById('checkout-content').innerHTML = `
+                <div class="timer-card ${p.urgent_enabled ? 'show' : ''}" id="timer-box">
+                    <div style="font-size:10px">OFERTA EXPIRA EM:</div>
+                    <div id="countdown" style="font-size:24px; font-weight:800">15:00</div>
                 </div>
 
                 <div class="produto-card">
                     <div class="produto-header">
-                        <img src="${imagem}" class="produto-imagem" id="produto-imagem" onerror="this.src='https://placehold.co/80x100/1e1b4b/white?text=ZentroPay'">
+                        <img src="${p.imagem || ''}" class="produto-imagem" onerror="this.src='https://via.placeholder.com/80x100?text=Vantix'">
                         <div class="produto-info">
-                            <h2 id="produto-nome">${produto.nome}</h2>
-                            <div class="preco" id="produto-preco">MT ${precoFormatado.replace('.', ',')} MZN</div>
-                            <div class="description" id="produto-descricao">${produto.descricao_curta || 'Produto digital - Entrega imediata'}</div>
+                            <h2>${p.nome}</h2>
+                            <div class="preco">MT ${valorMz}</div>
                         </div>
-                    </div>
-                    <div class="resumo">
-                        <div class="resumo-item"><span>Subtotal:</span><span id="subtotal">MT ${precoFormatado.replace('.', ',')} MZN</span></div>
-                        <div class="resumo-item"><span>Tarifas:</span><span>Livre</span></div>
-                        <div class="resumo-total"><span>Total:</span><span id="total">MT ${precoFormatado.replace('.', ',')} MZN</span></div>
                     </div>
                 </div>
 
                 <div class="produto-card">
-                    <div class="form-section">
-                        <form id="checkout-form">
-                            <div class="form-group">
-                                <label>NOME COMPLETO *</label>
-                                <input type="text" id="nome" placeholder="Nome completo" required>
+                    <form class="form-section" id="pay-form">
+                        <div class="form-group">
+                            <label>NOME</label>
+                            <input type="text" id="c_nome" placeholder="Nome Completo" required>
+                        </div>
+                        <div class="form-group">
+                            <label>E-MAIL</label>
+                            <input type="email" id="c_email" placeholder="email@exemplo.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label>MÉTODO</label>
+                            <div class="metodos-grid">
+                                <div class="metodo-btn active" onclick="setMetodo('emola', this)">e-Mola</div>
+                                <div class="metodo-btn" onclick="setMetodo('mpesa', this)">M-Pesa</div>
                             </div>
-                            <div class="form-group">
-                                <label>E-MAIL *</label>
-                                <input type="email" id="email" placeholder="seu@email.com" required>
-                            </div>
-                            <div class="form-group">
-                                <label>TELEFONE/WHATSAPP</label>
-                                <div class="phone-prefix">
-                                    <span>+258</span>
-                                    <input type="tel" id="telefone" placeholder="84 123 4567">
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label>MÉTODO DE PAGAMENTO *</label>
-                                <div class="metodos-grid">
-                                    <div class="metodo-btn active" data-metodo="emola">
-                                        <i class="fas fa-mobile-alt"></i>
-                                        <span>e-Mola</span>
-                                    </div>
-                                    <div class="metodo-btn" data-metodo="mpesa">
-                                        <i class="fas fa-mobile-alt"></i>
-                                        <span>M-Pesa</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-group campo-extra show" id="campo-emola">
-                                <label>NÚMERO E-MOLA *</label>
-                                <div class="phone-prefix">
-                                    <span>+258</span>
-                                    <input type="tel" id="numero-emola" placeholder="86 12 34 567" required>
-                                </div>
-                            </div>
-
-                            <div class="form-group campo-extra" id="campo-mpesa">
-                                <label>NÚMERO M-PESA *</label>
-                                <div class="phone-prefix">
-                                    <span>+258</span>
-                                    <input type="tel" id="numero-mpesa" placeholder="84 123 4567" required>
-                                </div>
-                            </div>
-
-                            <button type="submit" class="btn-finalizar" id="btn-finalizar">
-                                <i class="fas fa-arrow-right"></i> PAGAR MT ${precoFormatado.replace('.', ',')}
-                            </button>
-                            <div id="mensagem" class="message"></div>
-                        </form>
-                    </div>
-                </div>
-
-                <div class="footer">
-                    <div><i class="fas fa-lock"></i> Pagamento Seguro</div>
-                    <div><i class="fas fa-bolt"></i> Entrega Imediata</div>
+                        </div>
+                        <div class="form-group">
+                            <label id="label-num">NÚMERO E-MOLA</label>
+                            <input type="tel" id="c_fone" placeholder="86XXXXXXX" required>
+                        </div>
+                        <button type="submit" class="btn-finalizar" id="btn-submit">PAGAR MT ${valorMz}</button>
+                        <div id="status-msg" class="message"></div>
+                    </form>
                 </div>
             `;
-
-            // Iniciar timer se urgência ativada
-            if (produto.urgent_enabled && produto.urgent_minutes > 0) {
-                iniciarTimer(produto.urgent_minutes);
-            }
-
-            // Eventos dos métodos de pagamento
-            document.querySelectorAll('.metodo-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.metodo-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    metodoSelecionado = btn.dataset.metodo;
-                    
-                    document.getElementById('campo-emola').classList.remove('show');
-                    document.getElementById('campo-mpesa').classList.remove('show');
-                    
-                    if (metodoSelecionado === 'emola') {
-                        document.getElementById('campo-emola').classList.add('show');
-                    } else {
-                        document.getElementById('campo-mpesa').classList.add('show');
-                    }
-                });
-            });
-
-            document.getElementById('checkout-form').addEventListener('submit', processarPagamento);
+            if(p.urgent_enabled) startTimer(15);
         }
 
-        function iniciarTimer(minutos) {
-            let tempoRestante = minutos * 60;
-            const timerElement = document.getElementById('timer');
-            
-            function atualizarTimer() {
-                if (tempoRestante <= 0) {
-                    clearInterval(timerInterval);
-                    timerElement.innerText = "00:00:00";
-                    return;
-                }
-                const horas = Math.floor(tempoRestante / 3600);
-                const mins = Math.floor((tempoRestante % 3600) / 60);
-                const segs = tempoRestante % 60;
-                timerElement.innerText = `${horas.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${segs.toString().padStart(2, '0')}`;
-                tempoRestante--;
-            }
-            
-            if (timerInterval) clearInterval(timerInterval);
-            timerInterval = setInterval(atualizarTimer, 1000);
-            atualizarTimer();
+        window.setMetodo = (m, el) => {
+            metodoSelecionado = m;
+            document.querySelectorAll('.metodo-btn').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('label-num').innerText = m === 'emola' ? 'NÚMERO E-MOLA' : 'NÚMERO M-PESA';
+            document.getElementById('c_fone').placeholder = m === 'emola' ? '86XXXXXXX' : '84XXXXXXX';
+        };
+
+        function startTimer(m) {
+            let s = m * 60;
+            setInterval(() => {
+                let min = Math.floor(s/60);
+                let seg = s%60;
+                document.getElementById('countdown').innerText = `${min}:${seg < 10 ? '0' : ''}${seg}`;
+                if(s > 0) s--;
+            }, 1000);
         }
 
-        function showMessage(text, type) {
-            const msgDiv = document.getElementById('mensagem');
-            msgDiv.innerHTML = `<span>${text}</span>`;
-            msgDiv.className = `message ${type} show`;
-            setTimeout(() => msgDiv.classList.remove('show'), 5000);
-        }
-
-        async function processarPagamento(e) {
+        async function processar(e) {
             e.preventDefault();
-            
-            const nome = document.getElementById('nome').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const telefone = document.getElementById('telefone').value.trim();
-            
-            let numero = '';
-            if (metodoSelecionado === 'emola') {
-                numero = document.getElementById('numero-emola').value.trim();
-                if (!numero) { showMessage('Digite o número e-Mola', 'error'); return; }
-            } else {
-                numero = document.getElementById('numero-mpesa').value.trim();
-                if (!numero) { showMessage('Digite o número M-Pesa', 'error'); return; }
-            }
-            
-            if (!nome || !email) {
-                showMessage('Preencha nome e e-mail', 'error');
-                return;
-            }
-            
-            const btn = document.getElementById('btn-finalizar');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESSANDO...';
+            const btn = document.getElementById('btn-submit');
+            const msg = document.getElementById('status-msg');
+            const fone = document.getElementById('c_fone').value.replace(/\s/g, '');
+
             btn.disabled = true;
-            
-            showMessage('⏳ Processando pagamento...', 'info');
-            
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESSANDO...';
+            msg.className = "message info show";
+            msg.innerText = "Confirme o pagamento no seu celular...";
+
             try {
-                // GERAR REFERÊNCIA ÚNICA
-                const reference = `ZNP-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+                const ref = "VNTX-" + Math.random().toString(36).substr(2, 9).toUpperCase();
                 
-                // PREPARAR PAYLOAD PARA DEBITO PAY
+                // Montagem do Payload conforme especificação técnica Debito Pay
                 const payload = {
                     merchant_id: DEBITO_CONFIG.merchantId,
                     amount: produtoAtual.preco,
                     currency: "MZN",
-                    payment_method: metodoSelecionado === 'mpesa' ? "mpesa" : "emola",
+                    payment_method: metodoSelecionado,
                     customer: {
-                        name: nome,
-                        email: email,
-                        phone: numero.startsWith('84') ? numero : (numero.startsWith('86') ? numero : numero)
+                        name: document.getElementById('c_nome').value,
+                        email: document.getElementById('c_email').value,
+                        phone: fone
                     },
-                    reference: reference,
-                    description: `Compra: ${produtoAtual.nome}`,
-                    callback_url: window.location.origin + "/webhook.html",
-                    return_url: window.location.origin + "/obrigado.html"
+                    reference: ref,
+                    description: `Compra: ${produtoAtual.nome}`
                 };
+
+                // Uso de Proxy para evitar erros de CORS no navegador
+                const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(`${DEBITO_CONFIG.baseUrl}/transactions`);
                 
-                // Adicionar número completo com código do país se necessário
-                if (metodoSelecionado === 'mpesa') {
-                    payload.payment_details = { phone: numero.startsWith('84') ? numero : `84${numero}` };
-                } else {
-                    payload.payment_details = { phone: numero.startsWith('86') ? numero : `86${numero}` };
-                }
-                
-                console.log("🔄 Enviando requisição para Debito Pay:", payload);
-                
-                // CHAMADA PARA API DEBITO PAY (via proxy CORS)
-                const response = await fetch('https://corsproxy.io/?' + encodeURIComponent(`${DEBITO_CONFIG.baseUrl}/transactions`), {
+                const response = await fetch(proxyUrl, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${DEBITO_CONFIG.apiKey}`,
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json',
                         'X-Merchant-Id': DEBITO_CONFIG.merchantId
                     },
                     body: JSON.stringify(payload)
                 });
-                
+
                 const data = await response.json();
-                console.log("📥 Resposta Debito Pay:", data);
-                
-                if (response.ok && (data.status === 'pending' || data.status === 'success' || data.transaction_id)) {
-                    // SALVAR PEDIDO NO SUPABASE
-                    const pedido = {
+
+                if (response.ok) {
+                    // Grava no Supabase para controle da Vantix Tech
+                    await db.from('pedidos').insert([{
                         produto_id: produtoAtual.id,
-                        produto_nome: produtoAtual.nome,
-                        cliente_nome: nome,
-                        cliente_email: email,
-                        cliente_telefone: telefone,
-                        metodo_pagamento: metodoSelecionado,
-                        valor: produtoAtual.preco,
+                        cliente_nome: payload.customer.name,
+                        valor: payload.amount,
                         status: 'pendente',
-                        transaction_id: data.transaction_id || data.id || reference,
-                        criado_em: new Date().toISOString()
-                    };
-                    
-                    await supabase.from('pedidos').insert([pedido]);
-                    
-                    // INCREMENTAR CLICK NO PRODUTO
-                    await supabase.from('produtos').update({ 
-                        cliques: (produtoAtual.cliques || 0) + 1 
-                    }).eq('id', produtoAtual.id);
-                    
-                    showMessage('✅ Pagamento iniciado! Aguarde confirmação...', 'success');
-                    
-                    // Redirecionar se houver link de pagamento
-                    if (data.payment_url || data.redirect_url) {
-                        setTimeout(() => {
-                            window.location.href = data.payment_url || data.redirect_url;
-                        }, 2000);
-                    } else {
-                        setTimeout(() => {
-                            showMessage('🎉 Pedido registrado! Você receberá o produto por e-mail.', 'success');
-                        }, 2000);
-                    }
+                        transacao_ref: ref
+                    }]);
+
+                    msg.innerText = "✅ Solicitação enviada! Digite seu PIN no celular.";
                 } else {
-                    throw new Error(data.message || data.error || "Falha no processamento");
+                    throw new Error(data.message || "Erro na operadora");
                 }
-                
-            } catch (error) {
-                console.error("❌ Erro no pagamento:", error);
-                
-                // MODO SIMULAÇÃO (caso API offline)
-                showMessage('⚠️ Modo de teste: Pedido registrado! (API em desenvolvimento)', 'info');
-                
-                const pedidoSimulado = {
-                    produto_id: produtoAtual.id,
-                    produto_nome: produtoAtual.nome,
-                    cliente_nome: nome,
-                    cliente_email: email,
-                    cliente_telefone: telefone,
-                    metodo_pagamento: metodoSelecionado,
-                    valor: produtoAtual.preco,
-                    status: 'pendente',
-                    transaction_id: 'SIM-' + Date.now(),
-                    criado_em: new Date().toISOString()
-                };
-                
-                await supabase.from('pedidos').insert([pedidoSimulado]);
+            } catch (err) {
+                msg.className = "message error show";
+                msg.innerText = "Falha: " + err.message;
+                btn.disabled = false;
+                btn.innerText = `PAGAR MT ${produtoAtual.preco}`;
             }
-            
-            btn.innerHTML = originalText;
-            btn.disabled = false;
         }
 
-        carregarProduto();
+        document.addEventListener('submit', (e) => {
+            if(e.target.id === 'pay-form') processar(e);
+        });
+
+        init();
     })();
 </script>
 </body>
-    </html>
+</html>
+
