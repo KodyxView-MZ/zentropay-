@@ -31,7 +31,7 @@
 <body>
 
 <div class="container">
-    <div id="loader" style="text-align:center; padding:50px;">Sincronizando com Vantix...</div>
+    <div id="loader" style="text-align:center; padding:50px;">Sincronizando Vantix...</div>
     
     <div id="main-content" style="display:none;">
         <div class="card">
@@ -63,6 +63,7 @@
 </div>
 
 <script>
+    // Configurações de Banco de Dados
     const S_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
     const S_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
     
@@ -100,7 +101,7 @@
         btn.disabled = true;
         btn.innerText = "PROCESSANDO...";
         msg.className = "status info";
-        msg.innerText = "Verifique o telemóvel para confirmar o PIN...";
+        msg.innerText = "Aguarde a solicitação do PIN no telemóvel...";
 
         try {
             const payload = {
@@ -111,12 +112,12 @@
                     email: document.getElementById('email').value,
                     phone: document.getElementById('phone').value.replace(/\s/g, '')
                 },
-                reference: "LIVE-" + Date.now(),
+                reference: "VANTIX-" + Date.now(),
                 description: "Vantix: " + currentProd.nome
             };
 
-            // ATUALIZADO: Link direto para o túnel Cloudflare atual
-            const response = await fetch('https://defining-category-grid-prix.trycloudflare.com/processar', {
+            // LINK ATUALIZADO DO CLOUDFLARE
+            const response = await fetch('https://attended-ent-though-award.trycloudflare.com/processar', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -126,7 +127,7 @@
 
             if (response.ok) {
                 msg.className = "status success";
-                msg.innerText = "✅ PIN solicitado! Insira no telemóvel para concluir.";
+                msg.innerText = "✅ PIN Solicitado! Insira para confirmar o pagamento.";
                 
                 await db.from('pedidos').insert([{ 
                     cliente: payload.customer.name, 
@@ -135,7 +136,7 @@
                     ref: payload.reference 
                 }]);
             } else {
-                throw new Error(result.message || "Erro na operadora");
+                throw new Error(result.message || "Erro no processamento");
             }
         } catch (err) {
             msg.className = "status error";
@@ -149,4 +150,3 @@
 </script>
 </body>
 </html>
-
