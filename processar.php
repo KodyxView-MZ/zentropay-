@@ -1,5 +1,5 @@
 <?php
-// Bloqueia qualquer erro de texto que possa corromper o JSON
+// Impede que erros de aviso do PHP quebrem o JSON de saída
 ini_set('display_errors', 0);
 header('Content-Type: application/json');
 
@@ -12,24 +12,18 @@ try {
     $data = json_decode($input, true);
 
     if (!$data) {
-        throw new Exception("Nenhum dado recebido pelo PHP.");
+        throw new Exception("Nenhum dado recebido pelo servidor.");
     }
-
-    $serviceCode = ($data['payment_method'] === 'mpesa') ? 'MPESA_C2B' : 'EMOLA_C2B';
 
     $payload = [
         'merchant_id'    => $merchantId,
-        'service_code'   => $serviceCode,
+        'service_code'   => ($data['payment_method'] === 'mpesa') ? 'MPESA_C2B' : 'EMOLA_C2B',
         'amount'         => (float)$data['amount'],
         'currency'       => 'MZN',
         'payment_method' => $data['payment_method'],
         'reference'      => $data['reference'],
         'description'    => $data['description'],
-        'customer'       => [
-            'name'  => $data['customer']['name'],
-            'email' => $data['customer']['email'],
-            'phone' => $data['customer']['phone']
-        ]
+        'customer'       => $data['customer']
     ];
 
     $ch = curl_init($apiUrl);
@@ -46,14 +40,14 @@ try {
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     
     if (curl_errno($ch)) {
-        throw new Exception("CURL Error: " . curl_error($ch));
+        throw new Exception("Falha na conexão (CURL): " . curl_error($ch));
     }
     curl_close($ch);
 
-    // Se a API retornar vazio, criamos nossa própria mensagem de erro
+    // Garante que se a API falhar, o PHP ainda responda um JSON válido
     if (empty($response)) {
         http_response_code(500);
-        echo json_encode(["message" => "API da Debito Pay retornou uma resposta vazia (HTTP $httpCode)"]);
+        echo json_encode(["status" => "error", "message" => "Resposta vazia da API (Código $httpCode)"]);
     } else {
         http_response_code($httpCode);
         echo $response;
@@ -61,6 +55,6 @@ try {
 
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(["message" => "Erro interno: " . $e->getMessage()]);
+    echo json_encode(["status" => "error", "message" => $e->getMessage()]);
 }
 ?>
