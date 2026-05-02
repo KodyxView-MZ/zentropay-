@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-mz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout Seguro — ZentroPay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary: #10b981;
+            --bg: #f9fafb;
+            --text: #1f2937;
+            --danger: #d90429;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--text); padding-bottom: 40px; }
+
+        /* Barra de Urgência */
+        #timer-bar {
+            background: var(--danger);
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            display: none; /* Só aparece se ativado no admin */
+        }
+
+        .container { max-width: 500px; margin: 20px auto; padding: 15px; }
+
+        /* Card do Produto */
+        .product-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .prod-header { display: flex; gap: 15px; align-items: center; margin-bottom: 15px; }
+        .prod-img { width: 70px; height: 70px; border-radius: 12px; object-fit: cover; background: #eee; }
+        .prod-info h2 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+        .prod-price { color: var(--primary); font-weight: 800; font-size: 18px; }
+
+        .summary-row { display: flex; justify-content: space-between; font-size: 14px; margin-top: 10px; color: #6b7280; }
+        .total-row { display: flex; justify-content: space-between; font-size: 18px; font-weight: 800; margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; }
+
+        /* Formulário */
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+        input {
+            width: 100%; padding: 12px 15px; border-radius: 10px;
+            border: 1px solid #e5e7eb; font-size: 15px; transition: 0.2s;
+        }
+        input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1); }
+
+        /* Métodos de Pagamento */
+        .payment-methods { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+        .method-card {
+            border: 2px solid #f3f4f6; border-radius: 12px; padding: 12px;
+            text-align: center; cursor: pointer; position: relative; transition: 0.3s;
+        }
+        .method-card.active { border-color: var(--primary); background: #f0fdf4; }
+        .method-card img { height: 35px; margin-bottom: 5px; display: block; margin: 0 auto 5px; }
+        .method-card input { position: absolute; opacity: 0; }
+
+        /* Botão Finalizar */
+        .btn-pay {
+            width: 100%; background: var(--primary); color: white; border: none;
+            padding: 16px; border-radius: 12px; font-size: 16px; font-weight: 700;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+            transition: 0.3s;
+        }
+        .btn-pay:hover { opacity: 0.9; transform: translateY(-2px); }
+
+        .footer-info { display: flex; justify-content: center; gap: 20px; margin-top: 20px; font-size: 12px; color: #9ca3af; }
+    </style>
+</head>
+<body>
+
+<div id="timer-bar">
+    <i class="fas fa-clock"></i> Oferta especial termina em: <span id="countdown">00:00:00</span>
+</div>
+
+<div class="container">
+    <div class="product-card">
+        <div class="prod-header">
+            <img src="" id="p-img" class="prod-img">
+            <div class="prod-info">
+                <h2 id="p-nome">Carregando...</h2>
+                <div class="prod-price"><span id="p-preco">0,00</span> MZN</div>
+            </div>
+        </div>
+        
+        <div class="summary-row"><span>Subtotal:</span> <span id="p-subtotal">0,00 MZN</span></div>
+        <div class="summary-row"><span>Tarifas:</span> <span style="color:var(--primary)">Livre</span></div>
+        <div class="total-row"><span>Total:</span> <span id="p-total">0,00 MZN</span></div>
+    </div>
+
+    <div class="form-group">
+        <label>Nome completo *</label>
+        <input type="text" id="c-nome" placeholder="Nome completo">
+    </div>
+
+    <div class="form-group">
+        <label>E-mail *</label>
+        <input type="email" id="c-email" placeholder="seu@email.com">
+    </div>
+
+    <div class="form-group">
+        <label>WhatsApp <small>(opcional)</small></label>
+        <div style="display:flex; gap:5px">
+            <input type="text" value="+258" disabled style="width:70px; text-align:center">
+            <input type="number" id="c-whatsapp" placeholder="84 123 4567">
+        </div>
+    </div>
+
+    <label>Selecione o método de pagamento *</label>
+    <div class="payment-methods">
+        <div class="method-card active" onclick="selectMethod('emola', this)">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/E-Mola_Logo.png/800px-E-Mola_Logo.png" alt="e-Mola">
+            <span style="font-size:12px; font-weight:700">e-Mola</span>
+        </div>
+        <div class="method-card" onclick="selectMethod('mpesa', this)">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/M-Pesa_Logo.png/1200px-M-Pesa_Logo.png" alt="M-Pesa">
+            <span style="font-size:12px; font-weight:700">M-Pesa</span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label id="label-carteira">Número e-Mola *</label>
+        <div style="display:flex; gap:5px">
+            <input type="text" value="+258" disabled style="width:70px; text-align:center">
+            <input type="number" id="c-telefone" placeholder="86 12 34 567">
+        </div>
+    </div>
+
+    <button class="btn-pay" onclick="processarPagamento()">
+        <i class="fas fa-shopping-cart"></i> Finalizar Compra - <span id="btn-val">0,00</span> MZN
+    </button>
+
+    <div class="footer-info">
+        <span><i class="fas fa-shield-alt"></i> Compra 100% segura</span>
+        <span><i class="fas fa-box"></i> Entrega imediata</span>
+    </div>
+</div>
+
+<script>
+    const SUP_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
+    const SUP_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."; // Sua chave
+    const supabase = window.supabase.createClient(SUP_URL, SUP_KEY);
+
+    let selectedMethod = 'emola';
+    let productData = null;
+
+    async function loadProduct() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+
+        if (!productId) {
+            alert("Produto não encontrado!");
+            return;
+        }
+
+        const { data, error } = await supabase.from('produtos').select('*').eq('id', productId).single();
+
+        if (data) {
+            productData = data;
+            document.getElementById('p-nome').innerText = data.nome;
+            document.getElementById('p-preco').innerText = data.preco.toLocaleString();
+            document.getElementById('p-subtotal').innerText = data.preco.toLocaleString() + " MZN";
+            document.getElementById('p-total').innerText = data.preco.toLocaleString() + " MZN";
+            document.getElementById('btn-val').innerText = data.preco.toLocaleString();
+            document.getElementById('p-img').src = data.imagem || 'https://placehold.co/70';
+
+            // Configurar Urgência
+            if (data.urgent_enabled) {
+                startTimer(data.urgent_minutes);
+            }
+        }
+    }
+
+    function selectMethod(method, element) {
+        selectedMethod = method;
+        document.querySelectorAll('.method-card').forEach(c => c.classList.remove('active'));
+        element.classList.add('active');
+        document.getElementById('label-carteira').innerText = `Número ${method === 'emola' ? 'e-Mola' : 'M-Pesa'} *`;
+    }
+
+    function startTimer(minutes) {
+        document.getElementById('timer-bar').style.display = 'block';
+        let time = minutes * 60;
+        const display = document.getElementById('countdown');
+        
+        setInterval(() => {
+            let h = Math.floor(time / 3600);
+            let m = Math.floor((time % 3600) / 60);
+            let s = time % 60;
+            display.innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+            if (time > 0) time--;
+        }, 1000);
+    }
+
+    async function processarPagamento() {
+        // Aqui você insere a lógica de integração com a API de pagamentos
+        alert("Iniciando pagamento via " + selectedMethod);
+    }
+
+    loadProduct();
+</script>
+</body>
+</html>
+
