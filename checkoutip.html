@@ -117,8 +117,8 @@
                 description: "Compra: " + currentProd.nome
             };
 
-            // ALTERADO: Apontando para a Serverless Function da Vercel
-            const response = await fetch('/api/processar', {
+            // ALTERADO: Agora aponta para o túnel Cloudflare do Termux
+            const response = await fetch('https://marks-concerns-fossil-convert.trycloudflare.com/processar', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -137,7 +137,6 @@
                     ref: payload.reference 
                 }]);
             } else {
-                // Captura a mensagem de erro vinda da API da DebitoPay
                 throw new Error(result.message || "Erro na operadora");
             }
         } catch (err) {
@@ -152,4 +151,3 @@
 </script>
 </body>
 </html>
-
