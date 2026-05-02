@@ -1,92 +1,582 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout Seguro — ZentroPay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>ZentroPay — Checkout Infoproduto</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* Adicione seu CSS aqui ou mantenha o link externo */
-        .loading { opacity: 0.5; pointer-events: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #0a0a0c;
+            font-family: 'Inter', sans-serif;
+            padding: 20px;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 550px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .logo {
+            width: 80px;
+            margin-bottom: 16px;
+        }
+        .header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff, #a855f7);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .timer-card {
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            border-radius: 24px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 24px;
+            animation: pulse 1s infinite;
+            display: none;
+        }
+        .timer-card.show { display: block; }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.01); opacity: 0.95; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .timer-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+        .timer-value {
+            font-size: 36px;
+            font-weight: 800;
+            font-family: monospace;
+            letter-spacing: 4px;
+        }
+
+        .produto-card {
+            background: rgba(18, 18, 24, 0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+            border: 1px solid rgba(255,255,255,0.08);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .produto-header {
+            display: flex;
+            gap: 16px;
+            padding: 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .produto-imagem {
+            width: 80px;
+            height: 100px;
+            border-radius: 16px;
+            object-fit: cover;
+            background: rgba(255,255,255,0.05);
+        }
+        .produto-info h2 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .produto-info .preco {
+            font-size: 24px;
+            font-weight: 800;
+            color: #10b981;
+        }
+        .produto-info .description {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 4px;
+        }
+
+        .resumo {
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .resumo-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        .resumo-total {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 16px;
+            margin-top: 8px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .form-section {
+            padding: 24px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 8px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            font-size: 15px;
+            color: white;
+            font-family: 'Inter', sans-serif;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #10b981;
+        }
+
+        .phone-prefix {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .phone-prefix span {
+            background: rgba(255,255,255,0.05);
+            padding: 14px 16px;
+            border-radius: 16px;
+            color: rgba(255,255,255,0.6);
+        }
+        .phone-prefix input {
+            flex: 1;
+        }
+
+        .metodos-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 8px;
+        }
+        .metodo-btn {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .metodo-btn i {
+            font-size: 24px;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .metodo-btn span {
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .metodo-btn.active {
+            background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(5,150,105,0.2));
+            border-color: #10b981;
+        }
+
+        .campo-extra { display: none; }
+        .campo-extra.show { display: block; }
+
+        .btn-finalizar {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(90deg, #10b981, #059669);
+            border: none;
+            border-radius: 44px;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 16px;
+            transition: all 0.2s;
+        }
+        .btn-finalizar:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+        }
+        .btn-finalizar:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.4);
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .footer i {
+            margin-right: 6px;
+        }
+
+        .message {
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: 16px;
+            font-size: 13px;
+            text-align: center;
+            display: none;
+        }
+        .message.show { display: block; }
+        .message.success { background: rgba(16,185,129,0.15); color: #10b981; }
+        .message.error { background: rgba(239,68,68,0.15); color: #ef4444; }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+        }
+        .error-state {
+            text-align: center;
+            padding: 60px;
+            background: rgba(18,18,24,0.6);
+            border-radius: 28px;
+        }
+
+        @media (max-width: 480px) {
+            .produto-header { flex-direction: column; text-align: center; }
+            .produto-imagem { margin: 0 auto; }
+            .metodos-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
-
-    <div id="checkout-container">
-        <div class="header">
-            <h2 id="product-name">Sincronizando...</h2>
-            <h1 id="total-price">0,00 MZN</h1>
-        </div>
-
-        <form id="payment-form">
-            <input type="text" placeholder="Seu nome" required>
-            <input type="email" placeholder="seu@email.com" required>
-
-            <div class="methods">
-                <label>
-                    <input type="radio" name="method" value="emola" checked>
-                    <img src="assets/emola-logo.png" alt="e-Mola" onerror="this.src='https://via.placeholder.com/40?text=eMola'">
-                    e-Mola
-                </label>
-                <label>
-                    <input type="radio" name="method" value="mpesa">
-                    <img src="assets/mpesa-logo.png" alt="M-Pesa" onerror="this.src='https://via.placeholder.com/40?text=Mpesa'">
-                    M-Pesa
-                </label>
-            </div>
-
-            <button type="submit" id="btn-finalizar">FINALIZAR COMPRA - 0,00 MZN</button>
-        </form>
+<div class="container">
+    <div class="header">
+        <img src="ei_1777492717837-removebg-preview.png" class="logo">
+        <h1>ZentroPay</h1>
     </div>
 
-    <script>
-        // 1. CONFIGURAÇÃO ÚNICA (Evita o erro de "already declared")
-        const SUPABASE_URL = 'SUA_URL_DO_SUPABASE';
-        const SUPABASE_KEY = 'SUA_ANON_KEY_DO_SUPABASE';
-        
-        // Verifica se a variável já existe no escopo global para não dar erro
-        if (typeof supabase === 'undefined' || !window._supabaseInstance) {
-            window._supabaseInstance = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    <div id="checkout-content">
+        <div class="loading"><i class="fas fa-spinner fa-spin"></i> Carregando produto...</div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const SUPABASE_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let produtoAtual = null;
+        let metodoSelecionado = 'emola';
+        let timerInterval = null;
+
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return { id: params.get('id') };
         }
-        const db = window._supabaseInstance;
 
-        // 2. FUNÇÃO PARA CARREGAR DADOS DO CHECKOUT
-        async function loadCheckoutData() {
-            try {
-                // Exemplo: buscando o produto atual da URL ou banco
-                const urlParams = new URLSearchParams(window.location.search);
-                const productId = urlParams.get('id') || '1';
+        async function carregarProduto() {
+            const { id } = getUrlParams();
+            const container = document.getElementById('checkout-content');
 
-                const { data, error } = await db
-                    .from('produtos') // Nome da sua tabela
-                    .select('*')
-                    .eq('id', productId)
-                    .single();
-
-                if (error) throw error;
-
-                if (data) {
-                    // Atualiza a UI com os dados reais
-                    document.getElementById('product-name').innerText = data.nome;
-                    const precoFormatado = `${data.preco.toLocaleString('pt-MZ')},00 MZN`;
-                    document.getElementById('total-price').innerText = precoFormatado;
-                    document.getElementById('btn-finalizar').innerText = `FINALIZAR COMPRA - ${precoFormatado}`;
-                }
-            } catch (err) {
-                console.error("Erro ao sincronizar:", err.message);
-                document.getElementById('product-name').innerText = "Erro ao carregar dados";
+            if (!id) {
+                container.innerHTML = `
+                    <div class="error-state">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 16px;"></i>
+                        <h3>Produto não especificado</h3>
+                        <p>Verifique o link e tente novamente.</p>
+                    </div>
+                `;
+                return;
             }
+
+            // Buscar produto APROVADO (status = 'active')
+            const { data, error } = await supabase
+                .from('produtos')
+                .select('*')
+                .eq('id', id)
+                .eq('status', 'active')
+                .single();
+
+            if (error || !data) {
+                console.error("Erro ao buscar produto:", error);
+                container.innerHTML = `
+                    <div class="error-state">
+                        <i class="fas fa-search" style="font-size: 48px; margin-bottom: 16px;"></i>
+                        <h3>Produto não encontrado</h3>
+                        <p>Este produto pode ter sido removido ou não está disponível.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            produtoAtual = data;
+            renderizarCheckout(produtoAtual);
+            incrementarVisualizacao(produtoAtual.id);
         }
 
-        // Executa ao carregar a página
-        window.onload = loadCheckoutData;
+        async function incrementarVisualizacao(id) {
+            await supabase.rpc('incrementar_visualizacoes', { produto_id: id }).catch(async () => {
+                const { data: produto } = await supabase.from('produtos').select('visualizacoes').eq('id', id).single();
+                await supabase.from('produtos').update({ visualizacoes: (produto?.visualizacoes || 0) + 1 }).eq('id', id);
+            });
+        }
 
-        // 3. LÓGICA DE ENVIO DO FORMULÁRIO
-        document.getElementById('payment-form').onsubmit = async (e) => {
-            e.preventDefault();
-            alert("Processando pagamento via ZentroPay...");
-            // Insira aqui sua chamada para a API de pagamento
-        };
-    </script>
+        function renderizarCheckout(produto) {
+            const precoFormatado = (produto.preco || 0).toLocaleString('pt-MZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            const container = document.getElementById('checkout-content');
+            const imagem = produto.imagem || 'https://placehold.co/80x100/1e1b4b/white?text=Produto';
+
+            container.innerHTML = `
+                <!-- Contador de Urgência (só se ativado) -->
+                <div class="timer-card ${produto.urgent_enabled ? 'show' : ''}" id="timer-card">
+                    <div class="timer-label">⚠️ OFERTA ESPECIAL TERMINA EM:</div>
+                    <div class="timer-value" id="timer">${produto.urgent_enabled ? '--:--:--' : ''}</div>
+                </div>
+
+                <div class="produto-card">
+                    <div class="produto-header">
+                        <img src="${imagem}" class="produto-imagem" id="produto-imagem" onerror="this.src='https://placehold.co/80x100/1e1b4b/white?text=Produto'">
+                        <div class="produto-info">
+                            <h2 id="produto-nome">${produto.nome}</h2>
+                            <div class="preco" id="produto-preco">MT ${precoFormatado.replace('.', ',')} MZN</div>
+                            <div class="description" id="produto-descricao">${produto.descricao_curta || 'Produto digital - Entrega imediata'}</div>
+                        </div>
+                    </div>
+                    <div class="resumo">
+                        <div class="resumo-item"><span>Subtotal:</span><span id="subtotal">MT ${precoFormatado.replace('.', ',')} MZN</span></div>
+                        <div class="resumo-item"><span>Tarifas:</span><span>Livre</span></div>
+                        <div class="resumo-total"><span>Total:</span><span id="total">MT ${precoFormatado.replace('.', ',')} MZN</span></div>
+                    </div>
+                </div>
+
+                <div class="produto-card">
+                    <div class="form-section">
+                        <form id="checkout-form">
+                            <div class="form-group">
+                                <label>NOME COMPLETO *</label>
+                                <input type="text" id="nome" placeholder="Nome completo" required>
+                            </div>
+                            <div class="form-group">
+                                <label>E-MAIL *</label>
+                                <input type="email" id="email" placeholder="seu@email.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label>WHATSAPP (opcional)</label>
+                                <div class="phone-prefix">
+                                    <span>+258</span>
+                                    <input type="tel" id="whatsapp" placeholder="84 123 4567">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>SELECTIONE O MÉTODO DE PAGAMENTO *</label>
+                                <div class="metodos-grid">
+                                    <div class="metodo-btn ${metodoSelecionado === 'emola' ? 'active' : ''}" data-metodo="emola">
+                                        <i class="fas fa-mobile-alt"></i>
+                                        <span>e-Mola</span>
+                                    </div>
+                                    <div class="metodo-btn ${metodoSelecionado === 'mpesa' ? 'active' : ''}" data-metodo="mpesa">
+                                        <i class="fas fa-mobile-alt"></i>
+                                        <span>M-Pesa</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group campo-extra ${metodoSelecionado === 'emola' ? 'show' : ''}" id="campo-emola">
+                                <label>NÚMERO E-MOLA *</label>
+                                <div class="phone-prefix">
+                                    <span>+258</span>
+                                    <input type="tel" id="numero-emola" placeholder="86 12 34 567">
+                                </div>
+                            </div>
+
+                            <div class="form-group campo-extra ${metodoSelecionado === 'mpesa' ? 'show' : ''}" id="campo-mpesa">
+                                <label>NÚMERO M-PESA *</label>
+                                <div class="phone-prefix">
+                                    <span>+258</span>
+                                    <input type="tel" id="numero-mpesa" placeholder="84 123 4567">
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn-finalizar" id="btn-finalizar">
+                                <i class="fas fa-arrow-right"></i> FINALIZAR COMPRA - MT ${precoFormatado.replace('.', ',')} MZN
+                            </button>
+                            <div id="mensagem" class="message"></div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="footer">
+                    <div><i class="fas fa-lock"></i> Compra 100% segura</div>
+                    <div><i class="fas fa-bolt"></i> Entrega imediata</div>
+                </div>
+            `;
+
+            // Iniciar timer se urgência estiver ativada
+            if (produto.urgent_enabled && produto.urgent_minutes > 0) {
+                iniciarTimer(produto.urgent_minutes);
+            }
+
+            // Eventos dos métodos de pagamento
+            document.querySelectorAll('.metodo-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.metodo-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    metodoSelecionado = btn.dataset.metodo;
+                    
+                    document.getElementById('campo-emola').classList.remove('show');
+                    document.getElementById('campo-mpesa').classList.remove('show');
+                    
+                    if (metodoSelecionado === 'emola') {
+                        document.getElementById('campo-emola').classList.add('show');
+                    } else if (metodoSelecionado === 'mpesa') {
+                        document.getElementById('campo-mpesa').classList.add('show');
+                    }
+                });
+            });
+
+            // Evento do formulário
+            document.getElementById('checkout-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await processarPedido(produto);
+            });
+        }
+
+        function iniciarTimer(minutos) {
+            let tempoRestante = minutos * 60;
+            const timerElement = document.getElementById('timer');
+            
+            function atualizarTimer() {
+                if (tempoRestante <= 0) {
+                    clearInterval(timerInterval);
+                    timerElement.innerText = "00:00:00";
+                    return;
+                }
+                const horas = Math.floor(tempoRestante / 3600);
+                const mins = Math.floor((tempoRestante % 3600) / 60);
+                const segs = tempoRestante % 60;
+                timerElement.innerText = `${horas.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${segs.toString().padStart(2, '0')}`;
+                tempoRestante--;
+            }
+            
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(atualizarTimer, 1000);
+            atualizarTimer();
+        }
+
+        async function processarPedido(produto) {
+            const nome = document.getElementById('nome').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const whatsapp = document.getElementById('whatsapp').value.trim();
+            
+            let numero = '';
+            if (metodoSelecionado === 'emola') {
+                numero = document.getElementById('numero-emola').value.trim();
+                if (!numero) {
+                    showMessage('Digite o número e-Mola', 'error');
+                    return;
+                }
+            } else if (metodoSelecionado === 'mpesa') {
+                numero = document.getElementById('numero-mpesa').value.trim();
+                if (!numero) {
+                    showMessage('Digite o número M-Pesa', 'error');
+                    return;
+                }
+            }
+            
+            if (!nome || !email) {
+                showMessage('Preencha nome e e-mail', 'error');
+                return;
+            }
+            
+            const btn = document.getElementById('btn-finalizar');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESSANDO...';
+            btn.disabled = true;
+            
+            // Salvar pedido no Supabase
+            const pedido = {
+                produto_id: produto.id,
+                produto_nome: produto.nome,
+                cliente_nome: nome,
+                cliente_email: email,
+                cliente_telefone: whatsapp,
+                metodo_pagamento: metodoSelecionado,
+                valor: produto.preco,
+                status: 'pendente',
+                transaction_id: 'TXN-' + Date.now(),
+                criado_em: new Date().toISOString()
+            };
+            
+            // Incrementar cliques no produto
+            await supabase.from('produtos').update({ cliques: (produto.cliques || 0) + 1 }).eq('id', produto.id);
+            
+            // Salvar pedido
+            const { error } = await supabase.from('pedidos').insert([pedido]);
+            
+            if (error) {
+                console.error("Erro ao salvar pedido:", error);
+                showMessage('Erro ao processar pagamento. Tente novamente.', 'error');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                return;
+            }
+            
+            // Incrementar vendas no produto
+            await supabase.from('produtos').update({ vendas: (produto.vendas || 0) + 1 }).eq('id', produto.id);
+            
+            showMessage('✅ Pedido realizado com sucesso! Você receberá o produto por e-mail.', 'success');
+            
+            setTimeout(() => {
+                window.location.href = `obrigado.html?produto=${produto.id}`;
+            }, 2000);
+        }
+
+        function showMessage(text, type) {
+            const msg = document.getElementById('mensagem');
+            msg.innerText = text;
+            msg.className = `message ${type} show`;
+            setTimeout(() => msg.classList.remove('show'), 5000);
+        }
+
+        carregarProduto();
+    })();
+</script>
 </body>
-</html>
+    </html>
