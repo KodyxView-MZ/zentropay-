@@ -1,34 +1,40 @@
 export default async function handler(req, res) {
-    // Cabeçalhos CORS
+    // 1. Headers para evitar bloqueios
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
     if (req.method === 'OPTIONS') return res.status(200).end();
 
-    const merchantId = "f2a41c3a-4ed7-482c-8d16-4fd9c376f9c8";
-    const apiKey = "sk_sandbox_sM9q5NuDelfYwKSrV1xzORYoha0inrIq";
-
     try {
-        const body = req.body;
-        
-        // Verificação básica se os dados chegaram
-        if (!body || !body.customer) {
-            throw new Error("Dados do cliente ausentes no corpo da requisição.");
+        const { amount, payment_method, customer, reference, description } = req.body;
+
+        // 2. Validação e Formatação do Telefone (Essencial para Moçambique)
+        let phone = customer.phone.replace(/\s/g, '');
+        if (!phone.startsWith('258')) {
+            phone = '258' + phone; // Garante que tem o código do país
         }
 
+        const merchantId = "f2a41c3a-4ed7-482c-8d16-4fd9c376f9c8";
+        const apiKey = "sk_sandbox_sM9q5NuDelfYwKSrV1xzORYoha0inrIq";
+
+        // 3. Montagem do Payload conforme a documentação técnica
         const payload = {
             merchant_id: merchantId,
-            service_code: (body.payment_method === 'mpesa') ? 'MPESA_C2B' : 'EMOLA_C2B',
-            amount: parseFloat(body.amount),
+            service_code: (payment_method === 'mpesa') ? 'MPESA_C2B' : 'EMOLA_C2B',
+            amount: parseFloat(amount),
             currency: 'MZN',
-            payment_method: body.payment_method,
-            reference: body.reference,
-            description: body.description,
-            customer: body.customer
+            payment_method: payment_method,
+            reference: reference || `ZNP-${Date.now()}`,
+            description: description || "Pagamento ZentroPay",
+            customer: {
+                name: customer.name,
+                email: customer.email,
+                phone: phone
+            }
         };
 
-        const apiRes = await fetch("https://debito.co.mz/v1/transactions", {
+        const response = await fetch("https://api.debito.co.mz/v1/transactions", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -38,23 +44,13 @@ export default async function handler(req, res) {
             body: JSON.stringify(payload)
         });
 
-        const result = await apiRes.json();
-        
-        // Se a API da Debito retornar erro, repassamos o erro dela
-        if (!apiRes.ok) {
-            return res.status(apiRes.status).json({ 
-                message: result.message || "Erro na API da Débito" 
-            });
-        }
+        const result = await response.json();
 
-        return res.status(200).json(result);
+        // 4. Retorna a resposta da operadora (M-Pesa/e-Mola)
+        return res.status(response.status).json(result);
 
     } catch (error) {
-        // Isso ajuda a debugar nos Logs da Vercel
-        console.error("DETALHE DO ERRO:", error.message);
-        return res.status(500).json({ 
-            status: "error", 
-            message: error.message 
-        });
+        console.error("ERRO CRÍTICO:", error.message);
+        return res.status(500).json({ status: "error", message: error.message });
     }
 }
