@@ -9,57 +9,47 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --primary: #10b981; --bg: #f9fafb; --text: #1f2937; --danger: #d90429; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); color: var(--text); padding-bottom: 40px; }
-        
         #timer-bar { background: var(--danger); color: white; padding: 12px; text-align: center; font-size: 13px; font-weight: 700; display: none; position: sticky; top: 0; z-index: 100; }
-        
         .container { max-width: 480px; margin: 0 auto; padding: 15px; }
-
         .product-card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid rgba(0,0,0,0.03); }
         .prod-header { display: flex; gap: 15px; align-items: center; margin-bottom: 15px; }
-        .prod-img { width: 80px; height: 80px; border-radius: 15px; object-fit: cover; background: #f3f4f6; border: 1px solid #eee; }
-        .prod-info h2 { font-size: 16px; font-weight: 700; line-height: 1.3; }
-        .prod-price { color: var(--primary); font-weight: 800; font-size: 20px; margin-top: 4px; }
-        
+        .prod-img { width: 80px; height: 80px; border-radius: 15px; object-fit: cover; background: #f3f4f6; }
+        .prod-info h2 { font-size: 16px; font-weight: 700; }
+        .prod-price { color: var(--primary); font-weight: 800; font-size: 20px; }
         .summary-row { display: flex; justify-content: space-between; font-size: 14px; margin-top: 10px; color: #6b7280; }
         .total-row { display: flex; justify-content: space-between; font-size: 18px; font-weight: 800; margin-top: 15px; padding-top: 15px; border-top: 1px solid #f3f4f6; }
-
         .form-group { margin-bottom: 15px; }
-        label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 8px; color: #374151; }
-        input { width: 100%; padding: 14px; border-radius: 12px; border: 1.5px solid #e5e7eb; font-size: 15px; transition: 0.2s; background: #fff; }
-        input:focus { outline: none; border-color: var(--primary); background: #f0fdf4; }
-
+        label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+        input { width: 100%; padding: 14px; border-radius: 12px; border: 1.5px solid #e5e7eb; font-size: 15px; }
         .payment-methods { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 15px 0; }
-        .method-card { border: 2px solid #f3f4f6; border-radius: 15px; padding: 15px; text-align: center; cursor: pointer; transition: 0.3s; background: white; }
+        .method-card { border: 2px solid #f3f4f6; border-radius: 15px; padding: 15px; text-align: center; cursor: pointer; background: white; }
         .method-card.active { border-color: var(--primary); background: #f0fdf4; }
-        .method-card img { height: 35px; object-fit: contain; margin-bottom: 8px; }
-
-        .btn-pay { width: 100%; background: var(--primary); color: white; border: none; padding: 18px; border-radius: 15px; font-size: 16px; font-weight: 800; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); }
-        .footer-secure { display: flex; justify-content: center; gap: 15px; margin-top: 25px; font-size: 11px; color: #9ca3af; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .method-card img { height: 30px; margin-bottom: 5px; }
+        .btn-pay { width: 100%; background: var(--primary); color: white; border: none; padding: 18px; border-radius: 15px; font-size: 16px; font-weight: 800; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div id="timer-bar"><i class="fas fa-clock"></i> Oferta especial termina em: <span id="countdown">00:00:00</span></div>
+<div id="timer-bar"><i class="fas fa-clock"></i> Oferta termina em: <span id="countdown">00:00:00</span></div>
 
 <div class="container">
     <div class="product-card">
         <div class="prod-header">
-            <img src="" id="p-img" class="prod-img" onerror="this.src='https://placehold.co/100x100/f3f4f6/999?text=ZentroPay'">
+            <img src="" id="p-img" class="prod-img" onerror="this.src='https://placehold.co/100x100?text=ZentroPay'">
             <div class="prod-info">
-                <h2 id="p-nome">Aguardando conexão...</h2>
+                <h2 id="p-nome">A carregar dados...</h2>
                 <div class="prod-price"><span id="p-preco">0,00</span> MZN</div>
             </div>
         </div>
         <div class="summary-row"><span>Subtotal:</span> <span id="p-subtotal">0,00 MZN</span></div>
-        <div class="summary-row"><span>Tarifas:</span> <span style="color:var(--primary)">Livre</span></div>
         <div class="total-row"><span>Total:</span> <span id="p-total">0,00 MZN</span></div>
     </div>
 
     <div class="form-group">
         <label>Nome completo *</label>
-        <input type="text" id="c-nome" placeholder="Como no documento">
+        <input type="text" id="c-nome" placeholder="Seu nome">
     </div>
 
     <div class="form-group">
@@ -81,20 +71,12 @@
 
     <div class="form-group">
         <label id="label-carteira">Número e-Mola *</label>
-        <div style="display:flex; gap:8px">
-            <input type="text" value="+258" disabled style="width:65px; text-align:center; background:#eee">
-            <input type="number" id="c-telefone" placeholder="86 123 4567">
-        </div>
+        <input type="number" id="c-telefone" placeholder="86 123 4567">
     </div>
 
     <button class="btn-pay" onclick="processarPagamento()">
-        <i class="fas fa-lock"></i> FINALIZAR COMPRA - <span id="btn-val">0,00</span> MZN
+        FINALIZAR COMPRA - <span id="btn-val">0,00</span> MZN
     </button>
-
-    <div class="footer-secure">
-        <span><i class="fas fa-shield-alt"></i> 100% SEGURO</span>
-        <span><i class="fas fa-bolt"></i> ENTREGA IMEDIATA</span>
-    </div>
 </div>
 
 <script>
@@ -102,32 +84,30 @@
     const SUP_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
     const supabase = window.supabase.createClient(SUP_URL, SUP_KEY);
 
-    let selectedMethod = 'emola';
+    async function fetchData() {
+        const urlParams = new URLSearchParams(window.location.search);
+        let productId = urlParams.get('id');
 
-    async function start() {
-        try {
-            const urlParams = new URLSearchParams(window.location.search);
-            const productId = urlParams.get('id');
+        // Se não houver ID na URL, vamos tentar buscar o produto mais recente só para testar
+        if (!productId) {
+            console.log("Sem ID na URL. A tentar carregar produto genérico...");
+            const { data: latest } = await supabase.from('produtos').select('*').limit(1).single();
+            if (latest) productId = latest.id;
+        }
 
-            if (!productId) {
-                alert("ERRO: O link não contém o ID do produto. Use: ?id=VALOR");
-                document.getElementById('p-nome').innerText = "ID do produto ausente";
-                return;
-            }
+        if (!productId) {
+            alert("Nenhum produto encontrado. Verifique a tabela 'produtos' no Supabase.");
+            return;
+        }
 
-            const { data, error } = await supabase.from('produtos').select('*').eq('id', productId).single();
+        const { data, error } = await supabase.from('produtos').select('*').eq('id', productId).single();
 
-            if (error) {
-                alert("ERRO SUPABASE: " + error.message);
-                return;
-            }
+        if (error) {
+            alert("Erro Supabase: " + error.message);
+            return;
+        }
 
-            if (!data) {
-                alert("ERRO: Produto não encontrado no banco de dados.");
-                return;
-            }
-
-            // Inserir dados
+        if (data) {
             document.getElementById('p-nome').innerText = data.nome;
             document.getElementById('p-preco').innerText = Number(data.preco).toLocaleString();
             document.getElementById('p-subtotal').innerText = Number(data.preco).toLocaleString() + " MZN";
@@ -135,10 +115,9 @@
             document.getElementById('btn-val').innerText = Number(data.preco).toLocaleString();
             document.getElementById('p-img').src = data.imagem;
 
-            // Timer
-            if (data.urgent_enabled && data.urgent_minutes > 0) {
+            if (data.urgent_enabled) {
                 document.getElementById('timer-bar').style.display = 'block';
-                let time = data.urgent_minutes * 60;
+                let time = (data.urgent_minutes || 15) * 60;
                 setInterval(() => {
                     let m = Math.floor(time / 60);
                     let s = time % 60;
@@ -146,28 +125,20 @@
                     if(time > 0) time--;
                 }, 1000);
             }
-
-        } catch (e) {
-            alert("ERRO CRÍTICO: " + e.message);
         }
     }
 
     function selectMethod(m, el) {
-        selectedMethod = m;
         document.querySelectorAll('.method-card').forEach(c => c.classList.remove('active'));
         el.classList.add('active');
         document.getElementById('label-carteira').innerText = `Número ${m === 'emola' ? 'e-Mola' : 'M-Pesa'} *`;
     }
 
-    async function processarPagamento() {
-        const nome = document.getElementById('c-nome').value;
-        const tel = document.getElementById('c-telefone').value;
-        if(!nome || !tel) return alert("Preencha todos os campos obrigatórios!");
-        
-        alert("SOLICITAÇÃO ENVIADA!\nVerifique o seu telemóvel para confirmar o pagamento via " + selectedMethod.toUpperCase());
+    function processarPagamento() {
+        alert("A processar... Verifique o seu telemóvel!");
     }
 
-    start();
+    fetchData();
 </script>
 </body>
 </html>
