@@ -1,146 +1,92 @@
 <!DOCTYPE html>
-<html lang="pt-mz">
+<html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout Seguro — ZentroPay</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --primary: #10b981; --bg: #f9fafb; --text: #1f2937; --danger: #d90429; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: var(--text); padding-bottom: 40px; }
-        #timer-bar { background: var(--danger); color: white; padding: 12px; text-align: center; font-size: 13px; font-weight: 700; display: none; position: sticky; top: 0; z-index: 100; }
-        .container { max-width: 480px; margin: 0 auto; padding: 15px; }
-        .product-card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .prod-header { display: flex; gap: 15px; align-items: center; margin-bottom: 15px; }
-        .prod-img { width: 80px; height: 80px; border-radius: 15px; object-fit: cover; background: #f3f4f6; }
-        .prod-info h2 { font-size: 16px; font-weight: 700; }
-        .prod-price { color: var(--primary); font-weight: 800; font-size: 20px; }
-        .summary-row { display: flex; justify-content: space-between; font-size: 14px; margin-top: 10px; color: #6b7280; }
-        .total-row { display: flex; justify-content: space-between; font-size: 18px; font-weight: 800; margin-top: 15px; padding-top: 15px; border-top: 1px solid #f3f4f6; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 8px; }
-        input { width: 100%; padding: 14px; border-radius: 12px; border: 1.5px solid #e5e7eb; font-size: 15px; }
-        .payment-methods { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 15px 0; }
-        .method-card { border: 2px solid #f3f4f6; border-radius: 15px; padding: 15px; text-align: center; cursor: pointer; background: white; position: relative; }
-        .method-card.active { border-color: var(--primary); background: #f0fdf4; }
-        .method-card img { height: 30px; margin-bottom: 5px; }
-        .btn-pay { width: 100%; background: var(--primary); color: white; border: none; padding: 18px; border-radius: 15px; font-size: 16px; font-weight: 800; cursor: pointer; }
+        /* Adicione seu CSS aqui ou mantenha o link externo */
+        .loading { opacity: 0.5; pointer-events: none; }
     </style>
 </head>
 <body>
 
-<div id="timer-bar"><i class="fas fa-clock"></i> Oferta termina em: <span id="countdown">00:00:00</span></div>
+    <div id="checkout-container">
+        <div class="header">
+            <h2 id="product-name">Sincronizando...</h2>
+            <h1 id="total-price">0,00 MZN</h1>
+        </div>
 
-<div class="container">
-    <div class="product-card">
-        <div class="prod-header">
-            <img src="" id="p-img" class="prod-img" onerror="this.src='https://placehold.co/100x100?text=ZentroPay'">
-            <div class="prod-info">
-                <h2 id="p-nome">Sincronizando...</h2>
-                <div class="prod-price"><span id="p-preco">0,00</span> MZN</div>
+        <form id="payment-form">
+            <input type="text" placeholder="Seu nome" required>
+            <input type="email" placeholder="seu@email.com" required>
+
+            <div class="methods">
+                <label>
+                    <input type="radio" name="method" value="emola" checked>
+                    <img src="assets/emola-logo.png" alt="e-Mola" onerror="this.src='https://via.placeholder.com/40?text=eMola'">
+                    e-Mola
+                </label>
+                <label>
+                    <input type="radio" name="method" value="mpesa">
+                    <img src="assets/mpesa-logo.png" alt="M-Pesa" onerror="this.src='https://via.placeholder.com/40?text=Mpesa'">
+                    M-Pesa
+                </label>
             </div>
-        </div>
-        <div class="summary-row"><span>Subtotal:</span> <span id="p-subtotal">0,00 MZN</span></div>
-        <div class="total-row"><span>Total:</span> <span id="p-total">0,00 MZN</span></div>
+
+            <button type="submit" id="btn-finalizar">FINALIZAR COMPRA - 0,00 MZN</button>
+        </form>
     </div>
 
-    <div class="form-group">
-        <label>Nome completo *</label>
-        <input type="text" id="c-nome" placeholder="Seu nome">
-    </div>
-
-    <div class="form-group">
-        <label>E-mail *</label>
-        <input type="email" id="c-email" placeholder="seu@email.com">
-    </div>
-
-    <label>Método de pagamento *</label>
-    <div class="payment-methods">
-        <div class="method-card active" onclick="selectMethod('emola', this)">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/E-Mola_Logo.png/800px-E-Mola_Logo.png" alt="e-Mola">
-            <div style="font-size:12px; font-weight:700">e-Mola</div>
-        </div>
-        <div class="method-card" onclick="selectMethod('mpesa', this)">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/M-Pesa_Logo.png/512px-M-Pesa_Logo.png" alt="M-Pesa">
-            <div style="font-size:12px; font-weight:700">M-Pesa</div>
-        </div>
-    </div>
-
-    <div class="form-group">
-        <label id="label-carteira">Número e-Mola *</label>
-        <input type="number" id="c-telefone" placeholder="86 123 4567">
-    </div>
-
-    <button class="btn-pay" onclick="processarPagamento()">
-        FINALIZAR COMPRA - <span id="btn-val">0,00</span> MZN
-    </button>
-</div>
-
-<script>
-    const SUP_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
-    const SUP_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
-    const supabase = window.supabase.createClient(SUP_URL, SUP_KEY);
-
-    async function loadData() {
-        const urlParams = new URLSearchParams(window.location.search);
-        let pid = urlParams.get('id');
-
-        try {
-            let query = supabase.from('produtos').select('*');
-            
-            if (pid) {
-                query = query.eq('id', pid).single();
-            } else {
-                // FALLBACK: Se não tiver ID na URL, pega o produto mais recente
-                query = query.order('id', { ascending: false }).limit(1).single();
-            }
-
-            const { data, error } = await query;
-
-            if (error) throw error;
-
-            if (data) {
-                document.getElementById('p-nome').innerText = data.nome;
-                document.getElementById('p-preco').innerText = Number(data.preco).toLocaleString() + ",00";
-                document.getElementById('p-subtotal').innerText = Number(data.preco).toLocaleString() + ",00 MZN";
-                document.getElementById('p-total').innerText = Number(data.preco).toLocaleString() + ",00 MZN";
-                document.getElementById('btn-val').innerText = Number(data.preco).toLocaleString() + ",00";
-                document.getElementById('p-img').src = data.imagem;
-
-                if (data.urgent_enabled) {
-                    document.getElementById('timer-bar').style.display = 'block';
-                    startTimer(data.urgent_minutes || 15);
-                }
-            }
-        } catch (err) {
-            console.error("Erro ao carregar dados:", err.message);
-            document.getElementById('p-nome').innerText = "Produto não encontrado";
+    <script>
+        // 1. CONFIGURAÇÃO ÚNICA (Evita o erro de "already declared")
+        const SUPABASE_URL = 'SUA_URL_DO_SUPABASE';
+        const SUPABASE_KEY = 'SUA_ANON_KEY_DO_SUPABASE';
+        
+        // Verifica se a variável já existe no escopo global para não dar erro
+        if (typeof supabase === 'undefined' || !window._supabaseInstance) {
+            window._supabaseInstance = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         }
-    }
+        const db = window._supabaseInstance;
 
-    function startTimer(min) {
-        let time = min * 60;
-        setInterval(() => {
-            let m = Math.floor(time / 60);
-            let s = time % 60;
-            document.getElementById('countdown').innerText = `00:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-            if (time > 0) time--;
-        }, 1000);
-    }
+        // 2. FUNÇÃO PARA CARREGAR DADOS DO CHECKOUT
+        async function loadCheckoutData() {
+            try {
+                // Exemplo: buscando o produto atual da URL ou banco
+                const urlParams = new URLSearchParams(window.location.search);
+                const productId = urlParams.get('id') || '1';
 
-    function selectMethod(m, el) {
-        document.querySelectorAll('.method-card').forEach(c => c.classList.remove('active'));
-        el.classList.add('active');
-        document.getElementById('label-carteira').innerText = `Número ${m === 'emola' ? 'e-Mola' : 'M-Pesa'} *`;
-    }
+                const { data, error } = await db
+                    .from('produtos') // Nome da sua tabela
+                    .select('*')
+                    .eq('id', productId)
+                    .single();
 
-    function processarPagamento() { alert("Processando..."); }
+                if (error) throw error;
 
-    loadData();
-</script>
+                if (data) {
+                    // Atualiza a UI com os dados reais
+                    document.getElementById('product-name').innerText = data.nome;
+                    const precoFormatado = `${data.preco.toLocaleString('pt-MZ')},00 MZN`;
+                    document.getElementById('total-price').innerText = precoFormatado;
+                    document.getElementById('btn-finalizar').innerText = `FINALIZAR COMPRA - ${precoFormatado}`;
+                }
+            } catch (err) {
+                console.error("Erro ao sincronizar:", err.message);
+                document.getElementById('product-name').innerText = "Erro ao carregar dados";
+            }
+        }
+
+        // Executa ao carregar a página
+        window.onload = loadCheckoutData;
+
+        // 3. LÓGICA DE ENVIO DO FORMULÁRIO
+        document.getElementById('payment-form').onsubmit = async (e) => {
+            e.preventDefault();
+            alert("Processando pagamento via ZentroPay...");
+            // Insira aqui sua chamada para a API de pagamento
+        };
+    </script>
 </body>
 </html>
-
