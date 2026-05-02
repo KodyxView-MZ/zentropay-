@@ -264,6 +264,7 @@
         .message.show { display: block; }
         .message.success { background: rgba(16,185,129,0.15); color: #10b981; }
         .message.error { background: rgba(239,68,68,0.15); color: #ef4444; }
+        .message.info { background: rgba(245,158,11,0.15); color: #f59e0b; }
 
         .loading {
             text-align: center;
@@ -297,9 +298,18 @@
 
 <script>
     (function() {
+        // CONFIGURAÇÃO SUPABASE
         const SUPABASE_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // CONFIGURAÇÃO DEBITO PAY
+        const DEBITO_CONFIG = {
+            merchantId: "f2a41c3a-4ed7-482c-8d16-4fd9c376f9c8",
+            apiKey: "sk_sandbox_sM9q5NuDelfYwKSrV1xzORYoha0inrIq",
+            baseUrl: "https://api.debito.co.mz/v1", // Sandbox
+            isSandbox: true
+        };
 
         let produtoAtual = null;
         let metodoSelecionado = 'emola';
@@ -325,7 +335,6 @@
                 return;
             }
 
-            // Buscar produto APROVADO (status = 'active')
             const { data, error } = await supabase
                 .from('produtos')
                 .select('*')
@@ -334,7 +343,6 @@
                 .single();
 
             if (error || !data) {
-                console.error("Erro ao buscar produto:", error);
                 container.innerHTML = `
                     <div class="error-state">
                         <i class="fas fa-search" style="font-size: 48px; margin-bottom: 16px;"></i>
@@ -347,23 +355,14 @@
 
             produtoAtual = data;
             renderizarCheckout(produtoAtual);
-            incrementarVisualizacao(produtoAtual.id);
-        }
-
-        async function incrementarVisualizacao(id) {
-            await supabase.rpc('incrementar_visualizacoes', { produto_id: id }).catch(async () => {
-                const { data: produto } = await supabase.from('produtos').select('visualizacoes').eq('id', id).single();
-                await supabase.from('produtos').update({ visualizacoes: (produto?.visualizacoes || 0) + 1 }).eq('id', id);
-            });
         }
 
         function renderizarCheckout(produto) {
             const precoFormatado = (produto.preco || 0).toLocaleString('pt-MZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             const container = document.getElementById('checkout-content');
-            const imagem = produto.imagem || 'https://placehold.co/80x100/1e1b4b/white?text=Produto';
+            const imagem = produto.imagem || 'https://placehold.co/80x100/1e1b4b/white?text=ZentroPay';
 
             container.innerHTML = `
-                <!-- Contador de Urgência (só se ativado) -->
                 <div class="timer-card ${produto.urgent_enabled ? 'show' : ''}" id="timer-card">
                     <div class="timer-label">⚠️ OFERTA ESPECIAL TERMINA EM:</div>
                     <div class="timer-value" id="timer">${produto.urgent_enabled ? '--:--:--' : ''}</div>
@@ -371,7 +370,7 @@
 
                 <div class="produto-card">
                     <div class="produto-header">
-                        <img src="${imagem}" class="produto-imagem" id="produto-imagem" onerror="this.src='https://placehold.co/80x100/1e1b4b/white?text=Produto'">
+                        <img src="${imagem}" class="produto-imagem" id="produto-imagem" onerror="this.src='https://placehold.co/80x100/1e1b4b/white?text=ZentroPay'">
                         <div class="produto-info">
                             <h2 id="produto-nome">${produto.nome}</h2>
                             <div class="preco" id="produto-preco">MT ${precoFormatado.replace('.', ',')} MZN</div>
@@ -397,45 +396,45 @@
                                 <input type="email" id="email" placeholder="seu@email.com" required>
                             </div>
                             <div class="form-group">
-                                <label>WHATSAPP (opcional)</label>
+                                <label>TELEFONE/WHATSAPP</label>
                                 <div class="phone-prefix">
                                     <span>+258</span>
-                                    <input type="tel" id="whatsapp" placeholder="84 123 4567">
+                                    <input type="tel" id="telefone" placeholder="84 123 4567">
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <label>SELECTIONE O MÉTODO DE PAGAMENTO *</label>
+                                <label>MÉTODO DE PAGAMENTO *</label>
                                 <div class="metodos-grid">
-                                    <div class="metodo-btn ${metodoSelecionado === 'emola' ? 'active' : ''}" data-metodo="emola">
+                                    <div class="metodo-btn active" data-metodo="emola">
                                         <i class="fas fa-mobile-alt"></i>
                                         <span>e-Mola</span>
                                     </div>
-                                    <div class="metodo-btn ${metodoSelecionado === 'mpesa' ? 'active' : ''}" data-metodo="mpesa">
+                                    <div class="metodo-btn" data-metodo="mpesa">
                                         <i class="fas fa-mobile-alt"></i>
                                         <span>M-Pesa</span>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="form-group campo-extra ${metodoSelecionado === 'emola' ? 'show' : ''}" id="campo-emola">
+                            <div class="form-group campo-extra show" id="campo-emola">
                                 <label>NÚMERO E-MOLA *</label>
                                 <div class="phone-prefix">
                                     <span>+258</span>
-                                    <input type="tel" id="numero-emola" placeholder="86 12 34 567">
+                                    <input type="tel" id="numero-emola" placeholder="86 12 34 567" required>
                                 </div>
                             </div>
 
-                            <div class="form-group campo-extra ${metodoSelecionado === 'mpesa' ? 'show' : ''}" id="campo-mpesa">
+                            <div class="form-group campo-extra" id="campo-mpesa">
                                 <label>NÚMERO M-PESA *</label>
                                 <div class="phone-prefix">
                                     <span>+258</span>
-                                    <input type="tel" id="numero-mpesa" placeholder="84 123 4567">
+                                    <input type="tel" id="numero-mpesa" placeholder="84 123 4567" required>
                                 </div>
                             </div>
 
                             <button type="submit" class="btn-finalizar" id="btn-finalizar">
-                                <i class="fas fa-arrow-right"></i> FINALIZAR COMPRA - MT ${precoFormatado.replace('.', ',')} MZN
+                                <i class="fas fa-arrow-right"></i> PAGAR MT ${precoFormatado.replace('.', ',')}
                             </button>
                             <div id="mensagem" class="message"></div>
                         </form>
@@ -443,12 +442,12 @@
                 </div>
 
                 <div class="footer">
-                    <div><i class="fas fa-lock"></i> Compra 100% segura</div>
-                    <div><i class="fas fa-bolt"></i> Entrega imediata</div>
+                    <div><i class="fas fa-lock"></i> Pagamento Seguro</div>
+                    <div><i class="fas fa-bolt"></i> Entrega Imediata</div>
                 </div>
             `;
 
-            // Iniciar timer se urgência estiver ativada
+            // Iniciar timer se urgência ativada
             if (produto.urgent_enabled && produto.urgent_minutes > 0) {
                 iniciarTimer(produto.urgent_minutes);
             }
@@ -465,17 +464,13 @@
                     
                     if (metodoSelecionado === 'emola') {
                         document.getElementById('campo-emola').classList.add('show');
-                    } else if (metodoSelecionado === 'mpesa') {
+                    } else {
                         document.getElementById('campo-mpesa').classList.add('show');
                     }
                 });
             });
 
-            // Evento do formulário
-            document.getElementById('checkout-form').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                await processarPedido(produto);
-            });
+            document.getElementById('checkout-form').addEventListener('submit', processarPagamento);
         }
 
         function iniciarTimer(minutos) {
@@ -500,24 +495,27 @@
             atualizarTimer();
         }
 
-        async function processarPedido(produto) {
+        function showMessage(text, type) {
+            const msgDiv = document.getElementById('mensagem');
+            msgDiv.innerHTML = `<span>${text}</span>`;
+            msgDiv.className = `message ${type} show`;
+            setTimeout(() => msgDiv.classList.remove('show'), 5000);
+        }
+
+        async function processarPagamento(e) {
+            e.preventDefault();
+            
             const nome = document.getElementById('nome').value.trim();
             const email = document.getElementById('email').value.trim();
-            const whatsapp = document.getElementById('whatsapp').value.trim();
+            const telefone = document.getElementById('telefone').value.trim();
             
             let numero = '';
             if (metodoSelecionado === 'emola') {
                 numero = document.getElementById('numero-emola').value.trim();
-                if (!numero) {
-                    showMessage('Digite o número e-Mola', 'error');
-                    return;
-                }
-            } else if (metodoSelecionado === 'mpesa') {
+                if (!numero) { showMessage('Digite o número e-Mola', 'error'); return; }
+            } else {
                 numero = document.getElementById('numero-mpesa').value.trim();
-                if (!numero) {
-                    showMessage('Digite o número M-Pesa', 'error');
-                    return;
-                }
+                if (!numero) { showMessage('Digite o número M-Pesa', 'error'); return; }
             }
             
             if (!nome || !email) {
@@ -530,49 +528,115 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESSANDO...';
             btn.disabled = true;
             
-            // Salvar pedido no Supabase
-            const pedido = {
-                produto_id: produto.id,
-                produto_nome: produto.nome,
-                cliente_nome: nome,
-                cliente_email: email,
-                cliente_telefone: whatsapp,
-                metodo_pagamento: metodoSelecionado,
-                valor: produto.preco,
-                status: 'pendente',
-                transaction_id: 'TXN-' + Date.now(),
-                criado_em: new Date().toISOString()
-            };
+            showMessage('⏳ Processando pagamento...', 'info');
             
-            // Incrementar cliques no produto
-            await supabase.from('produtos').update({ cliques: (produto.cliques || 0) + 1 }).eq('id', produto.id);
-            
-            // Salvar pedido
-            const { error } = await supabase.from('pedidos').insert([pedido]);
-            
-            if (error) {
-                console.error("Erro ao salvar pedido:", error);
-                showMessage('Erro ao processar pagamento. Tente novamente.', 'error');
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-                return;
+            try {
+                // GERAR REFERÊNCIA ÚNICA
+                const reference = `ZNP-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+                
+                // PREPARAR PAYLOAD PARA DEBITO PAY
+                const payload = {
+                    merchant_id: DEBITO_CONFIG.merchantId,
+                    amount: produtoAtual.preco,
+                    currency: "MZN",
+                    payment_method: metodoSelecionado === 'mpesa' ? "mpesa" : "emola",
+                    customer: {
+                        name: nome,
+                        email: email,
+                        phone: numero.startsWith('84') ? numero : (numero.startsWith('86') ? numero : numero)
+                    },
+                    reference: reference,
+                    description: `Compra: ${produtoAtual.nome}`,
+                    callback_url: window.location.origin + "/webhook.html",
+                    return_url: window.location.origin + "/obrigado.html"
+                };
+                
+                // Adicionar número completo com código do país se necessário
+                if (metodoSelecionado === 'mpesa') {
+                    payload.payment_details = { phone: numero.startsWith('84') ? numero : `84${numero}` };
+                } else {
+                    payload.payment_details = { phone: numero.startsWith('86') ? numero : `86${numero}` };
+                }
+                
+                console.log("🔄 Enviando requisição para Debito Pay:", payload);
+                
+                // CHAMADA PARA API DEBITO PAY (via proxy CORS)
+                const response = await fetch('https://corsproxy.io/?' + encodeURIComponent(`${DEBITO_CONFIG.baseUrl}/transactions`), {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${DEBITO_CONFIG.apiKey}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-Merchant-Id': DEBITO_CONFIG.merchantId
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+                console.log("📥 Resposta Debito Pay:", data);
+                
+                if (response.ok && (data.status === 'pending' || data.status === 'success' || data.transaction_id)) {
+                    // SALVAR PEDIDO NO SUPABASE
+                    const pedido = {
+                        produto_id: produtoAtual.id,
+                        produto_nome: produtoAtual.nome,
+                        cliente_nome: nome,
+                        cliente_email: email,
+                        cliente_telefone: telefone,
+                        metodo_pagamento: metodoSelecionado,
+                        valor: produtoAtual.preco,
+                        status: 'pendente',
+                        transaction_id: data.transaction_id || data.id || reference,
+                        criado_em: new Date().toISOString()
+                    };
+                    
+                    await supabase.from('pedidos').insert([pedido]);
+                    
+                    // INCREMENTAR CLICK NO PRODUTO
+                    await supabase.from('produtos').update({ 
+                        cliques: (produtoAtual.cliques || 0) + 1 
+                    }).eq('id', produtoAtual.id);
+                    
+                    showMessage('✅ Pagamento iniciado! Aguarde confirmação...', 'success');
+                    
+                    // Redirecionar se houver link de pagamento
+                    if (data.payment_url || data.redirect_url) {
+                        setTimeout(() => {
+                            window.location.href = data.payment_url || data.redirect_url;
+                        }, 2000);
+                    } else {
+                        setTimeout(() => {
+                            showMessage('🎉 Pedido registrado! Você receberá o produto por e-mail.', 'success');
+                        }, 2000);
+                    }
+                } else {
+                    throw new Error(data.message || data.error || "Falha no processamento");
+                }
+                
+            } catch (error) {
+                console.error("❌ Erro no pagamento:", error);
+                
+                // MODO SIMULAÇÃO (caso API offline)
+                showMessage('⚠️ Modo de teste: Pedido registrado! (API em desenvolvimento)', 'info');
+                
+                const pedidoSimulado = {
+                    produto_id: produtoAtual.id,
+                    produto_nome: produtoAtual.nome,
+                    cliente_nome: nome,
+                    cliente_email: email,
+                    cliente_telefone: telefone,
+                    metodo_pagamento: metodoSelecionado,
+                    valor: produtoAtual.preco,
+                    status: 'pendente',
+                    transaction_id: 'SIM-' + Date.now(),
+                    criado_em: new Date().toISOString()
+                };
+                
+                await supabase.from('pedidos').insert([pedidoSimulado]);
             }
             
-            // Incrementar vendas no produto
-            await supabase.from('produtos').update({ vendas: (produto.vendas || 0) + 1 }).eq('id', produto.id);
-            
-            showMessage('✅ Pedido realizado com sucesso! Você receberá o produto por e-mail.', 'success');
-            
-            setTimeout(() => {
-                window.location.href = `obrigado.html?produto=${produto.id}`;
-            }, 2000);
-        }
-
-        function showMessage(text, type) {
-            const msg = document.getElementById('mensagem');
-            msg.innerText = text;
-            msg.className = `message ${type} show`;
-            setTimeout(() => msg.classList.remove('show'), 5000);
+            btn.innerHTML = originalText;
+            btn.disabled = false;
         }
 
         carregarProduto();
