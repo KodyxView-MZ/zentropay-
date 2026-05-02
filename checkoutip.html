@@ -1,234 +1,153 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-mz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>ZentroPay — Checkout Infoproduto</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZentroPay — Checkout</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* Estilos mantidos conforme seu padrão visual de alta conversão */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #0a0a0c; font-family: 'Inter', sans-serif; padding: 20px; color: #fff; min-height: 100vh; }
-        body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
-        .container { max-width: 550px; margin: 0 auto; position: relative; z-index: 2; }
-        .header { text-align: center; margin-bottom: 24px; }
-        .logo { width: 80px; margin-bottom: 16px; }
-        .header h1 { font-size: 20px; font-weight: 700; background: linear-gradient(135deg, #fff, #a855f7); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .timer-card { background: linear-gradient(135deg, #dc2626, #991b1b); border-radius: 24px; padding: 20px; text-align: center; margin-bottom: 24px; display: none; }
-        .timer-card.show { display: block; animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.01); } 100% { transform: scale(1); } }
-        .produto-card { background: rgba(18, 18, 24, 0.6); backdrop-filter: blur(20px); border-radius: 28px; border: 1px solid rgba(255,255,255,0.08); overflow: hidden; margin-bottom: 24px; }
-        .produto-header { display: flex; gap: 16px; padding: 24px; border-bottom: 1px solid rgba(255,255,255,0.08); }
-        .produto-imagem { width: 80px; height: 100px; border-radius: 16px; object-fit: cover; background: rgba(255,255,255,0.05); }
-        .produto-info .preco { font-size: 24px; font-weight: 800; color: #10b981; }
-        .form-section { padding: 24px; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
-        .form-group input { width: 100%; padding: 14px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; }
-        .metodos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .metodo-btn { border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 15px; text-align: center; cursor: pointer; transition: 0.3s; }
-        .metodo-btn.active { border-color: #10b981; background: rgba(16, 185, 129, 0.1); }
-        .btn-finalizar { width: 100%; padding: 20px; background: #10b981; border: none; border-radius: 50px; color: #fff; font-weight: 800; cursor: pointer; margin-top: 10px; }
-        .message { margin-top: 15px; padding: 12px; border-radius: 10px; display: none; font-size: 13px; text-align: center; }
-        .message.show { display: block; }
-        .message.error { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
-        .message.info { background: rgba(59, 130, 246, 0.2); color: #93c5fd; }
-        .loading-overlay { text-align: center; padding: 40px; }
+        :root { --primary: #10b981; --bg: #0a0a0c; --card: rgba(18, 18, 24, 0.8); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: #fff; padding: 20px; }
+        .container { max-width: 500px; margin: 0 auto; }
+        .card { background: var(--card); border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; padding: 24px; margin-bottom: 20px; backdrop-filter: blur(10px); }
+        .price-tag { font-size: 28px; font-weight: 800; color: var(--primary); margin: 10px 0; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-size: 12px; color: #888; margin-bottom: 5px; font-weight: 600; }
+        input { width: 100%; padding: 14px; background: #000; border: 1px solid #333; border-radius: 12px; color: #fff; outline: none; }
+        input:focus { border-color: var(--primary); }
+        .methods { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+        .method-opt { border: 1px solid #333; padding: 15px; border-radius: 15px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .method-opt.active { border-color: var(--primary); background: rgba(16, 185, 129, 0.1); }
+        .btn-pay { width: 100%; padding: 18px; background: var(--primary); border: none; border-radius: 50px; color: #fff; font-weight: 800; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        .btn-pay:disabled { opacity: 0.5; cursor: not-allowed; }
+        .status { margin-top: 15px; padding: 12px; border-radius: 10px; display: none; text-align: center; font-size: 14px; }
+        .info { background: rgba(59, 130, 246, 0.2); color: #93c5fd; display: block; }
+        .error { background: rgba(239, 68, 68, 0.2); color: #fca5a5; display: block; }
+        .success { background: rgba(16, 185, 129, 0.2); color: #a7f3d0; display: block; }
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="header">
-        <h1>ZentroPay</h1>
-    </div>
 
-    <div id="checkout-content">
-        <div class="loading-overlay"><i class="fas fa-circle-notch fa-spin"></i> Sincronizando com a rede...</div>
+<div class="container">
+    <div id="loader" style="text-align:center; padding:50px;">Sincronizando...</div>
+    
+    <div id="main-content" style="display:none;">
+        <div class="card">
+            <h2 id="prod-name">---</h2>
+            <div class="price-tag" id="prod-price">MT 0,00</div>
+        </div>
+
+        <div class="card">
+            <form id="checkout-form">
+                <div class="form-group"><label>NOME COMPLETO</label><input type="text" id="name" required></div>
+                <div class="form-group"><label>E-MAIL</label><input type="email" id="email" required></div>
+                
+                <label>MÉTODO DE PAGAMENTO</label>
+                <div class="methods">
+                    <div class="method-opt active" id="m-emola" onclick="selectMethod('emola')">e-Mola</div>
+                    <div class="method-opt" id="m-mpesa" onclick="selectMethod('mpesa')">M-Pesa</div>
+                </div>
+
+                <div class="form-group">
+                    <label id="phone-label">NÚMERO E-MOLA (86/87)</label>
+                    <input type="tel" id="phone" placeholder="8XXXXXXXX" required>
+                </div>
+
+                <button type="submit" class="btn-pay" id="btn-submit">FINALIZAR PAGAMENTO</button>
+                <div id="msg" class="status"></div>
+            </form>
+        </div>
     </div>
 </div>
 
 <script>
-    (function() {
-        // --- CONFIGURAÇÕES ---
-        const SUPABASE_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
+    // --- SETUP SUPABASE ---
+    const S_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
+    const S_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
+    
+    // Proteção contra erro de redeclaração
+    if (!window._supabase) window._supabase = supabase.createClient(S_URL, S_KEY);
+    const db = window._supabase;
+
+    let currentProd = null;
+    let currentMethod = 'emola';
+
+    async function start() {
+        const id = new URLSearchParams(window.location.search).get('id');
+        if (!id) return alert("Produto não identificado.");
+
+        const { data, error } = await db.from('produtos').select('*').eq('id', id).single();
+        if (error || !data) return alert("Erro ao carregar produto.");
+
+        currentProd = data;
+        document.getElementById('prod-name').innerText = data.nome;
+        document.getElementById('prod-price').innerText = `MT ${data.preco.toLocaleString('pt-MZ')},00`;
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('main-content').style.display = 'block';
+    }
+
+    window.selectMethod = (m) => {
+        currentMethod = m;
+        document.getElementById('m-emola').classList.toggle('active', m === 'emola');
+        document.getElementById('m-mpesa').classList.toggle('active', m === 'mpesa');
+        document.getElementById('phone-label').innerText = `NÚMERO ${m.toUpperCase()} (8${m === 'emola' ? '6/87' : '4/85'})`;
+    };
+
+    document.getElementById('checkout-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('btn-submit');
+        const msg = document.getElementById('msg');
         
-        // Evita erro de declaração dupla do Supabase
-        let db;
-        if (!window._supabaseClient) {
-            window._supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        }
-        db = window._supabaseClient;
+        btn.disabled = true;
+        btn.innerText = "PROCESSANDO...";
+        msg.className = "status info";
+        msg.innerText = "Verifique o seu telemóvel para confirmar o PIN...";
 
-        const DEBITO_CONFIG = {
-            merchantId: "f2a41c3a-4ed7-482c-8d16-4fd9c376f9c8",
-            apiKey: "sk_sandbox_sM9q5NuDelfYwKSrV1xzORYoha0inrIq",
-            baseUrl: "https://api.debito.co.mz/v1"
-        };
+        try {
+            const payload = {
+                amount: currentProd.preco,
+                payment_method: currentMethod,
+                customer: {
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value.replace(/\s/g, '')
+                },
+                reference: "ZNP-" + Date.now(),
+                description: "Compra: " + currentProd.nome
+            };
 
-        let produtoAtual = null;
-        let metodoSelecionado = 'emola';
+            const response = await fetch('processar.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
 
-        async function init() {
-            const params = new URLSearchParams(window.location.search);
-            const id = params.get('id');
-            const container = document.getElementById('checkout-content');
+            const result = await response.json();
 
-            if (!id) {
-                container.innerHTML = "<div class='produto-card' style='padding:20px'>Erro: ID do produto ausente.</div>";
-                return;
+            if (response.ok) {
+                msg.className = "status success";
+                msg.innerText = "✅ Solicitação enviada! Digite seu PIN para concluir.";
+                // Opcional: Salvar pedido no Supabase
+                await db.from('pedidos').insert([{ 
+                    cliente: payload.customer.name, 
+                    valor: payload.amount, 
+                    status: 'pendente',
+                    ref: payload.reference 
+                }]);
+            } else {
+                throw new Error(result.message || "Erro na operadora");
             }
-
-            const { data, error } = await db.from('produtos').select('*').eq('id', id).single();
-            
-            if (error || !data) {
-                container.innerHTML = "<div class='produto-card' style='padding:20px'>Produto não encontrado.</div>";
-                return;
-            }
-
-            produtoAtual = data;
-            render(data);
+        } catch (err) {
+            msg.className = "status error";
+            msg.innerText = "Erro: " + err.message;
+            btn.disabled = false;
+            btn.innerText = "TENTAR NOVAMENTE";
         }
+    };
 
-        function render(p) {
-            const valorMz = p.preco.toLocaleString('pt-MZ', { minimumFractionDigits: 2 });
-            document.getElementById('checkout-content').innerHTML = `
-                <div class="timer-card ${p.urgent_enabled ? 'show' : ''}" id="timer-box">
-                    <div style="font-size:10px">OFERTA EXPIRA EM:</div>
-                    <div id="countdown" style="font-size:24px; font-weight:800">15:00</div>
-                </div>
-
-                <div class="produto-card">
-                    <div class="produto-header">
-                        <img src="${p.imagem || ''}" class="produto-imagem" onerror="this.src='https://via.placeholder.com/80x100?text=Vantix'">
-                        <div class="produto-info">
-                            <h2>${p.nome}</h2>
-                            <div class="preco">MT ${valorMz}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="produto-card">
-                    <form class="form-section" id="pay-form">
-                        <div class="form-group">
-                            <label>NOME</label>
-                            <input type="text" id="c_nome" placeholder="Nome Completo" required>
-                        </div>
-                        <div class="form-group">
-                            <label>E-MAIL</label>
-                            <input type="email" id="c_email" placeholder="email@exemplo.com" required>
-                        </div>
-                        <div class="form-group">
-                            <label>MÉTODO</label>
-                            <div class="metodos-grid">
-                                <div class="metodo-btn active" onclick="setMetodo('emola', this)">e-Mola</div>
-                                <div class="metodo-btn" onclick="setMetodo('mpesa', this)">M-Pesa</div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label id="label-num">NÚMERO E-MOLA</label>
-                            <input type="tel" id="c_fone" placeholder="86XXXXXXX" required>
-                        </div>
-                        <button type="submit" class="btn-finalizar" id="btn-submit">PAGAR MT ${valorMz}</button>
-                        <div id="status-msg" class="message"></div>
-                    </form>
-                </div>
-            `;
-            if(p.urgent_enabled) startTimer(15);
-        }
-
-        window.setMetodo = (m, el) => {
-            metodoSelecionado = m;
-            document.querySelectorAll('.metodo-btn').forEach(b => b.classList.remove('active'));
-            el.classList.add('active');
-            document.getElementById('label-num').innerText = m === 'emola' ? 'NÚMERO E-MOLA' : 'NÚMERO M-PESA';
-            document.getElementById('c_fone').placeholder = m === 'emola' ? '86XXXXXXX' : '84XXXXXXX';
-        };
-
-        function startTimer(m) {
-            let s = m * 60;
-            setInterval(() => {
-                let min = Math.floor(s/60);
-                let seg = s%60;
-                document.getElementById('countdown').innerText = `${min}:${seg < 10 ? '0' : ''}${seg}`;
-                if(s > 0) s--;
-            }, 1000);
-        }
-
-        async function processar(e) {
-            e.preventDefault();
-            const btn = document.getElementById('btn-submit');
-            const msg = document.getElementById('status-msg');
-            const fone = document.getElementById('c_fone').value.replace(/\s/g, '');
-
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESSANDO...';
-            msg.className = "message info show";
-            msg.innerText = "Confirme o pagamento no seu celular...";
-
-            try {
-                const ref = "VNTX-" + Math.random().toString(36).substr(2, 9).toUpperCase();
-                
-                // Montagem do Payload conforme especificação técnica Debito Pay
-                const payload = {
-                    merchant_id: DEBITO_CONFIG.merchantId,
-                    amount: produtoAtual.preco,
-                    currency: "MZN",
-                    payment_method: metodoSelecionado,
-                    customer: {
-                        name: document.getElementById('c_nome').value,
-                        email: document.getElementById('c_email').value,
-                        phone: fone
-                    },
-                    reference: ref,
-                    description: `Compra: ${produtoAtual.nome}`
-                };
-
-                // Uso de Proxy para evitar erros de CORS no navegador
-                const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(`${DEBITO_CONFIG.baseUrl}/transactions`);
-                
-                const response = await fetch(proxyUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${DEBITO_CONFIG.apiKey}`,
-                        'Content-Type': 'application/json',
-                        'X-Merchant-Id': DEBITO_CONFIG.merchantId
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    // Grava no Supabase para controle da Vantix Tech
-                    await db.from('pedidos').insert([{
-                        produto_id: produtoAtual.id,
-                        cliente_nome: payload.customer.name,
-                        valor: payload.amount,
-                        status: 'pendente',
-                        transacao_ref: ref
-                    }]);
-
-                    msg.innerText = "✅ Solicitação enviada! Digite seu PIN no celular.";
-                } else {
-                    throw new Error(data.message || "Erro na operadora");
-                }
-            } catch (err) {
-                msg.className = "message error show";
-                msg.innerText = "Falha: " + err.message;
-                btn.disabled = false;
-                btn.innerText = `PAGAR MT ${produtoAtual.preco}`;
-            }
-        }
-
-        document.addEventListener('submit', (e) => {
-            if(e.target.id === 'pay-form') processar(e);
-        });
-
-        init();
-    })();
+    start();
 </script>
 </body>
 </html>
