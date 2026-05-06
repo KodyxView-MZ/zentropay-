@@ -124,7 +124,13 @@
 
 <aside class="sidebar">
     <div class="logo-area">
-        <img src="./logo.png" onerror="this.src='https://placehold.co/40x40?text=ZP'">
+        <!-- ÍCONE SVG EMBUTIDO PARA EVITAR 404 -->
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 0 8px rgba(168,85,247,0.5));">
+            <rect width="40" height="40" rx="12" fill="#a855f7"/>
+            <path d="M12 28L20 12L28 28H12Z" fill="white" fill-opacity="0.2"/>
+            <path d="M20 12L12 28H28L20 12Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="20" cy="22" r="3" fill="white"/>
+        </svg>
         <span>ZentroAdmin</span>
     </div>
     <div class="nav-menu">
@@ -219,19 +225,33 @@
     }
 
     async function loadAllData() {
-        // Carregamento PARALELO para performance máxima
-        const [uRes, pRes, sRes] = await Promise.all([
-            _client.from('usuarios').select('*').order('criado_em', { ascending: false }),
-            _client.from('produtos').select('*').order('criado_em', { ascending: false }),
-            _client.from('vendas').select('*').order('criado_em', { ascending: false })
-        ]);
+        try {
+            // Carregamento PARALELO para performance máxima
+            const [uRes, pRes, sRes] = await Promise.all([
+                _client.from('usuarios').select('*').order('criado_em', { ascending: false }),
+                _client.from('produtos').select('*').order('criado_em', { ascending: false }),
+                _client.from('vendas').select('*').order('criado_em', { ascending: false })
+            ]);
 
-        cache.users = uRes.data || [];
-        cache.prods = pRes.data || [];
-        cache.sales = sRes.data || [];
+            if (uRes.error || pRes.error || sRes.error) throw new Error("Falha na conexão.");
 
-        renderStats();
-        renderCurrentTab();
+            cache.users = uRes.data || [];
+            cache.prods = pRes.data || [];
+            cache.sales = sRes.data || [];
+
+            renderStats();
+            renderCurrentTab();
+        } catch (err) {
+            console.error("Erro de Rede:", err);
+            document.getElementById('dashboard-content').innerHTML = `
+                <div style="text-align:center; padding:50px; color:var(--danger);">
+                    <i class="fas fa-wifi-slash" style="font-size:40px; margin-bottom:20px;"></i>
+                    <h3>Instabilidade de Rede</h3>
+                    <p>Não foi possível conectar ao servidor. Verifique sua internet.</p>
+                    <button class="btn-action" style="margin-top:20px; border-color:var(--accent); color:var(--accent);" onclick="loadAllData()">TENTAR NOVAMENTE</button>
+                </div>
+            `;
+        }
     }
 
     function renderStats() {
