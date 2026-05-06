@@ -552,7 +552,7 @@
                         description: produtoAtual.nome,
                         method: method,
                         return_url: window.location.origin + "/obrigado.html",
-                        webhook_url: window.location.origin + "/api/webhook",
+                        webhook_url: "https://zentropay.digital/api/webhook",
                         customer: {
                             name: nome,
                             phone: carteira,
@@ -581,20 +581,46 @@
                     console.log("📥 Resposta Debito:", data);
 
                     if (data?.success) {
-                        const isSuccess = data.status === 'success';
+                        const isSuccess = data.status === 'success' || data.event === 'payment.completed';
+                        
+                        // Atualizar status inicial
                         await supabase.from('pedidos').update({ status: isSuccess ? 'pago' : 'pendente' }).eq('transaction_id', reference);
 
                         if (data.checkout_url) {
                             showMessage("✅ Redirecionando para pagamento...", "success");
                             setTimeout(() => { window.location.href = data.checkout_url; }, 1500);
+                        } else if (isSuccess) {
+                            showMessage("✅ Pagamento concluído com sucesso!", "success");
+                            setTimeout(() => { window.location.href = "obrigado.html?transacao=" + reference; }, 2000);
                         } else {
-                            if (isSuccess) {
-                                showMessage("✅ Pagamento concluído com sucesso!", "success");
-                                setTimeout(() => { window.location.href = "obrigado.html?transacao=" + reference; }, 2000);
-                            } else {
-                                showMessage("⏳ Verifique o seu celular para inserir o PIN e confirmar.", "success");
-                                setTimeout(() => { window.location.href = "obrigado.html?transacao=" + reference; }, 5000);
-                            }
+                            // CASO PENDENTE (USSD/Push): Iniciar Polling para verificar se o cliente pagou
+                            showMessage("⏳ Aguardando confirmação no seu celular...", "success");
+                            
+                            let checkCount = 0;
+                            const maxChecks = 40; // 40 vezes * 3 segundos = 120 segundos (2 minutos)
+                            
+                            const interval = setInterval(async () => {
+                                checkCount++;
+                                console.log(`Verificando status (${checkCount}/${maxChecks})...`);
+                                
+                                const { data: statusData } = await supabase
+                                    .from('pedidos')
+                                    .select('status')
+                                    .eq('transaction_id', reference)
+                                    .single();
+                                
+                                if (statusData?.status === 'pago') {
+                                    clearInterval(interval);
+                                    showMessage("✅ Pagamento confirmado!", "success");
+                                    setTimeout(() => { window.location.href = "obrigado.html?transacao=" + reference; }, 1500);
+                                } else if (checkCount >= maxChecks) {
+                                    clearInterval(interval);
+                                    const overlay = document.getElementById('loadingOverlay');
+                                    if (overlay) overlay.classList.remove('active');
+                                    showMessage("❌ Tempo de espera esgotado. Se você pagou, aguarde alguns minutos.", "error");
+                                    btn.disabled = false;
+                                }
+                            }, 3000);
                         }
                         return;
                     } else {

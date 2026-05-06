@@ -1043,9 +1043,11 @@
 
         async function applyFilterAndUpdate() {
             const filteredSales = filterByPeriod(allSalesData, currentFilter);
-            await updateMetricsAndSalesList(filteredSales);
+            const filteredAttempts = filterByPeriod(allTentativasData, currentFilter);
+            
+            await updateMetricsAndSalesList(filteredSales, filteredAttempts);
             updatePaymentMethods(filteredSales);
-            updateFunnelMetrics();
+            updateFunnelMetrics(filteredAttempts, filteredSales);
             
             const totalRevenueAll = allSalesData.filter(s => s.status_venda === 'sucesso').reduce((sum, s) => sum + (s.valor_total || 0), 0);
             updateRankAndProgress(totalRevenueAll);
@@ -1110,8 +1112,7 @@
             }
         }
 
-        function updateFunnelMetrics() {
-            const pedidos = allTentativasData;
+        function updateFunnelMetrics(pedidos, vendas) {
             const checkoutEl = document.getElementById('funnelCheckout');
             const dadosEl = document.getElementById('funnelDados');
             const pagamentoEl = document.getElementById('funnelPagamento');
@@ -1119,9 +1120,7 @@
             const sucessoEl = document.getElementById('funnelSucesso');
             const pendenteEl = document.getElementById('funnelPendente');
             const falhouEl = document.getElementById('funnelFalhou');
-            const vendas = allSalesData;
             
-            // Usando pedidos reais como métrica principal, já que checkout_iniciado não tem tabela própria ainda
             if (checkoutEl) checkoutEl.innerText = pedidos.length;
             if (dadosEl) dadosEl.innerText = pedidos.length;
             if (pagamentoEl) pagamentoEl.innerText = pedidos.length;
@@ -1131,7 +1130,7 @@
             if (falhouEl) falhouEl.innerText = vendas.filter(v => v.status_venda === 'falhou').length;
         }
 
-        async function updateMetricsAndSalesList(sales) {
+        async function updateMetricsAndSalesList(sales, attempts) {
             const successful = sales.filter(s => s.status_venda === 'sucesso');
             const totalRevenue = successful.reduce((sum, s) => sum + (s.valor_total || 0), 0);
             const totalNetRevenue = successful.reduce((sum, s) => sum + calculateNetAmount(s.valor_total || 0), 0);
@@ -1147,7 +1146,7 @@
             if (salesEl) salesEl.innerText = totalUnits;
             if (netRevenueEl) netRevenueEl.innerHTML = `${formatMoneyMZN(totalNetRevenue)} <span style="font-size:18px;">MZN</span>`;
             
-            const totalVisits = 450 + Math.floor(Math.random() * 150);
+            const totalVisits = attempts.length || 1;
             const convRate = totalUnits > 0 ? (totalUnits / totalVisits) * 100 : 0;
             if (convRateEl) convRateEl.innerHTML = `${convRate.toFixed(1)}%`;
             
@@ -1157,22 +1156,32 @@
             const salesBody = document.getElementById('salesTableBody');
             if (!salesBody) return;
             
-            if (!sales || sales.length === 0) {
-                salesBody.innerHTML = '<tr><td colspan="6">Nenhuma venda registrada no período</div></tr>';
+            // Unir pedidos e vendas para mostrar "Atividade Recente" filtrada
+            const allActivity = [...attempts].map(p => {
+                const venda = sales.find(v => v.transaction_id === p.transaction_id);
+                return {
+                    nome_produto: p.produto_nome || 'Produto',
+                    cliente: p.cliente_nome || p.cliente_email?.split('@')[0] || 'Cliente',
+                    valor: p.valor,
+                    status: venda ? 'sucesso' : p.status,
+                    data: p.criado_em
+                };
+            }).sort((a, b) => new Date(b.data) - new Date(a.data));
+
+            if (allActivity.length === 0) {
+                salesBody.innerHTML = '<tr><td colspan="6">Nenhuma atividade registrada no período</div></tr>';
             } else {
-                salesBody.innerHTML = sales.slice(0, 10).map(v => {
-                    const prodName = (v.produtos?.nome || 'Produto').replace(/[&<>]/g, (m) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m] || m));
-                    const clientName = (v.cliente_email?.split('@')[0] || 'cliente').replace(/[&<>]/g, (m) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m] || m));
-                    const statusClass = v.status_venda === 'sucesso' ? 'badge-active' : 'badge-pending';
-                    const statusText = v.status_venda === 'sucesso' ? 'Pago' : 'Pendente';
-                    const netValue = calculateNetAmount(v.valor_total || 0);
+                salesBody.innerHTML = allActivity.slice(0, 10).map(v => {
+                    const statusClass = (v.status === 'pago' || v.status === 'sucesso' || v.status === 'completed') ? 'badge-active' : (v.status === 'falhou' ? 'badge-rejected' : 'badge-pending');
+                    const statusText = (v.status === 'pago' || v.status === 'sucesso' || v.status === 'completed') ? 'Pago' : (v.status === 'falhou' ? 'Falhou' : 'Pendente');
+                    const netValue = calculateNetAmount(v.valor || 0);
                     return `<tr>
-                        <td><strong>${prodName}</strong></div>
-                        <td>${clientName}</div>
-                        <td><strong>${formatMoneyMZN(v.valor_total || 0)} MZN</strong></div>
+                        <td><strong>${v.nome_produto}</strong></div>
+                        <td>${v.cliente}</div>
+                        <td><strong>${formatMoneyMZN(v.valor || 0)} MZN</strong></div>
                         <td><span style="color: #10b981;">${formatMoneyMZN(netValue)} MZN</span></div>
                         <td><span class="badge ${statusClass}">${statusText}</span></div>
-                        <td><small>${new Date(v.criado_em).toLocaleDateString('pt-BR')}</small></div>
+                        <td><small>${new Date(v.data).toLocaleDateString('pt-BR')} ${new Date(v.data).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'})}</small></div>
                     </tr>`;
                 }).join('');
             }
