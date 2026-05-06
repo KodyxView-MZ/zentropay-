@@ -124,7 +124,7 @@
 
 <aside class="sidebar">
     <div class="logo-area">
-        <img src="ei_1777492717837-removebg-preview.png">
+        <img src="ei_1777492717837-removebg-preview.png" onerror="this.src='https://placehold.co/40x40?text=ZP'">
         <span>ZentroAdmin</span>
     </div>
     <div class="nav-menu">
@@ -200,7 +200,9 @@
 <script>
     const SUP_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
     const SUP_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
-    const supabase = window.supabase.createClient(SUP_URL, SUP_KEY);
+    
+    // RENOMEADO PARA EVITAR CONFLITO DE SINTAXE
+    const _client = window.supabase.createClient(SUP_URL, SUP_KEY);
 
     let cache = { users: [], prods: [], sales: [] };
 
@@ -219,9 +221,9 @@
     async function loadAllData() {
         // Carregamento PARALELO para performance máxima
         const [uRes, pRes, sRes] = await Promise.all([
-            supabase.from('usuarios').select('*').order('criado_em', { ascending: false }),
-            supabase.from('produtos').select('*').order('criado_em', { ascending: false }),
-            supabase.from('vendas').select('*').order('criado_em', { ascending: false })
+            _client.from('usuarios').select('*').order('criado_em', { ascending: false }),
+            _client.from('produtos').select('*').order('criado_em', { ascending: false }),
+            _client.from('vendas').select('*').order('criado_em', { ascending: false })
         ]);
 
         cache.users = uRes.data || [];
@@ -331,7 +333,7 @@
     async function updateStatus(table, id, newStatus) {
         if (!confirm(`Deseja alterar o status para ${newStatus}?`)) return;
         
-        const { error } = await supabase.from(table).update({ status: newStatus }).eq('id', id);
+        const { error } = await _client.from(table).update({ status: newStatus }).eq('id', id);
         if (error) {
             alert("Erro ao atualizar: " + error.message);
         } else {
