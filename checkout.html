@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Vantix • Checkout</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0a0a0c;
+            font-family: 'Inter', sans-serif;
+            padding: 20px;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+        .checkout-wrapper { max-width: 520px; width: 100%; margin: 0 auto; position: relative; z-index: 2; }
+        .checkout-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(18,18,24,0.7);
+            backdrop-filter: blur(12px);
+            padding: 6px 18px 6px 12px;
+            border-radius: 60px;
+            border: 0.5px solid rgba(255,255,255,0.1);
+            cursor: pointer;
+        }
+        .logo-area img { width: 32px; height: 32px; object-fit: contain; }
+        .logo-area span {
+            font-weight: 700;
+            font-size: 18px;
+            background: linear-gradient(135deg, #fff, #a0a0c0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .secure-badge {
+            background: rgba(16,185,129,0.12);
+            backdrop-filter: blur(8px);
+            padding: 6px 14px;
+            border-radius: 60px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #10b981;
+            border: 0.5px solid rgba(16,185,129,0.3);
+        }
+        .badge-simulado {
+            background: rgba(245,158,11,0.12);
+            border-color: rgba(245,158,11,0.3);
+            color: #f59e0b;
+        }
+        .checkout-card {
+            background: rgba(18, 18, 24, 0.75);
+            backdrop-filter: blur(20px);
+            border-radius: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            overflow: hidden;
+        }
+        .resumo-pedido {
+            background: rgba(0,0,0,0.4);
+            padding: 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .resumo-pedido h2 { font-size: 18px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .produto-info { display: flex; gap: 16px; margin-bottom: 20px; }
+        .produto-capa {
+            width: 70px; height: 70px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .produto-capa i { font-size: 28px; color: rgba(255,255,255,0.3); }
+        .produto-detalhes h3 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+        .produto-detalhes p { font-size: 13px; color: rgba(255,255,255,0.5); }
+        .valor-total { display: flex; justify-content: space-between; padding-top: 16px; margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); font-weight: 700; font-size: 18px; }
+        .form-pagamento { padding: 24px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 8px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            font-size: 15px;
+            color: white;
+            font-family: 'Inter', sans-serif;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: rgba(102,126,234,0.6);
+            background: rgba(0,0,0,0.6);
+        }
+        .metodos-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 8px;
+        }
+        .metodo-btn {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 40px;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .metodo-btn i { font-size: 22px; margin-bottom: 6px; display: block; }
+        .metodo-btn span { font-size: 11px; font-weight: 500; }
+        .metodo-btn.active {
+            background: linear-gradient(135deg, rgba(102,126,234,0.3), rgba(118,75,162,0.3));
+            border-color: rgba(102,126,234,0.6);
+        }
+        .campo-telefone, .campo-operadora, .campo-cartao { display: none; }
+        .campo-telefone.show { display: block; }
+        .campo-operadora.show { display: block; }
+        .campo-cartao.show { display: block; }
+        .operadora-select {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+        }
+        .operadora-option {
+            flex: 1;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 40px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .operadora-option.active {
+            background: rgba(102,126,234,0.3);
+            border-color: rgba(102,126,234,0.6);
+        }
+        .btn-pagar {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(90deg, #10b981, #059669);
+            border: none;
+            border-radius: 44px;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-pagar:disabled { opacity: 0.6; cursor: not-allowed; }
+        .mensagem {
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            text-align: center;
+            display: none;
+        }
+        .mensagem.show { display: block; }
+        .mensagem.sucesso { background: rgba(16,185,129,0.15); color: #10b981; border: 0.5px solid rgba(16,185,129,0.3); }
+        .mensagem.erro { background: rgba(239,68,68,0.15); color: #ef4444; border: 0.5px solid rgba(239,68,68,0.3); }
+        .mensagem.info { background: rgba(245,158,11,0.15); color: #f59e0b; border: 0.5px solid rgba(245,158,11,0.3); }
+        .loading-spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .btn-back {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px 20px;
+            border-radius: 40px;
+            color: rgba(255,255,255,0.7);
+            font-weight: 500;
+            font-size: 13px;
+            cursor: pointer;
+            text-decoration: none;
+            margin-right: 12px;
+        }
+        .btn-back:hover { background: rgba(255,255,255,0.1); color: white; }
+        @media (max-width: 480px) { body { padding: 12px; } .resumo-pedido, .form-pagamento { padding: 20px; } }
+    </style>
+</head>
+<body>
+<div class="checkout-wrapper">
+    <div class="checkout-header">
+        <div class="logo-area" onclick="window.location.href='dashboard.html'">
+            <img src="ei_1777492717837-removebg-preview.png" alt="Vantix">
+            <span>Vantix</span>
+        </div>
+        <div class="secure-badge badge-simulado"><i class="fas fa-flask"></i> Modo Demo • GitHub</div>
+    </div>
+
+    <div class="checkout-card">
+        <div class="resumo-pedido">
+            <h2><i class="fas fa-shopping-bag"></i> Resumo do pedido</h2>
+            <div class="produto-info">
+                <div class="produto-capa"><i class="fas fa-book"></i></div>
+                <div class="produto-detalhes">
+                    <h3 id="produto-nome">Ebook Marketing Digital 2025</h3>
+                    <p id="produto-descricao">Guia completo para vendas online</p>
+                </div>
+            </div>
+            <div class="valor-total">
+                <span><strong>TOTAL</strong></span>
+                <span><strong id="total-valor">270,00 MZN</strong></span>
+            </div>
+        </div>
+
+        <div class="form-pagamento">
+            <form id="checkout-form">
+                <div class="form-group">
+                    <label>NOME COMPLETO</label>
+                    <input type="text" id="nome-cliente" placeholder="Maria Eduarda" required>
+                </div>
+                <div class="form-group">
+                    <label>EMAIL</label>
+                    <input type="email" id="email-cliente" placeholder="cliente@email.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label>MÉTODO DE PAGAMENTO</label>
+                    <div class="metodos-grid">
+                        <div class="metodo-btn active" data-metodo="mpesa"><i class="fas fa-mobile-alt"></i><span>M-Pesa</span></div>
+                        <div class="metodo-btn" data-metodo="emola"><i class="fas fa-mobile-alt"></i><span>E-Mola</span></div>
+                        <div class="metodo-btn" data-metodo="cartao"><i class="fas fa-credit-card"></i><span>Cartão</span></div>
+                    </div>
+                </div>
+
+                <div class="campo-operadora" id="campo-operadora">
+                    <label>OPERADORA (E-Mola)</label>
+                    <div class="operadora-select">
+                        <div class="operadora-option active" data-operadora="mcel">📱 MCel</div>
+                        <div class="operadora-option" data-operadora="vodacom">📱 Vodacom</div>
+                        <div class="operadora-option" data-operadora="tmcel">📱 Tmcel</div>
+                    </div>
+                </div>
+
+                <div class="campo-telefone show" id="campo-telefone">
+                    <label>NÚMERO DE TELEFONE</label>
+                    <input type="tel" id="telefone" placeholder="84 123 4567" required>
+                </div>
+
+                <div class="campo-cartao" id="campo-cartao">
+                    <label>NÚMERO DO CARTÃO</label>
+                    <input type="text" id="cartao-numero" placeholder="4111 1111 1111 1111">
+                    <div style="display: flex; gap: 12px; margin-top: 12px;">
+                        <input type="text" id="cartao-vencimento" placeholder="MM/AA" style="width: 50%;">
+                        <input type="text" id="cartao-cvv" placeholder="CVV" style="width: 50%;">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-pagar" id="btn-pagar">
+                    <i class="fas fa-arrow-right"></i> SIMULAR PAGAMENTO
+                </button>
+                <div id="mensagem-pagamento" class="mensagem"></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const VALOR_TOTAL = 270;
+    const PRODUTO_NOME = "Ebook Marketing Digital 2025";
+    
+    let metodoSelecionado = "mpesa";
+    let operadoraSelecionada = "mcel";
+    let isLoading = false;
+
+    const campoTelefone = document.getElementById("campo-telefone");
+    const campoOperadora = document.getElementById("campo-operadora");
+    const campoCartao = document.getElementById("campo-cartao");
+    const telefoneInput = document.getElementById("telefone");
+    const btnPagar = document.getElementById("btn-pagar");
+    const mensagemDiv = document.getElementById("mensagem-pagamento");
+
+    function atualizarCampos() {
+        if (metodoSelecionado === "mpesa") {
+            campoTelefone.classList.add("show");
+            campoOperadora.classList.remove("show");
+            campoCartao.classList.remove("show");
+            telefoneInput.required = true;
+        } else if (metodoSelecionado === "emola") {
+            campoTelefone.classList.add("show");
+            campoOperadora.classList.add("show");
+            campoCartao.classList.remove("show");
+            telefoneInput.required = true;
+        } else if (metodoSelecionado === "cartao") {
+            campoTelefone.classList.remove("show");
+            campoOperadora.classList.remove("show");
+            campoCartao.classList.add("show");
+            telefoneInput.required = false;
+        }
+    }
+
+    document.querySelectorAll(".metodo-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll(".metodo-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            metodoSelecionado = btn.dataset.metodo;
+            atualizarCampos();
+        });
+    });
+
+    document.querySelectorAll(".operadora-option").forEach(opt => {
+        opt.addEventListener("click", () => {
+            document.querySelectorAll(".operadora-option").forEach(o => o.classList.remove("active"));
+            opt.classList.add("active");
+            operadoraSelecionada = opt.dataset.operadora;
+        });
+    });
+
+    function showMessage(text, type) {
+        mensagemDiv.innerText = text;
+        mensagemDiv.className = `mensagem ${type} show`;
+        setTimeout(() => {
+            mensagemDiv.classList.remove("show");
+        }, 5000);
+    }
+
+    // SIMULAÇÃO DE PAGAMENTO (funciona no GitHub)
+    async function processarPagamentoSimulado(dados) {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                const metodoNome = dados.metodo === "mpesa" ? "M-Pesa" : dados.metodo === "emola" ? "E-Mola" : "Cartão";
+                const reference = `VANTIX_${Date.now()}`;
+                
+                let mensagem = "";
+                if (dados.metodo === "mpesa") {
+                    mensagem = `📱 Pagamento ${metodoNome} de ${VALOR_TOTAL} MZN solicitado.\nEnvie para o número 84XXXXXXX com referência: ${reference}`;
+                } else if (dados.metodo === "emola") {
+                    mensagem = `📱 Pagamento ${metodoNome} (${operadoraSelecionada}) de ${VALOR_TOTAL} MZN solicitado.\nConfirme na sua app E-Mola.`;
+                } else {
+                    mensagem = `💳 Pagamento com ${metodoNome} processado com sucesso!`;
+                }
+                
+                showMessage(mensagem, "sucesso");
+                
+                // Salvar pedido
+                const pedidos = JSON.parse(localStorage.getItem("vantix_pedidos") || "[]");
+                pedidos.unshift({
+                    id: Date.now(),
+                    produto: PRODUTO_NOME,
+                    valor: VALOR_TOTAL,
+                    cliente: dados.nome,
+                    email: dados.email,
+                    telefone: dados.telefone || "-",
+                    metodo: metodoNome,
+                    operadora: dados.operadora || "-",
+                    status: "pendente",
+                    reference: reference,
+                    data: new Date().toISOString()
+                });
+                localStorage.setItem("vantix_pedidos", JSON.stringify(pedidos));
+                
+                resolve(true);
+            }, 2000);
+        });
+    }
+
+    // SUBMIT
+    document.getElementById("checkout-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (isLoading) return;
+
+        const nome = document.getElementById("nome-cliente").value.trim();
+        const email = document.getElementById("email-cliente").value.trim();
+        const telefone = document.getElementById("telefone").value.trim();
+
+        if (!nome || !email) {
+            showMessage("Preencha nome e email", "erro");
+            return;
+        }
+
+        if ((metodoSelecionado === "mpesa" || metodoSelecionado === "emola") && !telefone) {
+            showMessage("Digite o número de telefone", "erro");
+            return;
+        }
+
+        isLoading = true;
+        btnPagar.innerHTML = '<span class="loading-spinner"></span> Processando...';
+        btnPagar.disabled = true;
+
+        const dadosPagamento = {
+            nome: nome,
+            email: email,
+            telefone: telefone,
+            metodo: metodoSelecionado,
+            operadora: operadoraSelecionada
+        };
+
+        const success = await processarPagamentoSimulado(dadosPagamento);
+
+        if (success) {
+            setTimeout(() => {
+                window.location.href = "dashboard.html";
+            }, 3000);
+        }
+
+        isLoading = false;
+        btnPagar.innerHTML = '<i class="fas fa-arrow-right"></i> SIMULAR PAGAMENTO';
+        btnPagar.disabled = false;
+    });
+
+    telefoneInput.addEventListener("input", function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length > 9) value = value.slice(0,9);
+        e.target.value = value;
+    });
+
+    atualizarCampos();
+    console.log("✅ Vantix Checkout - Modo GitHub Pages (simulação)");
+</script>
+</body>
+</html>

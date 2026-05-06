@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>ZentroPay — Admin Command Center</title>
+    <link rel="icon" type="image/png" href="ei_1777492717837-removebg-preview.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --bg-deep: #050505;
+            --glass-core: rgba(15, 15, 20, 0.85);
+            --accent: #a855f7;
+            --accent-glow: rgba(168, 85, 247, 0.4);
+            --text-main: #ffffff;
+            --text-dim: rgba(255, 255, 255, 0.4);
+            --border: rgba(255, 255, 255, 0.06);
+            --danger: #ef4444;
+            --success: #10b981;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        body { background: var(--bg-deep); font-family: 'Inter', sans-serif; color: var(--text-main); min-height: 100vh; overflow-x: hidden; }
+
+        body::before {
+            content: ''; position: fixed; inset: 0;
+            background-image: linear-gradient(rgba(168, 85, 247, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(168, 85, 247, 0.02) 1px, transparent 1px);
+            background-size: 50px 50px; z-index: -1;
+        }
+
+        .aura { position: fixed; width: 800px; height: 800px; background: radial-gradient(circle, rgba(168, 85, 247, 0.08) 0%, transparent 70%); top: -200px; right: -200px; filter: blur(80px); z-index: -1; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 30px; position: relative; }
+
+        .navbar {
+            background: var(--glass-core); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--border); border-radius: 100px; padding: 15px 35px;
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;
+        }
+
+        .logo-area { display: flex; align-items: center; gap: 15px; }
+        .logo-img { width: 38px; }
+        .logo-txt { font-weight: 900; font-size: 22px; letter-spacing: -0.5px; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .stat-card {
+            background: var(--glass-core); border: 1px solid var(--border); border-radius: 30px; padding: 25px;
+            transition: 0.4s; position: relative; overflow: hidden;
+        }
+        .stat-card:hover { transform: translateY(-5px); border-color: var(--accent); }
+        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--accent); }
+        .stat-val { font-size: 32px; font-weight: 900; margin: 10px 0; color: #fff; }
+        .stat-lab { font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; font-weight: 800; }
+        .stat-icon { font-size: 20px; color: var(--accent); opacity: 0.6; margin-bottom: 10px; }
+
+        .tab-box { display: flex; gap: 10px; margin-bottom: 30px; background: rgba(0,0,0,0.4); padding: 8px; border-radius: 100px; width: fit-content; border: 1px solid var(--border); }
+        .tab-btn { padding: 12px 25px; border: none; background: transparent; color: var(--text-dim); font-weight: 800; font-size: 11px; border-radius: 100px; cursor: pointer; text-transform: uppercase; }
+        .tab-btn.active { background: var(--accent); color: white; }
+
+        .data-panel { background: var(--glass-core); backdrop-filter: blur(30px); border: 1px solid var(--border); border-radius: 35px; padding: 35px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 20px; font-size: 10px; color: var(--text-dim); text-transform: uppercase; border-bottom: 1px solid var(--border); }
+        td { padding: 20px; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+
+        .badge-status { padding: 6px 14px; border-radius: 100px; font-size: 10px; font-weight: 900; text-transform: uppercase; }
+        .active-status { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .suspended-status { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+
+        .action-icon { width: 35px; height: 35px; border-radius: 10px; border: none; background: rgba(255,255,255,0.05); color: white; cursor: pointer; transition: 0.3s; }
+        .action-icon:hover { background: var(--accent); }
+        .btn-view { width: auto; padding: 0 15px; font-size: 11px; font-weight: 800; background: rgba(168, 85, 247, 0.15); color: var(--accent); }
+
+        .modal { display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.95); backdrop-filter: blur(15px); align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: #0a0a0f; border: 1px solid var(--border); width: 100%; max-width: 700px; border-radius: 40px; padding: 40px; position: relative; }
+        .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        .modal-img { width: 100%; border-radius: 20px; border: 1px solid var(--border); margin-bottom: 20px; max-height: 300px; object-fit: cover; }
+        .close-modal { position: absolute; top: 25px; right: 25px; cursor: pointer; color: var(--text-dim); }
+
+        .btn-logout { background: rgba(255,50,50,0.1); border: 1px solid rgba(255,50,50,0.2); color: #ff5f5f; padding: 10px 20px; border-radius: 50px; cursor: pointer; font-size: 11px; font-weight: 800; }
+    </style>
+</head>
+<body>
+<div class="aura"></div>
+
+<div id="mainModal" class="modal">
+    <div class="modal-content">
+        <i class="fas fa-times close-modal" onclick="closeModal()"></i>
+        <div id="modalBody"></div>
+    </div>
+</div>
+
+<div class="container">
+    <nav class="navbar">
+        <div class="logo-area" onclick="location.reload()">
+            <img src="ei_1777492717837-removebg-preview.png" class="logo-img">
+            <span class="logo-txt">ZentroPay<span style="color:var(--accent)">.OS</span></span>
+        </div>
+        <div class="nav-tools">
+            <div id="greeting" style="font-size: 11px; font-weight: 700; letter-spacing: 1px; color: var(--text-dim)"></div>
+            <button class="btn-logout" onclick="logout()">TERMINATE_SESSION</button>
+        </div>
+    </nav>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <i class="fas fa-users-cog stat-icon"></i>
+            <div class="stat-val" id="total-users">--</div>
+            <div class="stat-lab">Total Operators</div>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-signal stat-icon" style="color:var(--success)"></i>
+            <div class="stat-val" id="active-users">--</div>
+            <div class="stat-lab">Active Nodes</div>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-user-lock stat-icon" style="color:var(--danger)"></i>
+            <div class="stat-val" id="banned-users">--</div>
+            <div class="stat-lab">Blacklisted</div>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-database stat-icon"></i>
+            <div class="stat-val" id="total-produtos">--</div>
+            <div class="stat-lab">Digital Assets</div>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-microchip stat-icon"></i>
+            <div class="stat-val" id="total-receita">--</div>
+            <div class="stat-lab">Total Flow (MZN)</div>
+        </div>
+    </div>
+
+    <div class="tab-box">
+        <button class="tab-btn active" onclick="switchTab('usuarios', this)">Operations</button>
+        <button class="tab-btn" onclick="switchTab('produtos', this)">Assets</button>
+        <button class="tab-btn" onclick="switchTab('saques', this)">Logs</button>
+    </div>
+
+    <div class="data-panel">
+        <div id="content-area">
+            <div style="text-align:center; padding: 50px;">
+                <i class="fas fa-circle-notch fa-spin" style="font-size: 24px; color: var(--accent)"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        "use strict";
+
+        const SUP_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
+        const SUP_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
+        const supabase = window.supabase.createClient(SUP_URL, SUP_KEY);
+
+        async function checkAuth() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (localStorage.getItem('zentro_admin') === 'true' || session) {
+                document.getElementById('greeting').innerText = `ACCESS_GRANTED: ${session?.user?.email || 'ROOT'}`;
+                return true;
+            }
+            window.location.href = 'index.html';
+            return false;
+        }
+
+        async function loadStats() {
+            try {
+                const { data: users } = await supabase.from('usuarios').select('status, faturamento');
+                const { data: products } = await supabase.from('produtos').select('id');
+                
+                if (users) {
+                    document.getElementById('total-users').innerText = users.length;
+                    document.getElementById('active-users').innerText = users.filter(u => u.status === 'active' || u.status === 'ATIVO').length;
+                    document.getElementById('banned-users').innerText = users.filter(u => u.status === 'suspended' || u.status === 'banned').length;
+                    
+                    const rev = users.reduce((acc, curr) => acc + (Number(curr.faturamento) || 0), 0);
+                    document.getElementById('total-receita').innerText = rev.toLocaleString();
+                }
+                
+                if (products) {
+                    document.getElementById('total-produtos').innerText = products.length;
+                }
+            } catch (e) {
+                console.error("Link Sync Error", e);
+            }
+        }
+
+        window.switchTab = async (type, btn) => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const area = document.getElementById('content-area');
+            area.innerHTML = `<div style="text-align:center; padding: 40px;"><i class="fas fa-sync fa-spin"></i></div>`;
+
+            if (type === 'usuarios') {
+                const { data } = await supabase.from('usuarios').select('*').order('criado_em', { ascending: false });
+                area.innerHTML = `
+                    <table>
+                        <thead><tr><th>Operator</th><th>Revenue</th><th>State</th><th>Control</th></tr></thead>
+                        <tbody>${data.map(u => `
+                            <tr>
+                                <td><strong>${u.nome || 'N/A'}</strong><br><small style="color:gray">${u["e-mail"] || u.email}</small></td>
+                                <td style="color:var(--success); font-weight:800">${(u.faturamento || 0).toLocaleString()} MZN</td>
+                                <td><span class="badge-status ${u.status === 'suspended' || u.status === 'banned' ? 'suspended-status' : 'active-status'}">${u.status || 'ACTIVE'}</span></td>
+                                <td>
+                                    <button class="action-icon" onclick="updateStatus('usuarios', '${u.id}', '${u.status === 'suspended' ? 'active' : 'suspended'}')">
+                                        <i class="fas ${u.status === 'suspended' ? 'fa-unlock' : 'fa-lock'}"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `).join('')}</tbody>
+                    </table>`;
+            } else if (type === 'produtos') {
+                const { data } = await supabase.from('produtos').select('*').order('criado_em', { ascending: false });
+                area.innerHTML = `
+                    <table>
+                        <thead><tr><th>Asset</th><th>Unit Price</th><th>Visibility</th><th>Control</th></tr></thead>
+                        <tbody>${data.map(p => `
+                            <tr>
+                                <td><strong>${p.nome}</strong></td>
+                                <td>${p.preco} MZN</td>
+                                <td><span class="badge-status ${p.status === 'banned' ? 'suspended-status' : 'active-status'}">${p.status || 'LIVE'}</span></td>
+                                <td>
+                                    <button class="action-icon btn-view" onclick="showProductDetails('${p.id}')"><i class="fas fa-eye"></i></button>
+                                    <button class="action-icon" style="color:var(--danger)" onclick="updateStatus('produtos', '${p.id}', '${p.status === 'banned' ? 'active' : 'banned'}')">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `).join('')}</tbody>
+                    </table>`;
+            }
+        };
+
+        window.updateStatus = async (table, id, newStatus) => {
+            const { error } = await supabase.from(table).update({ status: newStatus }).eq('id', id);
+            if (!error) {
+                await loadStats(); // Atualiza os números nos cards imediatamente
+                switchTab(table === 'usuarios' ? 'usuarios' : 'produtos', document.querySelector('.tab-btn.active'));
+            }
+        };
+
+        window.showProductDetails = async (id) => {
+            const { data: p } = await supabase.from('produtos').select('*').eq('id', id).single();
+            const body = document.getElementById('modalBody');
+            body.innerHTML = `
+                <img src="${p.imagem_url || p.foto || ''}" class="modal-img" onerror="this.style.display='none'">
+                <div class="modal-grid">
+                    <div><label style="color:gray; font-size:9px">ASSET_NAME</label><p><strong>${p.nome}</strong></p></div>
+                    <div><label style="color:gray; font-size:9px">VAL_UNIT</label><p><strong>${p.preco} MZN</strong></p></div>
+                    <div style="grid-column: span 2"><label style="color:gray; font-size:9px">MANIFEST_DESCRIPTION</label><p style="font-size:12px">${p.descricao || 'N/A'}</p></div>
+                    <div style="grid-column: span 2"><label style="color:gray; font-size:9px">INTERNAL_ENDPOINT</label><code style="font-size:10px; color:var(--accent)">${p.link_entrega || p.arquivo_url || 'N/A'}</code></div>
+                </div>
+            `;
+            document.getElementById('mainModal').style.display = 'flex';
+        };
+
+        window.closeModal = () => document.getElementById('mainModal').style.display = 'none';
+        window.logout = () => { localStorage.clear(); window.location.href = 'index.html'; };
+
+        async function init() {
+            if (await checkAuth()) {
+                await loadStats(); // Carrega os números ANTES de renderizar as abas
+                await switchTab('usuarios', document.querySelector('.tab-btn'));
+            }
+        }
+        init();
+    })();
+</script>
+</body>
+</html>

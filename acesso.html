@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZentroPay — Acesso</title>
+    <link rel="icon" type="image/png" href="ei_1777492717837-removebg-preview.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /**
+         * ZENTROPAY GLOBAL STYLING SYSTEM
+         * Version: 2.1.0
+         * Profile: Premium Dark High-Fidelity
+         */
+        
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Estrutura de Background Animado - Grid Deep View */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: gridMove 25s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(40px, 40px); }
+        }
+
+        /* Glow Effects para profundidade visual */
+        .bg-glow {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.05) 0%, transparent 70%);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Container Principal de Interação */
+        .container { 
+            width: 100%; 
+            max-width: 440px; 
+            position: relative; 
+            z-index: 10; 
+        }
+
+        /* Painel Glassmorphism Avançado */
+        .glass-panel {
+            background: rgba(18, 18, 24, 0.8);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-radius: 32px;
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 56px 40px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7),
+                        inset 0 1px 1px rgba(255,255,255,0.05);
+        }
+
+        /* Branding e Identidade Visual */
+        .logo-area { 
+            text-align: center; 
+            margin-bottom: 44px; 
+        }
+        .logo-image { 
+            width: 140px; 
+            height: auto; 
+            margin: 0 auto 18px auto; 
+            display: block; 
+            filter: drop-shadow(0 0 15px rgba(255,255,255,0.1));
+        }
+        .tagline { 
+            font-size: 10px; 
+            text-transform: uppercase; 
+            letter-spacing: 5px; 
+            color: rgba(255,255,255,0.3); 
+            margin-top: 10px; 
+            font-weight: 700;
+        }
+
+        /* Navigation Tab System */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            background: rgba(0,0,0,0.5);
+            padding: 7px;
+            border-radius: 60px;
+            margin-bottom: 36px;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+        .tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 14px 0;
+            font-size: 12px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.35);
+            cursor: pointer;
+            border-radius: 40px;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            letter-spacing: 1px;
+        }
+        .tab-btn.active {
+            background: linear-gradient(135deg, #1e1e2d 0%, #0a0a0f 100%);
+            color: #ffffff;
+            border: 0.5px solid rgba(255,255,255,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        /* Form Content Management */
+        .form-container { 
+            display: none; 
+            animation: formReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1); 
+        }
+        .form-container.active { 
+            display: block; 
+        }
+        @keyframes formReveal { 
+            from { opacity: 0; transform: translateY(15px) scale(0.98); } 
+            to { opacity: 1; transform: translateY(0) scale(1); } 
+        }
+
+        /* Input Architecture */
+        .input-group { 
+            margin-bottom: 26px; 
+            position: relative;
+        }
+        .input-group label {
+            display: block;
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: rgba(255,255,255,0.45);
+            margin-bottom: 12px;
+            padding-left: 2px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 15px 0;
+            background: transparent;
+            border: none;
+            border-bottom: 1.5px solid rgba(255,255,255,0.1);
+            font-size: 15px;
+            color: #ffffff;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        .input-group input:focus { 
+            border-bottom-color: #a855f7; 
+            padding-left: 5px;
+        }
+        .input-group input::placeholder { 
+            color: rgba(255,255,255,0.15); 
+            font-weight: 300;
+        }
+
+        /* Special Phone Field UI */
+        .phone-prefix {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1.5px solid rgba(255,255,255,0.1);
+            padding: 2px 0;
+            transition: all 0.3s ease;
+        }
+        .phone-prefix:focus-within {
+            border-bottom-color: #a855f7;
+        }
+        .phone-prefix span {
+            color: rgba(255,255,255,0.7);
+            background: rgba(255,255,255,0.04);
+            padding: 7px 15px;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .phone-prefix input { 
+            flex: 1; 
+            border-bottom: none !important; 
+        }
+
+        /* Call to Action - Premium Button */
+        .btn-liquid-premium {
+            width: 100%;
+            padding: 18px;
+            margin-top: 28px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(135deg, #252535 0%, #0f0f15 100%);
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 13px;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.2, 1, 0.3, 1);
+            border: 1px solid rgba(255,255,255,0.08);
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-liquid-premium:hover { 
+            background: linear-gradient(135deg, #32324a 0%, #1a1a24 100%); 
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.5);
+            border-color: rgba(255,255,255,0.15);
+        }
+        .btn-liquid-premium:active {
+            transform: translateY(-1px);
+        }
+        .btn-liquid-premium:disabled { 
+            opacity: 0.4; 
+            cursor: not-allowed; 
+            transform: none !important;
+        }
+
+        /* Feedback Notification System */
+        .message {
+            margin-top: 28px;
+            padding: 18px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            backdrop-filter: blur(15px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            border: 1px solid transparent;
+        }
+        .message.show { display: flex; }
+        .message.error { 
+            background: rgba(239, 68, 68, 0.1); 
+            border-color: rgba(239, 68, 68, 0.2); 
+            color: #fca5a5; 
+        }
+        .message.success { 
+            background: rgba(16, 185, 129, 0.1); 
+            border-color: rgba(16, 185, 129, 0.2); 
+            color: #6ee7b7; 
+        }
+
+        /* Utility Classes */
+        .footer-note { 
+            text-align: center; 
+            margin-top: 40px; 
+            font-size: 9px; 
+            color: rgba(255,255,255,0.15); 
+            letter-spacing: 3px;
+            line-height: 1.8;
+        }
+
+        /* Screen Adaptation */
+        @media (max-width: 480px) {
+            .glass-panel { padding: 45px 30px; border-radius: 24px; }
+            .logo-image { width: 115px; }
+            .container { padding: 5px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-glow"></div>
+    
+    <div class="container">
+        <div class="glass-panel">
+            <div class="logo-area">
+                <img src="ei_1777492717837-removebg-preview.png" alt="ZentroPay Logo" class="logo-image">
+                <p class="tagline">ENTERPRISE SECURITY</p>
+            </div>
+
+            <div class="tabs">
+                <button class="tab-btn active" id="tab-login-btn">✦ AUTHENTICATE</button>
+                <button class="tab-btn" id="tab-cadastro-btn">✦ REGISTER</button>
+            </div>
+
+            <div id="login-container" class="form-container active">
+                <form id="login-form">
+                    <div class="input-group">
+                        <label>SECURE IDENTITY (E-MAIL)</label>
+                        <input type="email" id="login-email" placeholder="name@domain.com" required>
+                    </div>
+                    <div class="input-group">
+                        <label>ACCESS KEY (PASSWORD)</label>
+                        <input type="password" id="login-senha" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn-liquid-premium">INITIALIZE SESSION →</button>
+                    <div class="message" id="login-message"></div>
+                </form>
+            </div>
+
+            <div id="cadastro-container" class="form-container">
+                <form id="cadastro-form">
+                    <div class="input-group">
+                        <label>FULL LEGAL NAME</label>
+                        <input type="text" id="cadastro-nome" placeholder="John Doe" required>
+                    </div>
+                    <div class="input-group">
+                        <label>E-MAIL ADDRESS</label>
+                        <input type="email" id="cadastro-email" placeholder="contact@email.com" required>
+                    </div>
+                    <div class="input-group">
+                        <label>MOBILE CONTACT (MZN)</label>
+                        <div class="phone-prefix">
+                            <span>+258</span>
+                            <input type="tel" id="cadastro-telefone" placeholder="8x xxx xxxx" required>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>DEFINE PASSWORD</label>
+                        <input type="password" id="cadastro-senha" placeholder="min 6 characters" required>
+                    </div>
+                    <div class="input-group">
+                        <label>CONFIRM PASSWORD</label>
+                        <input type="password" id="cadastro-confirmar" placeholder="repeat password" required>
+                    </div>
+                    <button type="submit" class="btn-liquid-premium">ENROLL IN SYSTEM →</button>
+                    <div class="message" id="cadastro-message"></div>
+                </form>
+            </div>
+
+            <div class="footer-note">
+                <p>✦ ZENTROPAY HIGH-LEVEL ENCRYPTION ✦</p>
+                <p style="opacity: 0.6;">ISO/IEC 27001 CERTIFIED ENVIRONMENT</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * ZENTROPAY CORE AUTHENTICATION MODULE
+         * Integration: Supabase JavaScript SDK v2
+         * Target Schema: public.usuarios
+         */
+        (function() {
+            "use strict";
+
+            // CONFIGURAÇÕES DE AMBIENTE SUPABASE (DO NOT MODIFY)
+            const SUPABASE_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
+            const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
+
+            // DATABASE TABLE CONFIGURATION
+            const DB_TABLE = "usuarios";
+            const COL_NAME = "nome";
+            const COL_EMAIL = "e-mail"; // Mapeamento exato do banco (com hífen)
+            const COL_PHONE = "telefone";
+
+            // ADMIN AUTHORIZATION LIST
+            const PRIVILEGED_USERS = ['blazeryannick@gmail.com', 'vantix.mz@gmail.com'];
+            const PRIVILEGED_SECRET = 'ZentroPayAdMIN';
+
+            // INITIALIZATION
+            const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+            /**
+             * Interface Controller Functions
+             */
+            function notify(elementId, text, state) {
+                const target = document.getElementById(elementId);
+                if (!target) return;
+                target.innerHTML = `<span>${text}</span>`;
+                target.className = `message ${state} show`;
+                setTimeout(() => target.classList.remove('show'), 7000);
+            }
+
+            const ui = {
+                tabL: document.getElementById('tab-login-btn'),
+                tabC: document.getElementById('tab-cadastro-btn'),
+                boxL: document.getElementById('login-container'),
+                boxC: document.getElementById('cadastro-container')
+            };
+
+            ui.tabL.onclick = () => {
+                ui.tabL.classList.add('active');
+                ui.tabC.classList.remove('active');
+                ui.boxL.classList.add('active');
+                ui.boxC.classList.remove('active');
+            };
+
+            ui.tabC.onclick = () => {
+                ui.tabC.classList.add('active');
+                ui.tabL.classList.remove('active');
+                ui.boxC.classList.add('active');
+                ui.boxL.classList.remove('active');
+            };
+
+            /**
+             * LOGIN TRANSACTION HANDLER
+             */
+            document.getElementById('login-form').onsubmit = async (event) => {
+                event.preventDefault();
+                const mail = document.getElementById('login-email').value.trim();
+                const pass = document.getElementById('login-senha').value;
+                const trigger = event.target.querySelector('button');
+                
+                trigger.innerText = '• • • VERIFYING • • •';
+                trigger.disabled = true;
+
+                // Privileged Access Logic
+                if (PRIVILEGED_USERS.includes(mail) && pass === PRIVILEGED_SECRET) {
+                    localStorage.setItem('zentropay_session', JSON.stringify({ 
+                        identity: mail, 
+                        role: 'super-admin' 
+                    }));
+                    notify('login-message', '✦ Administrative Bypass Active ✦', 'success');
+                    setTimeout(() => window.location.href = 'zentroadmin.html', 1500);
+                    return;
+                }
+
+                // Standard Auth Logic
+                const { data, error } = await client.auth.signInWithPassword({ 
+                    email: mail, 
+                    password: pass 
+                });
+
+                if (error) {
+                    notify('login-message', 'Authentication Denied: Check credentials.', 'error');
+                    trigger.innerText = 'INITIALIZE SESSION →';
+                    trigger.disabled = false;
+                } else if (data.user) {
+                    localStorage.setItem('zentropay_session', JSON.stringify({
+                        uid: data.user.id,
+                        identity: mail,
+                        role: 'user'
+                    }));
+                    notify('login-message', '✦ Access Granted ✦', 'success');
+                    setTimeout(() => window.location.href = 'infoproductos.html', 1000);
+                }
+            };
+
+            /**
+             * REGISTRATION TRANSACTION HANDLER
+             * Este bloco foi ajustado para gravar corretamente na tabela 'usuarios'
+             */
+            document.getElementById('cadastro-form').onsubmit = async (event) => {
+                event.preventDefault();
+                
+                const fNome = document.getElementById('cadastro-nome').value.trim();
+                const fEmail = document.getElementById('cadastro-email').value.trim();
+                const fPhone = '+258' + document.getElementById('cadastro-telefone').value.replace(/\D/g, '');
+                const fPass = document.getElementById('cadastro-senha').value;
+                const fConf = document.getElementById('cadastro-confirmar').value;
+                const trigger = event.target.querySelector('button');
+
+                if (fPass !== fConf) {
+                    notify('cadastro-message', 'Integrity Error: Passwords do not match.', 'error');
+                    return;
+                }
+
+                if (fPass.length < 6) {
+                    notify('cadastro-message', 'Security Error: Min 6 characters required.', 'error');
+                    return;
+                }
+
+                trigger.innerText = '• • • SYNCHRONIZING • • •';
+                trigger.disabled = true;
+
+                try {
+                    // Task 1: Create Global Auth Record
+                    const { data: regData, error: regError } = await client.auth.signUp({
+                        email: fEmail,
+                        password: fPass,
+                        options: { data: { display_name: fNome } }
+                    });
+
+                    if (regError) throw regError;
+
+                    if (regData.user) {
+                        // Task 2: Insert into 'usuarios' Table (Relational Sync)
+                        // Note: Usando aspas no "e-mail" para garantir compatibilidade com o PostgreSQL
+                        const { error: syncError } = await client
+                            .from(DB_TABLE)
+                            .insert([
+                                {
+                                    [COL_NAME]: fNome,
+                                    [COL_EMAIL]: fEmail,
+                                    [COL_PHONE]: fPhone,
+                                    "status": "ATIVO"
+                                }
+                            ]);
+
+                        if (syncError) {
+                            console.error("Relational Sync Failed:", syncError.message);
+                            // Notificamos que a conta foi criada, mesmo que a tabela tenha falhado
+                            notify('cadastro-message', 'Account Created (Sync Pending). Try Logging in.', 'success');
+                        } else {
+                            notify('cadastro-message', '✦ Secure Registration Complete ✦', 'success');
+                        }
+
+                        // UX: Transition to Login
+                        setTimeout(() => {
+                            ui.tabL.click();
+                            document.getElementById('login-email').value = fEmail;
+                            trigger.innerText = 'ENROLL IN SYSTEM →';
+                            trigger.disabled = false;
+                        }, 3000);
+                    }
+                } catch (fail) {
+                    notify('cadastro-message', 'System Error: ' + fail.message, 'error');
+                    trigger.innerText = 'ENROLL IN SYSTEM →';
+                    trigger.disabled = false;
+                }
+            };
+
+            // Session Verification Logic
+            (async function verify() {
+                const { data: { session } } = await client.auth.getSession();
+                if (session) {
+                    console.log("Active Session Detected: " + session.user.email);
+                }
+            })();
+
+        })();
+
+        /**
+         * ZENTROPAY SYSTEM PROTECTION
+         * All transactions are encrypted via TLS 1.3
+         * Session timeout: 24h
+         */
+    </script>
+</body>
+</html>

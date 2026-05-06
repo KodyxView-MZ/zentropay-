@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Configurar Webhook</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<script>
+    const SUPABASE_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    
+    async function setupWebhook() {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+            alert("Faça login primeiro");
+            return;
+        }
+        
+        const { error } = await supabase.from('webhooks').insert({
+            vendedor_id: session.user.id,
+            url: 'https://webhook.site/SEU-URL-AQUI', // Substitua pela sua URL
+            evento: 'venda.sucesso',
+            segredo: 'whsec_161f081d8c2e1eac7139a612f116729df028975d3aa0722e',
+            ativo: true
+        });
+        
+        if (error) {
+            console.error("Erro:", error);
+            alert("Erro: " + error.message);
+        } else {
+            alert("✅ Webhook configurado com sucesso!");
+        }
+    }
+    
+    setupWebhook();
+</script>
+</body>
+</html>

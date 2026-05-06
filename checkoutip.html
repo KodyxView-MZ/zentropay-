@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="pt-mz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Checkout Seguro — ZentroPay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary: #10b981;
+            --bg: #f9fafb;
+            --text: #1f2937;
+            --border: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            padding-top: 45px;
+            padding-bottom: 40px;
+        }
+
+        .top-timer {
+            background: #d90429;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        .brand-header {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 10px;
+            padding: 15px 5px;
+        }
+
+        .brand-logo {
+            height: 32px;
+            width: 32px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .brand-name {
+            font-weight: 800;
+            font-size: 24px;
+            letter-spacing: -1px;
+            background: linear-gradient(90deg, #6b21a8, #000000, #6b21a8);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: shine 3s linear infinite;
+        }
+
+        @keyframes shine {
+            to {
+                background-position: 200% center;
+            }
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            border: 1px solid #f0f0f0;
+        }
+
+        .prod-header {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .prod-img {
+            width: 90px;
+            height: 90px;
+            border-radius: 12px;
+            object-fit: cover;
+            background: #eee;
+        }
+
+        .prod-info {
+            flex: 1;
+        }
+
+        .prod-info h2 {
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .prod-price {
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 20px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-top: 12px;
+            color: #6b7280;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 18px;
+            font-weight: 800;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #f3f4f6;
+            color: var(--primary);
+        }
+
+        .delivery-notice {
+            background: #f0fff4;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #374151;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper i,
+        .input-wrapper .prefix {
+            position: absolute;
+            left: 15px;
+            color: #9ca3af;
+            font-size: 16px;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 14px 14px 14px 45px;
+            border-radius: 12px;
+            border: 1.5px solid var(--border);
+            font-size: 15px;
+            background: white;
+        }
+
+        .payment-methods {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .method-card {
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            background: white;
+            transition: all 0.3s;
+        }
+
+        .method-card.active {
+            border-color: var(--primary);
+            background: #f0fdf4;
+        }
+
+        .method-card img {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            object-fit: contain;
+        }
+
+        .btn-pay {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .btn-pay:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 12px;
+            border-radius: 12px;
+            margin-top: 15px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .success-message {
+            background: #d1fae5;
+            border: 1px solid #a7f3d0;
+            color: #059669;
+            padding: 12px;
+            border-radius: 12px;
+            margin-top: 15px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            color: white;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Processando pagamento...</div>
+    </div>
+
+    <div class="top-timer">
+        <i class="far fa-clock"></i> Oferta termina em: <span id="timer">14:59</span>
+    </div>
+
+    <div class="container">
+        <div class="brand-header">
+            <img src="IMG-20260429-WA0388.jpg" class="brand-logo" onerror="this.style.display='none'">
+            <span class="brand-name">ZentroPay</span>
+        </div>
+
+        <div class="product-card">
+            <div class="prod-header">
+                <img src="" id="p-img" class="prod-img"
+                    onerror="this.src='https://placehold.co/100x100?text=ZentroPay'">
+                <div class="prod-info">
+                    <h2 id="p-nome">Sincronizando...</h2>
+                    <div class="prod-price">MT <span id="p-preco">0,00</span></div>
+                </div>
+            </div>
+            <div class="summary-row"><span>Subtotal:</span> <span id="p-subtotal">MT 0,00</span></div>
+            <div class="total-row"><span>Total:</span> <span id="p-total">MT 0,00</span></div>
+        </div>
+
+        <div class="delivery-notice">
+            <i class="fas fa-check-circle"></i>
+            <span>Você receberá o acesso do produto imediatamente após a confirmação do pagamento.</span>
+        </div>
+
+        <div class="form-group">
+            <label>Nome completo *</label>
+            <div class="input-wrapper">
+                <i class="far fa-user"></i>
+                <input type="text" id="c-nome" placeholder="Nome completo" value="">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>E-mail *</label>
+            <div class="input-wrapper">
+                <i class="far fa-envelope"></i>
+                <input type="email" id="c-email" placeholder="seu@email.com" value="">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Número de Telefone (WhatsApp) *</label>
+            <div class="input-wrapper">
+                <i class="fas fa-phone-alt"></i>
+                <input type="tel" id="c-telefone" placeholder="84 000 0000" value="">
+            </div>
+        </div>
+
+        <label>Selecione o método de pagamento *</label>
+        <div class="payment-methods">
+            <div class="method-card active" data-method="emola">
+                <img src="emolalogo.png" alt="e-Mola" onerror="this.src='https://placehold.co/32x32?text=EM'">
+                <span style="font-size:14px; font-weight:600">e-Mola</span>
+            </div>
+            <div class="method-card" data-method="mpesa">
+                <img src="mpesalogo.png" alt="M-Pesa" onerror="this.src='https://placehold.co/32x32?text=MP'">
+                <span style="font-size:14px; font-weight:600">M-Pesa</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label id="label-carteira">Número da Carteira E-Mola *</label>
+            <div class="input-wrapper">
+                <i class="fas fa-wallet"></i>
+                <span class="prefix" style="left:40px">+258</span>
+                <input type="tel" id="c-numero_carteira" placeholder="84 000 0000" style="padding-left: 95px;" value="">
+            </div>
+        </div>
+
+        <button class="btn-pay" id="btn-pagar">
+            <i class="fas fa-shopping-cart"></i> Finalizar Compra - MT <span id="btn-val">0,00</span>
+        </button>
+
+        <div id="error-display" class="error-message"></div>
+        <div id="success-display" class="success-message"></div>
+    </div>
+
+    <script>
+        (function () {
+            // CONFIGURAÇÃO SUPABASE
+            const SUP_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
+            const SUP_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
+            const supabase = window.supabase.createClient(SUP_URL, SUP_KEY);
+
+            // A API de pagamentos (Debito) agora é chamada no servidor (/api/pay)
+            // Não coloque chaves secretas no frontend!
+
+            let produtoAtual = { nome: "Carregando...", preco: 0 };
+            let metodoSelecionado = 'emola';
+            let timerInterval = null;
+            let timerSeconds = 899;
+
+            // Timer
+            function startTimer() {
+                const timerDisplay = document.getElementById('timer');
+                if (!timerDisplay) return;
+
+                timerInterval = setInterval(() => {
+                    let minutes = Math.floor(timerSeconds / 60);
+                    let seconds = timerSeconds % 60;
+                    timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                    if (timerSeconds <= 0) clearInterval(timerInterval);
+                    timerSeconds--;
+                    if (timerSeconds < 0) timerSeconds = 0;
+                }, 1000);
+            }
+            startTimer();
+
+            // Troca de Métodos
+            document.querySelectorAll('.method-card').forEach(card => {
+                card.addEventListener('click', function () {
+                    document.querySelectorAll('.method-card').forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    metodoSelecionado = this.getAttribute('data-method');
+                    const label = metodoSelecionado === 'emola' ? 'e-Mola' : 'M-Pesa';
+                    document.getElementById('label-carteira').innerHTML = `Número ${label} *`;
+                });
+            });
+
+            async function fetchData() {
+                const urlParams = new URLSearchParams(window.location.search);
+                let productId = urlParams.get('id');
+
+                try {
+                    let query = supabase.from('produtos').select('*');
+                    if (productId) {
+                        query = query.eq('id', productId).single();
+                    } else {
+                        query = query.order('id', { ascending: false }).limit(1).single();
+                    }
+
+                    const { data, error } = await query;
+                    if (error) throw error;
+
+                    if (data) {
+                        produtoAtual = { id: data.id, nome: data.nome, preco: parseFloat(data.preco) };
+                        document.getElementById('p-nome').innerText = data.nome;
+                        const precoFmt = Number(data.preco).toLocaleString('pt-MZ', { minimumFractionDigits: 2 });
+                        document.getElementById('p-preco').innerText = precoFmt;
+                        document.getElementById('p-subtotal').innerHTML = "MT " + precoFmt;
+                        document.getElementById('p-total').innerHTML = "MT " + precoFmt;
+                        document.getElementById('btn-val').innerText = precoFmt;
+                        if (data.imagem) document.getElementById('p-img').src = data.imagem;
+                    }
+                } catch (err) {
+                    console.error('Erro:', err);
+                    document.getElementById('p-nome').innerText = "Produto Demo";
+                    produtoAtual = { id: "demo", nome: "Produto Demo", preco: 197 };
+                    const precoFmt = "197,00";
+                    document.getElementById('p-preco').innerText = precoFmt;
+                    document.getElementById('p-subtotal').innerHTML = "MT " + precoFmt;
+                    document.getElementById('p-total').innerHTML = "MT " + precoFmt;
+                    document.getElementById('btn-val').innerText = precoFmt;
+                }
+            }
+
+            function showMessage(text, type) {
+                const errorDiv = document.getElementById('error-display');
+                const successDiv = document.getElementById('success-display');
+                const overlay = document.getElementById('loadingOverlay');
+
+                if (type === 'error') {
+                    errorDiv.innerText = text;
+                    errorDiv.style.display = 'block';
+                    successDiv.style.display = 'none';
+                } else {
+                    successDiv.innerText = text;
+                    successDiv.style.display = 'block';
+                    errorDiv.style.display = 'none';
+                }
+
+                if (overlay) overlay.classList.remove('active');
+
+                setTimeout(() => {
+                    errorDiv.style.display = 'none';
+                    successDiv.style.display = 'none';
+                }, 5000);
+            }
+
+            async function processarPagamento() {
+                const btn = document.getElementById('btn-pagar');
+                const nome = document.getElementById('c-nome').value.trim();
+                const email = document.getElementById('c-email').value.trim();
+                const tel = document.getElementById('c-telefone').value.trim();
+                const carteira = document.getElementById('c-numero_carteira').value.trim();
+
+                if (!nome) { showMessage("❌ Preencha o nome!", "error"); return; }
+                if (!email || !email.includes('@')) { showMessage("❌ E-mail inválido!", "error"); return; }
+                if (!tel || tel.length < 9) { showMessage("❌ Telefone inválido!", "error"); return; }
+                if (!carteira || carteira.length < 9) { showMessage("❌ Número da carteira inválido!", "error"); return; }
+
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> A PROCESSAR...';
+
+                const overlay = document.getElementById('loadingOverlay');
+                if (overlay) overlay.classList.add('active');
+
+                // Gerar referência única
+                const reference = "PAY" + Date.now() + Math.floor(Math.random() * 10000);
+
+                try {
+                    // 1. PRIMEIRO: SALVAR PEDIDO COMO PENDENTE
+                    const pedido = {
+                        produto_id: produtoAtual.id,
+                        produto_nome: produtoAtual.nome,
+                        cliente_nome: nome,
+                        cliente_email: email,
+                        cliente_telefone: tel,
+                        metodo_pagamento: metodoSelecionado,
+                        valor: produtoAtual.preco,
+                        status: 'pendente',
+                        transaction_id: reference,
+                        criado_em: new Date().toISOString()
+                    };
+
+                    await supabase.from('pedidos').insert([pedido]);
+                    console.log("✅ Pedido salvo no Supabase:", reference);
+
+                    // 2. TENTAR API DA DEBITO
+                    const method = metodoSelecionado === 'emola' ? 'emola' : 'mpesa';
+                    const payload = {
+                        amount: produtoAtual.preco,
+                        reference: reference,
+                        description: produtoAtual.nome,
+                        method: method,
+                        return_url: window.location.origin + "/obrigado.html",
+                        webhook_url: window.location.origin + "/api/webhook",
+                        customer: {
+                            name: nome,
+                            phone: carteira,
+                            email: email
+                        }
+                    };
+
+                    console.log("📤 Tentando Debito...", payload);
+
+                    // Timeout de 10 segundos para não travar
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+                    const response = await fetch('/api/pay', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify(payload),
+                        signal: controller.signal
+                    });
+
+                    clearTimeout(timeoutId);
+                    const data = await response.json();
+                    console.log("📥 Resposta Debito:", data);
+
+                    if (data?.success) {
+                        const isSuccess = data.status === 'success';
+                        await supabase.from('pedidos').update({ status: isSuccess ? 'pago' : 'pendente' }).eq('transaction_id', reference);
+
+                        if (data.checkout_url) {
+                            showMessage("✅ Redirecionando para pagamento...", "success");
+                            setTimeout(() => { window.location.href = data.checkout_url; }, 1500);
+                        } else {
+                            if (isSuccess) {
+                                showMessage("✅ Pagamento concluído com sucesso!", "success");
+                                setTimeout(() => { window.location.href = "obrigado.html?transacao=" + reference; }, 2000);
+                            } else {
+                                showMessage("⏳ Verifique o seu celular para inserir o PIN e confirmar.", "success");
+                                setTimeout(() => { window.location.href = "obrigado.html?transacao=" + reference; }, 5000);
+                            }
+                        }
+                        return;
+                    } else {
+                        throw new Error(data?.error || data?.message || "Erro ao processar o pagamento com a Debito.");
+                    }
+
+                } catch (paysuiteError) {
+                    console.error("⚠️ Erro no processamento:", paysuiteError.message);
+
+                    await supabase.from('pedidos').update({ status: 'falhou' }).eq('transaction_id', reference);
+                    const overlay = document.getElementById('loadingOverlay');
+                    if (overlay) overlay.classList.remove('active');
+
+                    showMessage("❌ Erro ao iniciar pagamento. Tente novamente.", "error");
+                    btn.disabled = false;
+                    btn.innerHTML = `<i class="fas fa-shopping-cart"></i> Finalizar Compra - MT ${produtoAtual.preco.toLocaleString('pt-MZ', { minimumFractionDigits: 2 })}`;
+                }
+            }
+
+            document.getElementById('btn-pagar').addEventListener('click', processarPagamento);
+            fetchData();
+        })();
+    </script>
+</body>
+
+</html>

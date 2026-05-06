@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vantix — Criar Produto</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(40px, 40px); }
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(18, 18, 24, 0.8);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 16px 32px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .logo-image {
+            width: 40px;
+            height: auto;
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
+        }
+
+        .logo-text {
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff 0%, #a0a0c0 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .greeting {
+            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .greeting span {
+            color: white;
+            font-weight: 700;
+        }
+
+        .btn-logout {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px 20px;
+            border-radius: 40px;
+            color: rgba(255,255,255,0.7);
+            font-weight: 500;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255,59,48,0.2);
+            border-color: rgba(255,59,48,0.3);
+            color: #ff6b62;
+        }
+
+        .btn-back {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px 20px;
+            border-radius: 40px;
+            color: rgba(255,255,255,0.7);
+            font-weight: 500;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            margin-right: 12px;
+        }
+
+        .btn-back:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            padding: 32px;
+            position: relative;
+            z-index: 1;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Form Container */
+        .form-container {
+            background: rgba(18, 18, 24, 0.6);
+            backdrop-filter: blur(16px);
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 32px;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .form-header h1 {
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .form-header p {
+            color: rgba(255,255,255,0.5);
+            font-size: 14px;
+        }
+
+        /* Upload de Capa */
+        .upload-area {
+            margin-bottom: 24px;
+        }
+
+        .upload-label {
+            display: block;
+            color: rgba(255,255,255,0.7);
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .upload-box {
+            border: 2px dashed rgba(255,255,255,0.2);
+            border-radius: 20px;
+            padding: 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .upload-box:hover {
+            border-color: rgba(102,126,234,0.5);
+            background: rgba(102,126,234,0.05);
+        }
+
+        .upload-box i {
+            font-size: 48px;
+            color: rgba(255,255,255,0.3);
+            margin-bottom: 12px;
+        }
+
+        .upload-box p {
+            color: rgba(255,255,255,0.5);
+            font-size: 14px;
+        }
+
+        .upload-box .small {
+            font-size: 11px;
+            margin-top: 8px;
+            color: rgba(255,255,255,0.3);
+        }
+
+        #preview-image {
+            display: none;
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 16px;
+            margin-top: 16px;
+        }
+
+        /* Campos do formulário */
+        .input-group {
+            margin-bottom: 24px;
+        }
+
+        .input-group label {
+            display: block;
+            color: rgba(255,255,255,0.7);
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            font-size: 14px;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus {
+            outline: none;
+            border-color: rgba(102,126,234,0.5);
+            background: rgba(0,0,0,0.5);
+        }
+
+        .input-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .input-group input::placeholder,
+        .input-group textarea::placeholder {
+            color: rgba(255,255,255,0.2);
+        }
+
+        /* Preço */
+        .preco-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 0 16px;
+        }
+
+        .preco-wrapper span {
+            color: rgba(255,255,255,0.5);
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .preco-wrapper input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 14px 0;
+            font-size: 14px;
+            color: white;
+            outline: none;
+        }
+
+        /* Botão submit */
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(90deg, #1a1a24 0%, #0d0d14 100%);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 40px;
+            color: white;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 16px;
+        }
+
+        .btn-submit:hover {
+            background: linear-gradient(90deg, #2a2a38 0%, #1a1a24 100%);
+            transform: translateY(-2px);
+        }
+
+        /* Mensagem */
+        .message {
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            text-align: center;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.success {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .message.error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        @media (max-width: 640px) {
+            .main-content {
+                padding: 20px;
+            }
+            
+            .form-container {
+                padding: 24px;
+            }
+            
+            .form-header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo-area" onclick="goToDashboard()">
+            <img src="ei_1777492717837-removebg-preview.png" alt="Vantix Logo" class="logo-image">
+            <span class="logo-text">Vantix</span>
+        </div>
+        <div class="user-area">
+            <button class="btn-back" onclick="goToDashboard()">← Voltar</button>
+            <div class="greeting">Olá, <span id="user-name">Vendedor</span></div>
+            <button class="btn-logout" onclick="logout()">Sair</button>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="form-container">
+            <div class="form-header">
+                <h1>✨ Criar Novo Produto</h1>
+                <p>Adicione seu produto à plataforma Vantix</p>
+            </div>
+
+            <form id="product-form">
+                <!-- Upload de Capa -->
+                <div class="upload-area">
+                    <label class="upload-label">CAPA DO PRODUTO</label>
+                    <div class="upload-box" onclick="document.getElementById('capa-input').click()">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Clique para fazer upload da capa</p>
+                        <p class="small">PNG, JPG até 5MB</p>
+                    </div>
+                    <input type="file" id="capa-input" accept="image/*" style="display: none;">
+                    <img id="preview-image" alt="Prévia da capa">
+                </div>
+
+                <!-- Nome do Produto -->
+                <div class="input-group">
+                    <label>NOME DO PRODUTO</label>
+                    <input type="text" id="product-name" placeholder="Ex: Ebook Marketing Digital" required>
+                </div>
+
+                <!-- Descrição -->
+                <div class="input-group">
+                    <label>DESCRIÇÃO</label>
+                    <textarea id="product-description" placeholder="Descreva seu produto..."></textarea>
+                </div>
+
+                <!-- Preço -->
+                <div class="input-group">
+                    <label>PREÇO DE VENDA</label>
+                    <div class="preco-wrapper">
+                        <span>MT</span>
+                        <input type="number" id="product-price" placeholder="0,00" step="0.01" min="0" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">🚀 Publicar Produto</button>
+                <div id="form-message" class="message"></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const sessao = JSON.parse(localStorage.getItem('vantix_session'));
+        
+        if (sessao && sessao.nome) {
+            const nomePrimeiro = sessao.nome.split(' ')[0];
+            document.getElementById('user-name').innerText = nomePrimeiro;
+        } else {
+            window.location.href = 'acesso.html';
+        }
+
+        // Preview da imagem
+        const capaInput = document.getElementById('capa-input');
+        const previewImage = document.getElementById('preview-image');
+        let capaBase64 = null;
+
+        capaInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    capaBase64 = event.target.result;
+                    previewImage.src = capaBase64;
+                    previewImage.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function showMessage(text, type) {
+            const msg = document.getElementById('form-message');
+            msg.innerText = text;
+            msg.className = `message ${type} show`;
+            setTimeout(() => {
+                msg.classList.remove('show');
+            }, 3000);
+        }
+
+        function goToDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+
+        function logout() {
+            localStorage.removeItem('vantix_session');
+            window.location.href = 'acesso.html';
+        }
+
+        // Salvar produto no localStorage
+        function saveProduct(product) {
+            let produtos = JSON.parse(localStorage.getItem('vantix_produtos')) || [];
+            produtos.push({
+                ...product,
+                id: Date.now(),
+                dataCriacao: new Date().toISOString(),
+                vendedorId: sessao.usuarioId,
+                vendedorNome: sessao.nome
+            });
+            localStorage.setItem('vantix_produtos', JSON.stringify(produtos));
+        }
+
+        // Submit do formulário
+        document.getElementById('product-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const nome = document.getElementById('product-name').value.trim();
+            const descricao = document.getElementById('product-description').value.trim();
+            const preco = parseFloat(document.getElementById('product-price').value);
+            
+            if (!nome) {
+                showMessage('Por favor, insira o nome do produto', 'error');
+                return;
+            }
+            
+            if (isNaN(preco) || preco <= 0) {
+                showMessage('Por favor, insira um preço válido', 'error');
+                return;
+            }
+            
+            if (!capaBase64) {
+                showMessage('Por favor, faça upload da capa do produto', 'error');
+                return;
+            }
+            
+            const produto = {
+                nome: nome,
+                descricao: descricao || '',
+                preco: preco,
+                capa: capaBase64
+            };
+            
+            saveProduct(produto);
+            showMessage('✅ Produto criado com sucesso!', 'success');
+            
+            // Limpar formulário
+            document.getElementById('product-name').value = '';
+            document.getElementById('product-description').value = '';
+            document.getElementById('product-price').value = '';
+            capaInput.value = '';
+            previewImage.style.display = 'none';
+            capaBase64 = null;
+            
+            // Opcional: redirecionar após 2 segundos
+            setTimeout(() => {
+                if(confirm('Produto criado! Deseja criar outro produto?')) {
+                    // continua na página
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
+            }, 1500);
+        });
+    </script>
+</body>
+</html>
