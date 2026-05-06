@@ -92,9 +92,9 @@
         td { padding: 16px 15px; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.03); vertical-align: middle; }
 
         .status-badge { padding: 6px 12px; border-radius: 50px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
-        .status-ATIVO { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
-        .status-PENDENTE { background: rgba(245, 158, 11, 0.1); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2); }
-        .status-BANIDO { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
+        .status-active { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
+        .status-pending { background: rgba(245, 158, 11, 0.1); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2); }
+        .status-banned, .status-rejected { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
 
         .btn-action { padding: 8px 14px; border-radius: 10px; border: 1px solid var(--border); background: transparent; color: #fff; cursor: pointer; transition: 0.2s; font-size: 12px; font-weight: 700; margin-right: 5px; }
         .btn-approve { color: var(--success); border-color: rgba(16, 185, 129, 0.3); }
@@ -124,7 +124,7 @@
 
 <aside class="sidebar">
     <div class="logo-area">
-        <img src="logo.png" onerror="this.src='https://placehold.co/40x40?text=ZP'">
+        <img src="./logo.png" onerror="this.src='https://placehold.co/40x40?text=ZP'">
         <span>ZentroAdmin</span>
     </div>
     <div class="nav-menu">
@@ -242,7 +242,7 @@
         const total = cache.sales.reduce((acc, v) => acc + (v.valor_total || 0), 0);
         document.getElementById('stat-revenue').innerText = "MT " + total.toLocaleString('pt-MZ', { minimumFractionDigits: 2 });
 
-        const pCount = cache.users.filter(u => u.status === 'PENDENTE').length + cache.prods.filter(p => p.status === 'PENDENTE').length;
+        const pCount = cache.users.filter(u => u.status === 'pending').length + cache.prods.filter(p => p.status === 'pending').length;
         document.getElementById('badge-pendente').innerText = pCount;
     }
 
@@ -262,20 +262,20 @@
 
     function renderPendentes() {
         // Usuários Pendentes
-        const pUsers = cache.users.filter(u => u.status === 'PENDENTE');
+        const pUsers = cache.users.filter(u => u.status === 'pending');
         document.getElementById('table-pendentes-users').innerHTML = pUsers.map(u => `
             <tr>
                 <td><div class="user-info"><strong>${u.nome}</strong><small>${u['e-mail']}</small></div></td>
                 <td>${u.telefone}</td>
                 <td>
-                    <button class="btn-action btn-approve" onclick="updateStatus('usuarios', '${u.id}', 'ATIVO')">APROVAR</button>
-                    <button class="btn-action btn-ban" onclick="updateStatus('usuarios', '${u.id}', 'BANIDO')">REJEITAR</button>
+                    <button class="btn-action btn-approve" onclick="updateStatus('usuarios', '${u.id}', 'active')">APROVAR</button>
+                    <button class="btn-action btn-ban" onclick="updateStatus('usuarios', '${u.id}', 'banned')">REJEITAR</button>
                 </td>
             </tr>
         `).join('') || '<tr><td colspan="3" style="text-align:center">Nenhum usuário pendente</td></tr>';
 
         // Produtos Pendentes
-        const pProds = cache.prods.filter(p => p.status === 'PENDENTE');
+        const pProds = cache.prods.filter(p => p.status === 'pending');
         const userMap = Object.fromEntries(cache.users.map(u => [u.id, u.nome]));
         
         document.getElementById('table-pendentes-prods').innerHTML = pProds.map(p => `
@@ -284,8 +284,8 @@
                 <td>${userMap[p.vendedor_id] || 'Desconhecido'}</td>
                 <td>MT ${p.preco.toFixed(2)}</td>
                 <td>
-                    <button class="btn-action btn-approve" onclick="updateStatus('produtos', '${p.id}', 'ATIVO')">APROVAR</button>
-                    <button class="btn-action btn-ban" onclick="updateStatus('produtos', '${p.id}', 'BANIDO')">REJEITAR</button>
+                    <button class="btn-action btn-approve" onclick="updateStatus('produtos', '${p.id}', 'active')">APROVAR</button>
+                    <button class="btn-action btn-ban" onclick="updateStatus('produtos', '${p.id}', 'banned')">REJEITAR</button>
                 </td>
             </tr>
         `).join('') || '<tr><td colspan="4" style="text-align:center">Nenhum produto pendente</td></tr>';
@@ -300,12 +300,12 @@
         document.getElementById('table-usuarios').innerHTML = cache.users.map(u => `
             <tr>
                 <td><div class="user-info"><strong>${u.nome}</strong><small>${u['e-mail']}</small></div></td>
-                <td><span class="status-badge status-${u.status}">${u.status || 'ATIVO'}</span></td>
+                <td><span class="status-badge status-${u.status}">${u.status || 'active'}</span></td>
                 <td style="font-weight:bold; color:var(--success)">MT ${(revenueByUser[u.id] || 0).toLocaleString()}</td>
                 <td>
-                    <button class="btn-action ${u.status === 'ATIVO' ? 'btn-ban' : 'btn-approve'}" 
-                            onclick="updateStatus('usuarios', '${u.id}', '${u.status === 'ATIVO' ? 'BANIDO' : 'ATIVO'}')">
-                        ${u.status === 'ATIVO' ? 'BANIR' : 'REAPROVAR'}
+                    <button class="btn-action ${u.status === 'active' ? 'btn-ban' : 'btn-approve'}" 
+                            onclick="updateStatus('usuarios', '${u.id}', '${u.status === 'active' ? 'banned' : 'active'}')">
+                        ${u.status === 'active' ? 'BANIR' : 'REAPROVAR'}
                     </button>
                 </td>
             </tr>
@@ -319,11 +319,11 @@
                 <td><strong>${p.nome}</strong></td>
                 <td>${userMap[p.vendedor_id] || '—'}</td>
                 <td style="font-weight:bold">MT ${p.preco.toFixed(2)}</td>
-                <td><span class="status-badge status-${p.status}">${p.status || 'ATIVO'}</span></td>
+                <td><span class="status-badge status-${p.status}">${p.status || 'active'}</span></td>
                 <td>
-                    <button class="btn-action ${p.status === 'ATIVO' ? 'btn-ban' : 'btn-approve'}" 
-                            onclick="updateStatus('produtos', '${p.id}', '${p.status === 'ATIVO' ? 'BANIDO' : 'ATIVO'}')">
-                        ${p.status === 'ATIVO' ? 'BANIR' : 'ATIVAR'}
+                    <button class="btn-action ${p.status === 'active' ? 'btn-ban' : 'btn-approve'}" 
+                            onclick="updateStatus('produtos', '${p.id}', '${p.status === 'active' ? 'banned' : 'active'}')">
+                        ${p.status === 'active' ? 'BANIR' : 'ATIVAR'}
                     </button>
                 </td>
             </tr>

@@ -299,7 +299,7 @@
     <div class="container">
         <div class="glass-panel">
             <div class="logo-area">
-                <img src="logo.png" alt="ZentroPay Logo" class="logo-image">
+                <img src="./logo.png" alt="ZentroPay Logo" class="logo-image" onerror="this.src='https://placehold.co/120x120?text=ZentroPay'">
                 <p class="tagline">ENTERPRISE SECURITY</p>
             </div>
 
@@ -459,9 +459,9 @@
                         .eq(COL_EMAIL, mail)
                         .maybeSingle();
 
-                    if (!profile || profile.status !== 'ATIVO') {
+                    if (!profile || profile.status !== 'active') {
                         await client.auth.signOut();
-                        const alertMsg = (!profile || profile.status === 'PENDENTE') 
+                        const alertMsg = (!profile || profile.status === 'pending') 
                             ? '⚠️ Sua conta está em análise. Aguarde a aprovação.' 
                             : '❌ Esta conta foi suspensa ou banida.';
                         notify('login-message', alertMsg, 'error');
@@ -526,7 +526,7 @@
                                     [COL_NAME]: fNome,
                                     [COL_EMAIL]: fEmail,
                                     [COL_PHONE]: fPhone,
-                                    "status": "PENDENTE" // Definido como pendente para aprovação do admin
+                                    status: 'pending' // Definido como pendente em inglês para compatibilidade
                                 }
                             ]);
 
