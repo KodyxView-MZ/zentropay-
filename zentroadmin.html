@@ -294,40 +294,50 @@
     function renderUsuarios() {
         const revenueByUser = {};
         cache.sales.forEach(v => {
-            revenueByUser[v.vendedor_id] = (revenueByUser[v.vendedor_id] || 0) + v.valor_total;
+            revenueByUser[v.vendedor_id] = (revenueByUser[v.vendedor_id] || 0) + (v.valor_total || 0);
         });
 
-        document.getElementById('table-usuarios').innerHTML = cache.users.map(u => `
+        document.getElementById('table-usuarios').innerHTML = cache.users.map(u => {
+            const isActive = u.status === 'active';
+            const btnClass = isActive ? 'btn-ban' : 'btn-approve';
+            const btnText = isActive ? 'BANIR' : (u.status === 'pending' ? 'APROVAR' : 'REATIVAR');
+            const targetStatus = isActive ? 'banned' : 'active';
+
+            return `
             <tr>
                 <td><div class="user-info"><strong>${u.nome}</strong><small>${u['e-mail']}</small></div></td>
-                <td><span class="status-badge status-${u.status}">${u.status || 'active'}</span></td>
+                <td><span class="status-badge status-${u.status || 'active'}">${u.status || 'active'}</span></td>
                 <td style="font-weight:bold; color:var(--success)">MT ${(revenueByUser[u.id] || 0).toLocaleString()}</td>
                 <td>
-                    <button class="btn-action ${u.status === 'active' ? 'btn-ban' : 'btn-approve'}" 
-                            onclick="updateStatus('usuarios', '${u.id}', '${u.status === 'active' ? 'banned' : 'active'}')">
-                        ${u.status === 'active' ? 'BANIR' : 'REAPROVAR'}
+                    <button class="btn-action ${btnClass}" onclick="updateStatus('usuarios', '${u.id}', '${targetStatus}')">
+                        ${btnText}
                     </button>
                 </td>
-            </tr>
-        `).join('');
+            </tr>`;
+        }).join('');
     }
 
     function renderProdutos() {
         const userMap = Object.fromEntries(cache.users.map(u => [u.id, u.nome]));
-        document.getElementById('table-produtos').innerHTML = cache.prods.map(p => `
+        document.getElementById('table-produtos').innerHTML = cache.prods.map(p => {
+            const isActive = p.status === 'active';
+            const btnClass = isActive ? 'btn-ban' : 'btn-approve';
+            const btnText = isActive ? 'BANIR' : (p.status === 'pending' ? 'APROVAR' : 'ATIVAR');
+            const targetStatus = isActive ? 'banned' : 'active';
+
+            return `
             <tr>
                 <td><strong>${p.nome}</strong></td>
                 <td>${userMap[p.vendedor_id] || '—'}</td>
                 <td style="font-weight:bold">MT ${p.preco.toFixed(2)}</td>
-                <td><span class="status-badge status-${p.status}">${p.status || 'active'}</span></td>
+                <td><span class="status-badge status-${p.status || 'active'}">${p.status || 'active'}</span></td>
                 <td>
-                    <button class="btn-action ${p.status === 'active' ? 'btn-ban' : 'btn-approve'}" 
-                            onclick="updateStatus('produtos', '${p.id}', '${p.status === 'active' ? 'banned' : 'active'}')">
-                        ${p.status === 'active' ? 'BANIR' : 'ATIVAR'}
+                    <button class="btn-action ${btnClass}" onclick="updateStatus('produtos', '${p.id}', '${targetStatus}')">
+                        ${btnText}
                     </button>
                 </td>
-            </tr>
-        `).join('');
+            </tr>`;
+        }).join('');
     }
 
     async function updateStatus(table, id, newStatus) {
