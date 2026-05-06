@@ -327,10 +327,12 @@
     </div>
 
     <div class="container">
-        <div class="brand-header">
-            <img src="IMG-20260429-WA0388.jpg" class="brand-logo" onerror="this.style.display='none'">
-            <span class="brand-name">ZentroPay</span>
-        </div>
+        <header class="checkout-header">
+            <div class="logo-container">
+                <img src="./IMG-20260429-WA0388.jpg" alt="ZentroPay Logo"
+                    onerror="this.src='https://placehold.co/180x45?text=ZentroPay'">
+            </div>
+        </header>
 
         <div class="product-card">
             <div class="prod-header">
@@ -582,7 +584,7 @@
 
                     if (data?.success) {
                         const isSuccess = data.status === 'success' || data.event === 'payment.completed';
-                        
+
                         // Atualizar status inicial
                         await supabase.from('pedidos').update({ status: isSuccess ? 'pago' : 'pendente' }).eq('transaction_id', reference);
 
@@ -595,20 +597,20 @@
                         } else {
                             // CASO PENDENTE (USSD/Push): Iniciar Polling para verificar se o cliente pagou
                             showMessage("⏳ Aguardando confirmação no seu celular...", "success");
-                            
+
                             let checkCount = 0;
                             const maxChecks = 40; // 40 vezes * 3 segundos = 120 segundos (2 minutos)
-                            
+
                             const interval = setInterval(async () => {
                                 checkCount++;
                                 console.log(`Verificando status (${checkCount}/${maxChecks})...`);
-                                
+
                                 const { data: statusData } = await supabase
                                     .from('pedidos')
                                     .select('status')
                                     .eq('transaction_id', reference)
                                     .single();
-                                
+
                                 if (statusData?.status === 'pago') {
                                     clearInterval(interval);
                                     showMessage("✅ Pagamento confirmado!", "success");

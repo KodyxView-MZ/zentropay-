@@ -1,9 +1,15 @@
-const express = require('express');
-const fetch = require('node-fetch');
-const { createClient } = require('@supabase/supabase-js');
-const crypto = require('crypto');
-const path = require('path');
-require('dotenv').config();
+import express from 'express';
+import fetch from 'node-fetch';
+import { createClient } from '@supabase/supabase-js';
+import crypto from 'crypto';
+import path from 'path';
+import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+
+dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,7 +23,7 @@ app.use(express.static(path.join(__dirname)));
 // ---------- ROTA: API PAY ----------
 app.post('/api/pay', async (req, res) => {
     console.log("Recebido pedido de pagamento:", req.body);
-    
+
     try {
         const payload = req.body;
         const DEBITO_API_KEY = process.env.DEBITO_API_KEY || "sk_live_ItHJ7fJQT5BL4vlqzqwwTjEYhx3ZuROg";
@@ -81,17 +87,17 @@ app.post('/api/pay', async (req, res) => {
 // ---------- ROTA: WEBHOOK ----------
 app.post('/api/webhook', async (req, res) => {
     console.log("Webhook recebido localmente:", req.body);
-    
+
     const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET || "whsec_eec693e8334351177963120cd7ad6c7a8ab658a3908cd3f5cb195180296e1eb5";
     const SUPABASE_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
     const SUPABASE_KEY = process.env.SUPABASE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
-    
+
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     try {
         const paymentData = req.body;
         const isDebito = paymentData.event !== undefined && paymentData.data !== undefined;
-        
+
         let reference, status;
 
         if (isDebito) {
@@ -101,7 +107,7 @@ app.post('/api/webhook', async (req, res) => {
             reference = paymentData.reference;
             status = paymentData.status;
         }
-        
+
         if (status === 'completed' || status === 'success' || status === 'paid') {
             const { data: pedido, error: pedidoError } = await supabase
                 .from('pedidos')

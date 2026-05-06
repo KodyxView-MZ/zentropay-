@@ -2,6 +2,7 @@
   "name": "zentropay-local",
   "version": "1.0.0",
   "description": "Servidor local para testes do ZentroPay",
+  "type": "module",
   "main": "server.js",
   "dependencies": {
     "@supabase/supabase-js": "^2.105.3",

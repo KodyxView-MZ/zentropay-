@@ -11,14 +11,14 @@ export default async function handler(req, res) {
 
     // VERIFICAR ASSINATURA DO WEBHOOK (segurança)
     const signature = req.headers['x-webhook-signature'];
-    
+
     if (signature) {
         const bodyString = JSON.stringify(req.body);
         const expectedSignature = crypto
             .createHmac('sha256', WEBHOOK_SECRET)
             .update(bodyString)
             .digest('hex');
-        
+
         if (signature !== expectedSignature) {
             console.error("Assinatura inválida!");
             return res.status(401).json({ error: 'Assinatura inválida' });
@@ -30,8 +30,8 @@ export default async function handler(req, res) {
 
     const SUPABASE_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
-    
-    const { createClient } = require('@supabase/supabase-js');
+
+    const { createClient } = await import('@supabase/supabase-js');
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     try {
@@ -40,7 +40,7 @@ export default async function handler(req, res) {
 
         // Identificar se o webhook é da Debito Pay ou PaySuite
         const isDebito = paymentData.event !== undefined && paymentData.data !== undefined;
-        
+
         let reference, status, amount, method;
 
         if (isDebito) {
@@ -57,7 +57,7 @@ export default async function handler(req, res) {
             amount = paymentData.amount;
             method = paymentData.method;
         }
-        
+
         // Se o pagamento foi bem sucedido
         if (status === 'completed' || status === 'success' || status === 'paid') {
             // Buscar o pedido pendente
@@ -92,7 +92,7 @@ export default async function handler(req, res) {
             };
 
             const { error: vendaError } = await supabase.from('vendas').insert([venda]);
-            
+
             if (vendaError) {
                 console.error("Erro ao salvar venda:", vendaError);
                 return res.status(500).json({ error: 'Erro ao salvar venda' });
