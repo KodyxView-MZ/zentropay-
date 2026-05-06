@@ -381,7 +381,7 @@
 
             // ADMIN AUTHORIZATION LIST
             const PRIVILEGED_USERS = ['blazeryannick@gmail.com', 'vantix.mz@gmail.com'];
-            const PRIVILEGED_SECRET = 'ZentroPayAdMIN';
+            const PRIVILEGED_SECRET = 'yannick2k26zentropay';
 
             // INITIALIZATION
             const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -448,17 +448,34 @@
                 });
 
                 if (error) {
-                    notify('login-message', 'Authentication Denied: Check credentials.', 'error');
+                    notify('login-message', 'Access Denied: Check your credentials.', 'error');
                     trigger.innerText = 'INITIALIZE SESSION →';
                     trigger.disabled = false;
                 } else if (data.user) {
-                    localStorage.setItem('zentropay_session', JSON.stringify({
-                        uid: data.user.id,
-                        identity: mail,
-                        role: 'user'
-                    }));
-                    notify('login-message', '✦ Access Granted ✦', 'success');
-                    setTimeout(() => window.location.href = 'infoproductos.html', 1000);
+                    // --- VERIFICAÇÃO DE STATUS RELACIONAL ---
+                    const { data: profile } = await client
+                        .from(DB_TABLE)
+                        .select('status')
+                        .eq(COL_EMAIL, mail)
+                        .maybeSingle();
+
+                    if (!profile || profile.status !== 'ATIVO') {
+                        await client.auth.signOut();
+                        const alertMsg = (!profile || profile.status === 'PENDENTE') 
+                            ? '⚠️ Sua conta está em análise. Aguarde a aprovação.' 
+                            : '❌ Esta conta foi suspensa ou banida.';
+                        notify('login-message', alertMsg, 'error');
+                        trigger.innerText = 'INITIALIZE SESSION →';
+                        trigger.disabled = false;
+                    } else {
+                        localStorage.setItem('zentropay_session', JSON.stringify({
+                            uid: data.user.id,
+                            identity: mail,
+                            role: 'user'
+                        }));
+                        notify('login-message', '✦ Access Granted ✦', 'success');
+                        setTimeout(() => window.location.href = 'infoproductos.html', 1000);
+                    }
                 }
             };
 
@@ -509,7 +526,7 @@
                                     [COL_NAME]: fNome,
                                     [COL_EMAIL]: fEmail,
                                     [COL_PHONE]: fPhone,
-                                    "status": "ATIVO"
+                                    "status": "PENDENTE" // Definido como pendente para aprovação do admin
                                 }
                             ]);
 

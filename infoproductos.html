@@ -1299,7 +1299,7 @@
                         link_produto: document.getElementById('prodContentLink').value,
                         urgent_enabled: document.getElementById('prodTimer').value === 'true',
                         urgent_minutes: parseInt(document.getElementById('prodTimerMinutes').value) || 0,
-                        status: 'active',
+                        status: 'PENDENTE',
                         serial: 'ESC-' + Math.random().toString(36).substring(2, 10).toUpperCase()
                     };
                     const { error } = await supabase.from('produtos').insert([newProd]);
