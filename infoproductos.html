@@ -1372,6 +1372,7 @@
                         alert("Erro ao solicitar saque: " + error.message);
                     } else {
                         // --- NOTIFICAÇÃO POR E-MAIL ---
+                        console.log("📤 Enviando notificação de saque:", { email: currentUser.email, valor: valorSolicitado });
                         fetch('/api/notify-withdrawal', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -1382,7 +1383,10 @@
                                 metodo: metodo,
                                 dados_carteira: dadosCarteira
                             })
-                        }).catch(e => console.error("Falha ao notificar saque:", e));
+                        })
+                        .then(r => r.json())
+                        .then(d => console.log("📥 Resposta notificação:", d))
+                        .catch(e => console.error("❌ Falha ao notificar saque:", e));
 
                         alert("✅ Saque solicitado com sucesso! Aguarde aprovação do administrador.");
                         closeWithdrawalModal();
