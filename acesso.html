@@ -455,7 +455,7 @@
                     // --- VERIFICAÇÃO DE STATUS RELACIONAL ---
                     const { data: profile } = await client
                         .from(DB_TABLE)
-                        .select('status')
+                        .select('"e-mail", status')
                         .eq(COL_EMAIL, mail)
                         .maybeSingle();
 
@@ -532,7 +532,6 @@
 
                         if (syncError) {
                             console.error("Relational Sync Failed:", syncError.message);
-                            // Notificamos que a conta foi criada, mesmo que a tabela tenha falhado
                             notify('cadastro-message', 'Account Created (Sync Pending). Try Logging in.', 'success');
                         } else {
                             notify('cadastro-message', '✦ Secure Registration Complete ✦', 'success');
