@@ -1376,8 +1376,8 @@
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
-                                email: currentUser['e-mail'],
-                                nome: currentUser.nome,
+                                email: currentUser.email,
+                                nome: currentUser.user_metadata?.full_name || currentUser.user_metadata?.display_name || 'Vendedor',
                                 valor: valorSolicitado,
                                 metodo: metodo,
                                 dados_carteira: dadosCarteira
