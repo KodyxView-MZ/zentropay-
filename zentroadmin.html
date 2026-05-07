@@ -132,7 +132,7 @@
 
 <aside class="sidebar">
     <div class="logo-area">
-        <img src="logo.png" alt="ZentroPay">
+        <img src="/logo.png" alt="ZentroPay">
         <span>ZentroPay</span>
     </div>
     <div class="nav-menu">
@@ -230,9 +230,9 @@
         try {
             // Carregamento OTIMIZADO - Busca apenas o necessário para evitar erro 500
             const [uRes, pRes, sRes] = await Promise.all([
-                _client.from('usuarios').select('id, nome, "e-mail", telefone, status, criado_em').order('criado_em', { ascending: false }),
-                _client.from('produtos').select('id, nome, preco, status, vendedor_id, criado_em').order('criado_em', { ascending: false }),
-                _client.from('vendas').select('id, valor_total, vendedor_id, criado_em, status_venda').order('criado_em', { ascending: false })
+                _client.from('usuarios').select('*').order('criado_em', { ascending: false }),
+                _client.from('produtos').select('*').order('criado_em', { ascending: false }),
+                _client.from('vendas').select('*').order('criado_em', { ascending: false })
             ]);
 
             if (uRes.error || pRes.error || sRes.error) throw new Error("Falha na conexão.");
