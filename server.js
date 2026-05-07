@@ -193,6 +193,7 @@ app.post('/api/webhook', async (req, res) => {
         res.status(500).json({ error: 'Erro interno' });
 // ---------- ROTA: NOTIFICAÇÃO DE SAQUE ----------
 app.post('/api/notify-withdrawal', async (req, res) => {
+    console.log("📨 Solicitação de e-mail de saque recebida:", req.body);
     const { email, nome, valor, metodo, dados_carteira } = req.body;
     const RESEND_API_KEY = process.env.RESEND_API_KEY || "re_UaA6Rucy_H8mnicg5TTBRjdUFZymypwxu";
 
@@ -220,6 +221,7 @@ app.post('/api/notify-withdrawal', async (req, res) => {
                 </div>
             `
         });
+        console.log("✅ E-mail de saque enviado com sucesso para:", email);
         res.status(200).json({ success: true });
     } catch (error) {
         console.error("Erro ao enviar e-mail de saque local:", error);
