@@ -139,6 +139,48 @@ app.post('/api/webhook', async (req, res) => {
             };
 
             await supabase.from('vendas').insert([venda]);
+
+            // --- ENVIO DE E-MAIL VIA RESEND ---
+            const RESEND_API_KEY = process.env.RESEND_API_KEY || "re_123456789";
+            try {
+                const { Resend } = await import('resend');
+                const resend = new Resend(RESEND_API_KEY);
+
+                // Buscar e-mail do vendedor
+                const { data: vendedor } = await supabase
+                    .from('usuarios')
+                    .select('e-mail, nome')
+                    .eq('id', venda.vendedor_id)
+                    .single();
+
+                if (vendedor && vendedor['e-mail']) {
+                    await resend.emails.send({
+                        from: 'ZentroPay <onboarding@resend.dev>',
+                        to: vendedor['e-mail'],
+                        subject: `🎉 Nova Venda Realizada: ${pedido.produtos?.nome}`,
+                        html: `
+                            <div style="font-family: sans-serif; color: #333;">
+                                <h2>Parabéns, ${vendedor.nome}!</h2>
+                                <p>Você acaba de realizar uma nova venda na ZentroPay.</p>
+                                <hr>
+                                <p><strong>Produto:</strong> ${pedido.produtos?.nome}</p>
+                                <p><strong>Valor Total:</strong> MT ${venda.valor_total.toLocaleString()}</p>
+                                <p><strong>Seu Lucro (Líquido):</strong> MT ${venda.valor_liquido.toLocaleString()}</p>
+                                <hr>
+                                <p><strong>Cliente:</strong> ${venda.cliente_nome}</p>
+                                <p><strong>Método:</strong> ${venda.metodo_pagamento.toUpperCase()}</p>
+                                <br>
+                                <p>Continue com o excelente trabalho!</p>
+                                <p style="font-size: 12px; color: #999;">Equipa ZentroPay</p>
+                            </div>
+                        `
+                    });
+                    console.log("📧 E-mail de notificação enviado para:", vendedor['e-mail']);
+                }
+            } catch (emailErr) {
+                console.error("⚠️ Erro ao enviar e-mail no server.js (Resend):", emailErr.message);
+            }
+
             await supabase.from('pedidos').update({ status: 'pago' }).eq('transaction_id', reference);
 
             console.log("✅ Venda registada com sucesso localmente!");
