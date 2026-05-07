@@ -228,14 +228,18 @@
 
     async function loadAllData() {
         try {
-            // Carregamento OTIMIZADO - Busca apenas o necessário para evitar erro 500
-            const [uRes, pRes, sRes] = await Promise.all([
-                _client.from('usuarios').select('id, nome, "e-mail", telefone, status, criado_em').order('criado_em', { ascending: false }),
-                _client.from('produtos').select('id, nome, vendedor_id, preco, status, criado_em').order('criado_em', { ascending: false }),
-                _client.from('vendas').select('id, vendedor_id, valor_total, status_venda, criado_em').order('criado_em', { ascending: false })
-            ]);
+            const uRes = await _client.from('usuarios').select('id,nome,e-mail,telefone,status,criado_em').order('criado_em', { ascending: false });
+            if (uRes.error) console.error("Erro Usuários:", uRes.error.message);
+            
+            const pRes = await _client.from('produtos').select('id,nome,vendedor_id,preco,status,criado_em').order('criado_em', { ascending: false });
+            if (pRes.error) console.error("Erro Produtos:", pRes.error.message);
+            
+            const sRes = await _client.from('vendas').select('id,vendedor_id,valor_total,status_venda,criado_em').order('criado_em', { ascending: false });
+            if (sRes.error) console.error("Erro Vendas:", sRes.error.message);
 
-            if (uRes.error || pRes.error || sRes.error) throw new Error("Falha na conexão.");
+            if (uRes.error || pRes.error || sRes.error) {
+                throw new Error("Falha ao carregar dados parciais.");
+            }
 
             cache.users = uRes.data || [];
             cache.prods = pRes.data || [];
@@ -244,12 +248,12 @@
             renderStats();
             renderCurrentTab();
         } catch (err) {
-            console.error("Erro de Rede:", err);
+            console.error("Erro de Carregamento:", err);
             document.getElementById('dashboard-content').innerHTML = `
                 <div style="text-align:center; padding:50px; color:var(--danger);">
-                    <i class="fas fa-wifi-slash" style="font-size:40px; margin-bottom:20px;"></i>
-                    <h3>Instabilidade de Rede</h3>
-                    <p>Não foi possível conectar ao servidor (Erro 500 ou Conexão). Tente novamente.</p>
+                    <i class="fas fa-exclamation-triangle" style="font-size:40px; margin-bottom:20px;"></i>
+                    <h3>Erro de Sincronização</h3>
+                    <p>${err.message || 'Verifique o console para mais detalhes.'}</p>
                     <button class="btn-action" style="margin-top:20px; border-color:var(--accent); color:var(--accent);" onclick="loadAllData()">TENTAR NOVAMENTE</button>
                 </div>
             `;
