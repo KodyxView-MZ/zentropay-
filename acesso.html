@@ -376,7 +376,7 @@
             // DATABASE TABLE CONFIGURATION
             const DB_TABLE = "usuarios";
             const COL_NAME = "nome";
-            const COL_EMAIL = "e-mail"; // Mapeamento exato do banco (com hífen)
+            const COL_EMAIL = "email"; // Corrigido: sem hífen
             const COL_PHONE = "telefone";
 
             // ADMIN AUTHORIZATION LIST
@@ -518,7 +518,7 @@
 
                     if (regData.user) {
                         // Task 2: Insert into 'usuarios' Table (Relational Sync)
-                        // Note: Usando aspas no "e-mail" para garantir compatibilidade com o PostgreSQL
+                        // Note: Sincronização com a tabela 'usuarios' usando o ID do Auth
                         const { error: syncError } = await client
                             .from(DB_TABLE)
                             .insert([
