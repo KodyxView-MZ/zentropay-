@@ -191,6 +191,39 @@ app.post('/api/webhook', async (req, res) => {
     } catch (error) {
         console.error("Erro no webhook local:", error);
         res.status(500).json({ error: 'Erro interno' });
+// ---------- ROTA: NOTIFICAÇÃO DE SAQUE ----------
+app.post('/api/notify-withdrawal', async (req, res) => {
+    const { email, nome, valor, metodo, dados_carteira } = req.body;
+    const RESEND_API_KEY = process.env.RESEND_API_KEY || "re_UaA6Rucy_H8mnicg5TTBRjdUFZymypwxu";
+
+    try {
+        const { Resend } = await import('resend');
+        const resend = new Resend(RESEND_API_KEY);
+
+        await resend.emails.send({
+            from: 'ZentroPay <onboarding@resend.dev>',
+            to: email,
+            subject: '💰 Saque Solicitado - ZentroPay',
+            html: `
+                <div style="font-family: sans-serif; color: #333; max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px; border-radius: 10px;">
+                    <h2 style="color: #a855f7;">Olá, ${nome || 'Vendedor'}!</h2>
+                    <p>Recebemos o seu pedido de saque na plataforma ZentroPay.</p>
+                    <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                        <p><strong>Valor Solicitado:</strong> MT ${parseFloat(valor).toLocaleString()}</p>
+                        <p><strong>Método:</strong> ${metodo.toUpperCase()}</p>
+                        <p><strong>Destino:</strong> ${dados_carteira}</p>
+                        <p><strong>Status:</strong> <span style="color: #f59e0b; font-weight: bold;">PENDENTE</span></p>
+                    </div>
+                    <p>O nosso departamento financeiro irá analisar o seu pedido e o pagamento será processado em breve.</p>
+                    <hr style="border: none; border-top: 1px solid #eee;">
+                    <p style="font-size: 12px; color: #999; text-align: center;">ZentroPay - O seu ecossistema de pagamentos</p>
+                </div>
+            `
+        });
+        res.status(200).json({ success: true });
+    } catch (error) {
+        console.error("Erro ao enviar e-mail de saque local:", error);
+        res.status(500).json({ error: 'Erro interno' });
     }
 });
 
