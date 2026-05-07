@@ -39,7 +39,8 @@
         }
 
         .logo-area { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; padding: 0 10px; }
-        .logo-area img { width: 40px; height: 40px; border-radius: 12px; object-fit: cover; }
+        .logo-area { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; padding: 0 10px; }
+        .logo-area svg { width: 40px; height: 40px; }
         .logo-area span { 
             font-weight: 800; 
             font-size: 22px; 
@@ -131,7 +132,12 @@
 
 <aside class="sidebar">
     <div class="logo-area">
-        <img src="logo.png" alt="ZentroPay">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 0 8px rgba(168,85,247,0.5));">
+            <rect width="40" height="40" rx="12" fill="#a855f7"/>
+            <path d="M12 28L20 12L28 28H12Z" fill="white" fill-opacity="0.2"/>
+            <path d="M20 12L12 28H28L20 12Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="20" cy="22" r="3" fill="white"/>
+        </svg>
         <span>ZentroPay</span>
     </div>
     <div class="nav-menu">
@@ -227,11 +233,11 @@
 
     async function loadAllData() {
         try {
-            // Carregamento PARALELO para performance máxima
+            // Carregamento OTIMIZADO - Busca apenas o necessário para evitar erro 500
             const [uRes, pRes, sRes] = await Promise.all([
-                _client.from('usuarios').select('*').order('criado_em', { ascending: false }),
-                _client.from('produtos').select('*').order('criado_em', { ascending: false }),
-                _client.from('vendas').select('*').order('criado_em', { ascending: false })
+                _client.from('usuarios').select('id, nome, e-mail, telefone, status, criado_em').order('criado_em', { ascending: false }),
+                _client.from('produtos').select('id, nome, preco, status, vendedor_id, criado_em').order('criado_em', { ascending: false }),
+                _client.from('vendas').select('id, valor_total, vendedor_id, criado_em, status_venda').order('criado_em', { ascending: false })
             ]);
 
             if (uRes.error || pRes.error || sRes.error) throw new Error("Falha na conexão.");
@@ -248,7 +254,7 @@
                 <div style="text-align:center; padding:50px; color:var(--danger);">
                     <i class="fas fa-wifi-slash" style="font-size:40px; margin-bottom:20px;"></i>
                     <h3>Instabilidade de Rede</h3>
-                    <p>Não foi possível conectar ao servidor. Verifique sua internet.</p>
+                    <p>Não foi possível conectar ao servidor (Erro 500 ou Conexão). Tente novamente.</p>
                     <button class="btn-action" style="margin-top:20px; border-color:var(--accent); color:var(--accent);" onclick="loadAllData()">TENTAR NOVAMENTE</button>
                 </div>
             `;
