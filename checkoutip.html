@@ -463,6 +463,17 @@
                     if (error) throw error;
 
                     if (data) {
+                        // --- VERIFICAÇÃO DE BANIMENTO ---
+                        if (data.status === 'banned') {
+                            document.body.innerHTML = `
+                                <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:#050508;color:#fff;font-family:'Inter',sans-serif;text-align:center;padding:20px;">
+                                    <div style="font-size:60px;margin-bottom:20px;">🚫</div>
+                                    <h2 style="font-size:24px;font-weight:800;color:#ef4444;margin-bottom:10px;">Produto Indisponível</h2>
+                                    <p style="color:#94a3b8;font-size:15px;max-width:380px;">Este produto foi removido da plataforma e não está disponível para compra.</p>
+                                </div>`;
+                            return;
+                        }
+
                         produtoAtual = { id: data.id, nome: data.nome, preco: parseFloat(data.preco) };
                         document.getElementById('p-nome').innerText = data.nome;
                         const precoFmt = Number(data.preco).toLocaleString('pt-MZ', { minimumFractionDigits: 2 });
