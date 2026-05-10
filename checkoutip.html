@@ -7,6 +7,7 @@
     <title>Checkout Seguro — ZentroPay</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="logo.png">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -327,10 +328,12 @@
     </div>
 
     <div class="container">
-        <div class="brand-header">
-            <img src="IMG-20260429-WA0388.jpg" class="brand-logo" onerror="this.style.display='none'">
-            <span class="brand-name">ZentroPay</span>
-        </div>
+        <header class="checkout-header">
+            <div class="logo-container">
+                <img src="./IMG-20260429-WA0388.jpg" alt="ZentroPay Logo"
+                    onerror="this.src='https://placehold.co/180x45?text=ZentroPay'">
+            </div>
+        </header>
 
         <div class="product-card">
             <div class="prod-header">
@@ -377,11 +380,11 @@
         <label>Selecione o método de pagamento *</label>
         <div class="payment-methods">
             <div class="method-card active" data-method="emola">
-                <img src="emolalogo.png" alt="e-Mola" onerror="this.src='https://placehold.co/32x32?text=EM'">
+                <img src="./emolalogo.png" alt="e-Mola" onerror="this.src='https://placehold.co/32x32?text=EM'">
                 <span style="font-size:14px; font-weight:600">e-Mola</span>
             </div>
             <div class="method-card" data-method="mpesa">
-                <img src="mpesalogo.png" alt="M-Pesa" onerror="this.src='https://placehold.co/32x32?text=MP'">
+                <img src="./mpesalogo.png" alt="M-Pesa" onerror="this.src='https://placehold.co/32x32?text=MP'">
                 <span style="font-size:14px; font-weight:600">M-Pesa</span>
             </div>
         </div>
@@ -410,9 +413,8 @@
             const SUP_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
             const supabase = window.supabase.createClient(SUP_URL, SUP_KEY);
 
-            // CONFIGURAÇÃO PAYSUITE
-            const PAYSUITE_TOKEN = "1902|G4FV1yeQQDjdPkVSK69eLn6WBZS1jpbKFi7ebtDc7072075c";
-            const PAYSUITE_API = "https://paysuite.tech/api/v1/payments";
+            // A API de pagamentos (Debito) agora é chamada no servidor (/api/pay)
+            // Não coloque chaves secretas no frontend!
 
             let produtoAtual = { nome: "Carregando...", preco: 0 };
             let metodoSelecionado = 'emola';
@@ -462,6 +464,17 @@
                     if (error) throw error;
 
                     if (data) {
+                        // --- VERIFICAÇÃO DE BANIMENTO ---
+                        if (data.status === 'banned') {
+                            document.body.innerHTML = `
+                                <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:#050508;color:#fff;font-family:'Inter',sans-serif;text-align:center;padding:20px;">
+                                    <div style="font-size:60px;margin-bottom:20px;">🚫</div>
+                                    <h2 style="font-size:24px;font-weight:800;color:#ef4444;margin-bottom:10px;">Produto Indisponível</h2>
+                                    <p style="color:#94a3b8;font-size:15px;max-width:380px;">Este produto foi removido da plataforma e não está disponível para compra.</p>
+                                </div>`;
+                            return;
+                        }
+
                         produtoAtual = { id: data.id, nome: data.nome, preco: parseFloat(data.preco) };
                         document.getElementById('p-nome').innerText = data.nome;
                         const precoFmt = Number(data.preco).toLocaleString('pt-MZ', { minimumFractionDigits: 2 });
@@ -531,7 +544,6 @@
                     // 1. PRIMEIRO: SALVAR PEDIDO COMO PENDENTE
                     const pedido = {
                         produto_id: produtoAtual.id,
-                        produto_nome: produtoAtual.nome,
                         cliente_nome: nome,
                         cliente_email: email,
                         cliente_telefone: tel,
@@ -545,7 +557,7 @@
                     await supabase.from('pedidos').insert([pedido]);
                     console.log("✅ Pedido salvo no Supabase:", reference);
 
-                    // 2. TENTAR API DO PAYSUITE
+                    // 2. TENTAR API DA DEBITO
                     const method = metodoSelecionado === 'emola' ? 'emola' : 'mpesa';
                     const payload = {
                         amount: produtoAtual.preco,
@@ -553,7 +565,7 @@
                         description: produtoAtual.nome,
                         method: method,
                         return_url: window.location.origin + "/obrigado.html",
-                        webhook_url: window.location.origin + "/webhook-pagamento",
+                        webhook_url: "https://zentropay.digital/api/webhook",
                         customer: {
                             name: nome,
                             phone: carteira,
@@ -561,16 +573,15 @@
                         }
                     };
 
-                    console.log("📤 Tentando PaySuite...", payload);
+                    console.log("📤 Tentando Debito...", payload);
 
                     // Timeout de 10 segundos para não travar
                     const controller = new AbortController();
                     const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-                    const response = await fetch('https://corsproxy.io/?' + encodeURIComponent(PAYSUITE_API), {
+                    const response = await fetch('/api/pay', {
                         method: 'POST',
                         headers: {
-                            'Authorization': `Bearer ${PAYSUITE_TOKEN}`,
                             'Content-Type': 'application/json',
                             'Accept': 'application/json'
                         },
@@ -580,63 +591,66 @@
 
                     clearTimeout(timeoutId);
                     const data = await response.json();
-                    console.log("📥 Resposta PaySuite:", data);
+                    console.log("📥 Resposta Debito:", data);
 
-                    const checkoutUrl = data?.checkout_url || data?.data?.checkout_url || data?.url;
+                    if (data?.success) {
+                        const isSuccess = data.status === 'success' || data.event === 'payment.completed';
 
-                    if (checkoutUrl) {
-                        // SUCESSO: Redirecionar para o PaySuite
-                        await supabase.from('pedidos').update({ status: 'redirecionado' }).eq('transaction_id', reference);
-                        showMessage("✅ Redirecionando para pagamento...", "success");
-                        setTimeout(() => { window.location.href = checkoutUrl; }, 1500);
+                        // Atualizar status inicial
+                        await supabase.from('pedidos').update({ status: isSuccess ? 'pago' : 'pendente' }).eq('transaction_id', reference);
+
+                        if (data.checkout_url) {
+                            showMessage("✅ Redirecionando para pagamento...", "success");
+                            setTimeout(() => { window.location.href = data.checkout_url; }, 1500);
+                        } else if (isSuccess) {
+                            showMessage("✅ Pagamento concluído com sucesso!", "success");
+                            setTimeout(() => { window.location.href = "obrigado.html?transacao=" + reference; }, 2000);
+                        } else {
+                            // CASO PENDENTE (USSD/Push): Iniciar Polling para verificar se o cliente pagou
+                            showMessage("⏳ Aguardando confirmação no seu celular...", "success");
+
+                            let checkCount = 0;
+                            const maxChecks = 40; // 40 vezes * 3 segundos = 120 segundos (2 minutos)
+
+                            const interval = setInterval(async () => {
+                                checkCount++;
+                                console.log(`Verificando status (${checkCount}/${maxChecks})...`);
+
+                                const { data: statusData } = await supabase
+                                    .from('pedidos')
+                                    .select('status')
+                                    .eq('transaction_id', reference)
+                                    .single();
+
+                                if (statusData?.status === 'pago') {
+                                    clearInterval(interval);
+                                    showMessage("✅ Pagamento confirmado!", "success");
+                                    setTimeout(() => { window.location.href = "obrigado.html?transacao=" + reference; }, 1500);
+                                } else if (checkCount >= maxChecks) {
+                                    clearInterval(interval);
+                                    const overlay = document.getElementById('loadingOverlay');
+                                    if (overlay) overlay.classList.remove('active');
+                                    showMessage("❌ Tempo de espera esgotado. Se você pagou, aguarde alguns minutos.", "error");
+                                    btn.disabled = false;
+                                }
+                            }, 3000);
+                        }
                         return;
+                    } else {
+                        throw new Error(data?.error || data?.message || "Erro ao processar o pagamento com a Debito.");
                     }
-
-                    // 3. FALLBACK: Se PaySuite falhar, usar SIMULAÇÃO LOCAL (como no SPCK)
-                    console.log("⚠️ PaySuite falhou, usando modo local...");
 
                 } catch (paysuiteError) {
-                    console.log("⚠️ Erro no PaySuite:", paysuiteError.message);
-                    console.log("🔄 Usando modo local (simulação)...");
+                    console.error("⚠️ Erro no processamento:", paysuiteError.message);
+
+                    await supabase.from('pedidos').update({ status: 'falhou' }).eq('transaction_id', reference);
+                    const overlay = document.getElementById('loadingOverlay');
+                    if (overlay) overlay.classList.remove('active');
+
+                    showMessage("❌ Erro ao iniciar pagamento. Tente novamente.", "error");
+                    btn.disabled = false;
+                    btn.innerHTML = `<i class="fas fa-shopping-cart"></i> Finalizar Compra - MT ${produtoAtual.preco.toLocaleString('pt-MZ', { minimumFractionDigits: 2 })}`;
                 }
-
-                // 4. MODO SIMULAÇÃO LOCAL (funciona sempre, igual ao SPCK)
-                console.log("🎲 Iniciando simulação de pagamento...");
-
-                // Simular processamento (2 segundos)
-                setTimeout(async () => {
-                    try {
-                        // 90% de chance de sucesso na simulação
-                        const paymentSuccess = Math.random() < 0.9;
-
-                        if (paymentSuccess) {
-                            // Atualizar pedido para PAGO
-                            await supabase.from('pedidos').update({ status: 'pago' }).eq('transaction_id', reference);
-                            console.log("✅ Pagamento SIMULADO aprovado!");
-
-                            overlay.classList.remove('active');
-                            showMessage("✅ Pagamento aprovado! Você receberá o acesso por e-mail.", "success");
-
-                            setTimeout(() => {
-                                alert(`🎉 Pedido finalizado!\nProduto: ${produtoAtual.nome}\nValor: ${produtoAtual.preco} MZN\n\nO acesso será enviado para ${email}`);
-                                window.location.href = "obrigado.html?transacao=" + reference;
-                            }, 2000);
-                        } else {
-                            // Falha na simulação
-                            await supabase.from('pedidos').update({ status: 'falhou' }).eq('transaction_id', reference);
-                            overlay.classList.remove('active');
-                            showMessage("❌ Pagamento recusado. Tente novamente ou use outro método.", "error");
-                            btn.disabled = false;
-                            btn.innerHTML = `<i class="fas fa-shopping-cart"></i> Finalizar Compra - MT ${produtoAtual.preco.toLocaleString('pt-MZ', { minimumFractionDigits: 2 })}`;
-                        }
-                    } catch (err) {
-                        console.error("Erro no fallback:", err);
-                        overlay.classList.remove('active');
-                        showMessage("❌ Erro ao processar. Tente novamente.", "error");
-                        btn.disabled = false;
-                        btn.innerHTML = `<i class="fas fa-shopping-cart"></i> Finalizar Compra - MT ${produtoAtual.preco.toLocaleString('pt-MZ', { minimumFractionDigits: 2 })}`;
-                    }
-                }, 2000);
             }
 
             document.getElementById('btn-pagar').addEventListener('click', processarPagamento);
@@ -645,4 +659,4 @@
     </script>
 </body>
 
-                                                           </html>
+</html>
