@@ -6,6 +6,7 @@ export default async function handler(req, res) {
     }
 
     const { email, nome, valor, metodo, dados_carteira } = req.body;
+    console.log("📨 [Serverless] Solicitação de e-mail de saque:", { email, valor });
 
     if (!email || !valor) {
         return res.status(400).json({ error: 'Dados insuficientes' });
@@ -35,6 +36,7 @@ export default async function handler(req, res) {
             `
         });
 
+        console.log("✅ [Serverless] E-mail enviado para:", email);
         return res.status(200).json({ success: true, message: 'E-mail de saque enviado' });
     } catch (error) {
         console.error("Erro ao enviar e-mail de saque:", error);

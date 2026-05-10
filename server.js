@@ -146,17 +146,17 @@ app.post('/api/webhook', async (req, res) => {
                 const { Resend } = await import('resend');
                 const resend = new Resend(RESEND_API_KEY);
 
-                // Buscar e-mail do vendedor
+                // Buscar email do vendedor
                 const { data: vendedor } = await supabase
                     .from('usuarios')
-                    .select('e-mail, nome')
+                    .select('email, nome')
                     .eq('id', venda.vendedor_id)
                     .single();
 
-                if (vendedor && vendedor['e-mail']) {
+                if (vendedor && vendedor['email']) {
                     await resend.emails.send({
                         from: 'ZentroPay <onboarding@resend.dev>',
-                        to: vendedor['e-mail'],
+                        to: vendedor.email,
                         subject: `🎉 Nova Venda Realizada: ${pedido.produtos?.nome}`,
                         html: `
                             <div style="font-family: sans-serif; color: #333;">
@@ -175,10 +175,10 @@ app.post('/api/webhook', async (req, res) => {
                             </div>
                         `
                     });
-                    console.log("📧 E-mail de notificação enviado para:", vendedor['e-mail']);
+                    console.log("📧 E-mail de notificação enviado para:", vendedor['email']);
                 }
             } catch (emailErr) {
-                console.error("⚠️ Erro ao enviar e-mail no server.js (Resend):", emailErr.message);
+                console.error("⚠️ Erro ao enviar email no server.js (Resend):", emailErr.message);
             }
 
             await supabase.from('pedidos').update({ status: 'pago' }).eq('transaction_id', reference);
@@ -193,6 +193,7 @@ app.post('/api/webhook', async (req, res) => {
         res.status(500).json({ error: 'Erro interno' });
 // ---------- ROTA: NOTIFICAÇÃO DE SAQUE ----------
 app.post('/api/notify-withdrawal', async (req, res) => {
+    console.log("📨 Solicitação de email de saque recebida:", req.body);
     const { email, nome, valor, metodo, dados_carteira } = req.body;
     const RESEND_API_KEY = process.env.RESEND_API_KEY || "re_UaA6Rucy_H8mnicg5TTBRjdUFZymypwxu";
 
@@ -220,9 +221,10 @@ app.post('/api/notify-withdrawal', async (req, res) => {
                 </div>
             `
         });
+        console.log("✅ E-mail de saque enviado com sucesso para:", email);
         res.status(200).json({ success: true });
     } catch (error) {
-        console.error("Erro ao enviar e-mail de saque local:", error);
+        console.error("Erro ao enviar email de saque local:", error);
         res.status(500).json({ error: 'Erro interno' });
     }
 });

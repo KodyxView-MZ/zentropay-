@@ -105,17 +105,17 @@ export default async function handler(req, res) {
                 const { Resend } = await import('resend');
                 const resend = new Resend(RESEND_API_KEY);
 
-                // Buscar e-mail do vendedor
+                // Buscar email do vendedor
                 const { data: vendedor } = await supabase
                     .from('usuarios')
-                    .select('e-mail, nome')
+                    .select('email, nome')
                     .eq('id', venda.vendedor_id)
                     .single();
 
-                if (vendedor && vendedor['e-mail']) {
+                if (vendedor && vendedor['email']) {
                     await resend.emails.send({
                         from: 'ZentroPay <onboarding@resend.dev>', // Recomendado configurar domínio próprio depois
-                        to: vendedor['e-mail'],
+                        to: vendedor['email'],
                         subject: `🎉 Nova Venda Realizada: ${pedido.produtos?.nome}`,
                         html: `
                             <div style="font-family: sans-serif; color: #333;">
@@ -134,11 +134,11 @@ export default async function handler(req, res) {
                             </div>
                         `
                     });
-                    console.log("📧 E-mail de notificação enviado para:", vendedor['e-mail']);
+                    console.log("📧 E-mail de notificação enviado para:", vendedor['email']);
                 }
             } catch (emailErr) {
-                console.error("⚠️ Erro ao enviar e-mail (Resend):", emailErr.message);
-                // Não bloqueia o webhook se o e-mail falhar
+                console.error("⚠️ Erro ao enviar email (Resend):", emailErr.message);
+                // Não bloqueia o webhook se o email falhar
             }
 
             // Atualizar pedido para pago

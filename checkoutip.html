@@ -7,6 +7,7 @@
     <title>Checkout Seguro — ZentroPay</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="logo.png">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -379,11 +380,11 @@
         <label>Selecione o método de pagamento *</label>
         <div class="payment-methods">
             <div class="method-card active" data-method="emola">
-                <img src="emolalogo.png" alt="e-Mola" onerror="this.src='https://placehold.co/32x32?text=EM'">
+                <img src="./emolalogo.png" alt="e-Mola" onerror="this.src='https://placehold.co/32x32?text=EM'">
                 <span style="font-size:14px; font-weight:600">e-Mola</span>
             </div>
             <div class="method-card" data-method="mpesa">
-                <img src="mpesalogo.png" alt="M-Pesa" onerror="this.src='https://placehold.co/32x32?text=MP'">
+                <img src="./mpesalogo.png" alt="M-Pesa" onerror="this.src='https://placehold.co/32x32?text=MP'">
                 <span style="font-size:14px; font-weight:600">M-Pesa</span>
             </div>
         </div>
@@ -463,6 +464,17 @@
                     if (error) throw error;
 
                     if (data) {
+                        // --- VERIFICAÇÃO DE BANIMENTO ---
+                        if (data.status === 'banned') {
+                            document.body.innerHTML = `
+                                <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:#050508;color:#fff;font-family:'Inter',sans-serif;text-align:center;padding:20px;">
+                                    <div style="font-size:60px;margin-bottom:20px;">🚫</div>
+                                    <h2 style="font-size:24px;font-weight:800;color:#ef4444;margin-bottom:10px;">Produto Indisponível</h2>
+                                    <p style="color:#94a3b8;font-size:15px;max-width:380px;">Este produto foi removido da plataforma e não está disponível para compra.</p>
+                                </div>`;
+                            return;
+                        }
+
                         produtoAtual = { id: data.id, nome: data.nome, preco: parseFloat(data.preco) };
                         document.getElementById('p-nome').innerText = data.nome;
                         const precoFmt = Number(data.preco).toLocaleString('pt-MZ', { minimumFractionDigits: 2 });
@@ -532,7 +544,6 @@
                     // 1. PRIMEIRO: SALVAR PEDIDO COMO PENDENTE
                     const pedido = {
                         produto_id: produtoAtual.id,
-                        produto_nome: produtoAtual.nome,
                         cliente_nome: nome,
                         cliente_email: email,
                         cliente_telefone: tel,

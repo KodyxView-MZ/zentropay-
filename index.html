@@ -3,359 +3,780 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZentroPay — Acesso</title>
-    <link rel="icon" type="image/png" href="ei_1777492717837-removebg-preview.png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>ZentroPay — A Próxima Geração de Pagamentos</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #7c3aed;
+            --secondary: #0ea5e9;
+            --bg: #050505;
+            --card-bg: rgba(18, 18, 24, 0.7);
+            --border: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+            --text-dim: rgba(255, 255, 255, 0.6);
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
 
         body {
             font-family: 'Inter', sans-serif;
-            background: #0a0a0a;
-            min-height: 100vh;
+            background: var(--bg);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* --- Background Elements --- */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            mask-image: radial-gradient(circle at center, black, transparent 80%);
+        }
+
+        .bg-glow {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, transparent 70%);
+            top: -200px;
+            right: -200px;
+            z-index: -1;
+            filter: blur(100px);
+            animation: pulseGlow 10s infinite alternate;
+        }
+
+        .bg-glow-2 {
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(14, 165, 233, 0.1) 0%, transparent 70%);
+            bottom: -100px;
+            left: -100px;
+            z-index: -1;
+            filter: blur(80px);
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: scale(1); opacity: 0.5; }
+            100% { transform: scale(1.2); opacity: 0.8; }
+        }
+
+        /* --- Typography & Utils --- */
+        .gradient-text {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        section {
+            padding: 100px 0;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- Navbar --- */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(5, 5, 5, 0.7);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--border);
+            padding: 18px 0;
+        }
+
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 22px;
+            text-decoration: none;
+            color: white;
+        }
+
+        .logo img {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-dim);
+            font-size: 14px;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: white;
+        }
+
+        .btn-nav {
+            background: var(--gradient);
+            padding: 10px 24px;
+            border-radius: 50px;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-nav:hover {
+            box-shadow: 0 0 20px rgba(124, 58, 237, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* --- Hero --- */
+        .hero {
+            padding-top: 180px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: clamp(40px, 8vw, 72px);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            letter-spacing: -2px;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: var(--text-dim);
+            max-width: 600px;
+            margin: 0 auto 40px auto;
+        }
+
+        .hero-btns {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            padding: 16px 36px;
+            border-radius: 50px;
+            color: white;
+            font-weight: 700;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            padding: 16px 36px;
+            border-radius: 50px;
+            color: white;
+            font-weight: 700;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .hero-visual {
+            margin-top: 80px;
+            position: relative;
+        }
+
+        .hero-visual img {
+            width: 100%;
+            max-width: 1000px;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            box-shadow: 0 50px 100px rgba(0,0,0,0.5);
+        }
+
+        /* --- Stats --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 32px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 42px;
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+
+        .stat-card p {
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* --- Features --- */
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title h2 {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 48px;
+            border-radius: 32px;
+            transition: 0.4s;
+            cursor: pointer;
+        }
+
+        .feature-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-10px);
+            background: rgba(124, 58, 237, 0.05);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(124, 58, 237, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
-            position: relative;
-            overflow: hidden;
+            border-radius: 18px;
+            font-size: 24px;
+            color: var(--primary);
+            margin-bottom: 24px;
         }
 
-        body::before {
-            content: '';
-            position: absolute;
-            width: 200%;
-            height: 200%;
-            top: -50%;
-            left: -50%;
-            background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-                              linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-            background-size: 40px 40px;
-            animation: gridMove 20s linear infinite;
-            pointer-events: none;
+        .feature-card h4 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
         }
 
-        @keyframes gridMove {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(40px, 40px); }
+        .feature-card p {
+            color: var(--text-dim);
+            font-size: 15px;
         }
 
-        .container { width: 100%; max-width: 440px; position: relative; z-index: 2; }
-        .glass-panel {
-            background: rgba(18, 18, 24, 0.75);
-            backdrop-filter: blur(20px);
-            border-radius: 32px;
-            border: 1px solid rgba(255,255,255,0.08);
-            padding: 48px 36px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-        }
-
-        .logo-area { text-align: center; margin-bottom: 40px; }
-        .logo-image { width: 140px; height: auto; margin: 0 auto 16px auto; display: block; }
-        .tagline { font-size: 11px; text-transform: uppercase; letter-spacing: 4px; color: rgba(255,255,255,0.35); margin-top: 8px; }
-
-        .tabs {
+        /* --- Security --- */
+        .security-banner {
+            background: linear-gradient(90deg, rgba(124, 58, 237, 0.1), rgba(14, 165, 233, 0.1));
+            border: 1px solid var(--border);
+            border-radius: 40px;
+            padding: 60px;
             display: flex;
-            gap: 8px;
+            align-items: center;
+            gap: 60px;
+            flex-wrap: wrap;
+        }
+
+        .security-content { flex: 1; min-width: 300px; }
+        .security-visual { flex: 1; text-align: center; min-width: 300px; }
+
+        .security-visual i {
+            font-size: 120px;
+            color: var(--primary);
+            filter: drop-shadow(0 0 20px rgba(124, 58, 237, 0.5));
+        }
+
+        /* --- Auth Section --- */
+        .auth-section {
+            background: #080808;
+            border-top: 1px solid var(--border);
+        }
+
+        .auth-container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 50px;
+            border-radius: 40px;
+            border: 1px solid var(--border);
+            box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 12px;
             background: rgba(0,0,0,0.4);
             padding: 6px;
             border-radius: 60px;
-            margin-bottom: 32px;
-        }
-        .tab-btn {
-            flex: 1;
-            background: transparent;
-            border: none;
-            padding: 10px 0;
-            font-size: 14px;
-            font-weight: 600;
-            color: rgba(255,255,255,0.4);
-            cursor: pointer;
-            border-radius: 40px;
-            transition: 0.3s;
-        }
-        .tab-btn.active {
-            background: linear-gradient(90deg, #1a1a24 0%, #0d0d14 100%);
-            color: white;
-            border: 0.5px solid rgba(255,255,255,0.08);
+            margin-bottom: 40px;
         }
 
-        .form-container { display: none; animation: fadeIn 0.4s ease; }
-        .form-container.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 40px;
+            border: none;
+            background: transparent;
+            color: var(--text-dim);
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .tab-btn.active {
+            background: var(--gradient);
+            color: white;
+        }
 
         .input-group { margin-bottom: 24px; }
         .input-group label {
             display: block;
             font-size: 11px;
-            font-weight: 700;
+            font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            color: rgba(255,255,255,0.5);
-            margin-bottom: 8px;
+            color: var(--text-dim);
+            margin-bottom: 10px;
         }
+
         .input-group input {
             width: 100%;
-            padding: 14px 0;
-            background: transparent;
-            border: none;
-            border-bottom: 1.5px solid rgba(255,255,255,0.12);
-            font-size: 15px;
+            padding: 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 16px;
             color: white;
             outline: none;
+            transition: 0.3s;
         }
-        .input-group input:focus { border-bottom-color: #10b981; }
-        .input-group input::placeholder { color: rgba(255,255,255,0.2); }
 
-        .phone-prefix {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border-bottom: 1.5px solid rgba(255,255,255,0.12);
-            padding: 14px 0;
-        }
-        .phone-prefix span {
-            color: rgba(255,255,255,0.6);
-            background: rgba(255,255,255,0.05);
-            padding: 4px 12px;
-            border-radius: 40px;
-        }
-        .phone-prefix input { flex: 1; background: transparent; border: none; color: white; outline: none; }
+        .input-group input:focus { border-color: var(--primary); background: rgba(255,255,255,0.05); }
 
-        .btn-liquid-premium {
+        .btn-auth {
             width: 100%;
-            padding: 14px;
-            margin-top: 20px;
+            padding: 16px;
+            border-radius: 16px;
             border: none;
-            border-radius: 44px;
-            background: linear-gradient(90deg, #1a1a24 0%, #0d0d14 100%);
+            background: var(--gradient);
             color: white;
-            font-weight: 700;
-            font-size: 14px;
+            font-weight: 800;
             cursor: pointer;
-            transition: all 0.3s;
-            border: 0.5px solid rgba(255,255,255,0.1);
+            transition: 0.3s;
+            margin-top: 10px;
         }
-        .btn-liquid-premium:hover { background: linear-gradient(90deg, #2a2a38 0%, #1a1a24 100%); transform: translateY(-1px); }
-        .btn-liquid-premium:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        .footer-note { text-align: center; margin-top: 32px; font-size: 10px; color: rgba(255,255,255,0.2); }
+        .btn-auth:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(124, 58, 237, 0.3); }
+
+        .form-panel { display: none; }
+        .form-panel.active { display: block; animation: fadeIn 0.5s ease; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .message {
             margin-top: 20px;
-            padding: 14px 16px;
-            border-radius: 16px;
-            font-size: 13px;
-            font-weight: 500;
+            padding: 15px;
+            border-radius: 12px;
             text-align: center;
-            backdrop-filter: blur(12px);
+            font-size: 14px;
             display: none;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
         }
-        .message.show { display: flex; }
-        .message.error { background: rgba(220,38,38,0.2); border: 1px solid rgba(220,38,38,0.4); color: #f87171; }
-        .message.success { background: rgba(16,185,129,0.2); border: 1px solid rgba(16,185,129,0.4); color: #34d399; }
+        .message.show { display: block; }
+        .message.error { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: #fca5a5; }
+        .message.success { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); color: #6ee7b7; }
 
-        @media (max-width: 480px) {
-            .glass-panel { padding: 32px 24px; }
-            .logo-image { width: 120px; }
+        /* --- Footer --- */
+        footer {
+            padding: 80px 0 40px 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .footer-logo {
+            font-weight: 900;
+            font-size: 28px;
+            margin-bottom: 24px;
+            display: inline-block;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            text-decoration: none;
+            color: var(--text-dim);
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .footer-links a:hover { color: white; }
+
+        .copyright {
+            color: rgba(255,255,255,0.2);
+            font-size: 13px;
+        }
+
+        /* --- Responsiveness --- */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hero h1 { font-size: 48px; }
+            .security-banner { padding: 30px; text-align: center; }
+            .hero-btns { flex-direction: column; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="glass-panel">
-            <div class="logo-area">
-                <img src="ei_1777492717837-removebg-preview.png" alt="ZentroPay Logo" class="logo-image">
-                <p class="tagline">SECURE PAYMENT GATEWAY</p>
-            </div>
+    <div class="bg-grid"></div>
+    <div class="bg-glow"></div>
+    <div class="bg-glow-2"></div>
 
-            <div class="tabs">
-                <button class="tab-btn active" id="tab-login-btn">⟡ ENTRAR</button>
-                <button class="tab-btn" id="tab-cadastro-btn">⟡ CRIAR</button>
-            </div>
-
-            <div id="login-container" class="form-container active">
-                <form id="login-form">
-                    <div class="input-group">
-                        <label>E-MAIL</label>
-                        <input type="email" id="login-email" placeholder="vendedor@zentropay.com" required>
-                    </div>
-                    <div class="input-group">
-                        <label>SENHA</label>
-                        <input type="password" id="login-senha" placeholder="••••••••" required>
-                    </div>
-                    <button type="submit" class="btn-liquid-premium" id="login-btn">ACESSAR PAINEL →</button>
-                    <div class="message" id="login-message"></div>
-                </form>
-            </div>
-
-            <div id="cadastro-container" class="form-container">
-                <form id="cadastro-form">
-                    <div class="input-group">
-                        <label>NOME COMPLETO</label>
-                        <input type="text" id="cadastro-nome" required>
-                    </div>
-                    <div class="input-group">
-                        <label>E-MAIL</label>
-                        <input type="email" id="cadastro-email" required>
-                    </div>
-                    <div class="input-group">
-                        <label>NÚMERO DE CELULAR</label>
-                        <div class="phone-prefix">
-                            <span>+258</span>
-                            <input type="tel" id="cadastro-telefone" placeholder="84 123 4567" required>
-                        </div>
-                    </div>
-                    <div class="input-group">
-                        <label>SENHA</label>
-                        <input type="password" id="cadastro-senha" placeholder="mínimo 6 caracteres" required>
-                    </div>
-                    <div class="input-group">
-                        <label>CONFIRMAR SENHA</label>
-                        <input type="password" id="cadastro-confirmar" required>
-                    </div>
-                    <button type="submit" class="btn-liquid-premium" id="cadastro-btn">CRIAR CONTA →</button>
-                    <div class="message" id="cadastro-message"></div>
-                </form>
-            </div>
-
-            <div class="footer-note">
-                <p>✦ ENCRYPTED BY ZENTROPAY SECURE LAYER ✦</p>
+    <nav>
+        <div class="container">
+            <a href="#" class="logo">
+                <img src="logo.png" alt="ZentroPay">
+                <span>ZentroPay</span>
+            </a>
+            <div class="nav-links">
+                <a href="#features">Recursos</a>
+                <a href="#security">Segurança</a>
+                <a href="#developers">Desenvolvedores</a>
+                <button class="btn-nav" onclick="location.href='#auth'">Entrar</button>
             </div>
         </div>
-    </div>
+    </nav>
+
+    <header class="hero container">
+        <div class="reveal">
+            <h1>A Revolução nos <span class="gradient-text">Pagamentos</span> Digitais.</h1>
+            <p>Aceite M-Pesa, E-Mola e pagamentos globais com a infraestrutura mais rápida e segura de Moçambique.</p>
+            <div class="hero-btns">
+                <a href="#auth" class="btn-primary">Começar Agora</a>
+                <a href="#features" class="btn-secondary">Ver Demonstração</a>
+            </div>
+        </div>
+        <div class="hero-visual reveal" style="transition-delay: 0.2s;">
+            <!-- Usando o logo como um placeholder premium aqui se não houver imagem do dashboard -->
+            <img src="logo.png" alt="ZentroPay Dashboard Preview" style="max-width: 200px; padding: 20px; background: rgba(255,255,255,0.05);">
+        </div>
+    </header>
+
+    <section class="container">
+        <div class="stats-grid reveal">
+            <div class="stat-card">
+                <h3 class="gradient-text">99.9%</h3>
+                <p>Uptime de Rede</p>
+            </div>
+            <div class="stat-card">
+                <h3 class="gradient-text">0.5s</h3>
+                <p>Confirmação Média</p>
+            </div>
+            <div class="stat-card">
+                <h3 class="gradient-text">+10k</h3>
+                <p>Usuários Ativos</p>
+            </div>
+            <div class="stat-card">
+                <h3 class="gradient-text">TLS 1.3</h3>
+                <p>Criptografia Militar</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="container">
+        <div class="section-title reveal">
+            <h2>Por que escolher o <span class="gradient-text">ZentroPay</span>?</h2>
+            <p>Construímos a ponte entre o seu negócio e o futuro do dinheiro.</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card reveal" style="transition-delay: 0.1s;">
+                <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+                <h4>Checkout Instantâneo</h4>
+                <p>Integre nossa API de checkout em minutos e comece a vender imediatamente com M-Pesa e E-Mola.</p>
+            </div>
+            <div class="feature-card reveal" style="transition-delay: 0.2s;">
+                <div class="feature-icon"><i class="fas fa-shield-halved"></i></div>
+                <h4>Segurança Z-Layer</h4>
+                <p>Proteção contra fraudes em tempo real com nossa camada proprietária de segurança criptografada.</p>
+            </div>
+            <div class="feature-card reveal" style="transition-delay: 0.3s;">
+                <div class="feature-icon"><i class="fas fa-code"></i></div>
+                <h4>Developer First</h4>
+                <p>Documentação clara, Webhooks robustos e SDKs para qualquer linguagem de programação.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="security" class="container">
+        <div class="security-banner reveal">
+            <div class="security-visual">
+                <i class="fas fa-fingerprint"></i>
+            </div>
+            <div class="security-content">
+                <h2 style="font-size: 36px; margin-bottom: 20px;">Segurança de <span class="gradient-text">Classe Mundial</span></h2>
+                <p style="color: var(--text-dim); margin-bottom: 30px;">
+                    Todos os dados processados pelo ZentroPay são protegidos por criptografia de ponta a ponta (AES-256). Somos certificados ISO/IEC 27001, garantindo que o seu dinheiro e dos seus clientes estejam sempre protegidos.
+                </p>
+                <div style="display: flex; gap: 20px;">
+                    <span style="font-weight: 700; font-size: 12px; opacity: 0.5;">✦ PCI COMPLIANT</span>
+                    <span style="font-weight: 700; font-size: 12px; opacity: 0.5;">✦ TLS 1.3 ENABLED</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="auth" class="auth-section">
+        <div class="container reveal">
+            <div class="section-title">
+                <h2>Faça Parte do <span class="gradient-text">Futuro</span></h2>
+                <p>Crie sua conta em segundos ou acesse seu painel administrativo.</p>
+            </div>
+            
+            <div class="auth-container">
+                <div class="auth-tabs">
+                    <button class="tab-btn active" id="tab-login-btn">ENTRAR</button>
+                    <button class="tab-btn" id="tab-cadastro-btn">CADASTRAR</button>
+                </div>
+
+                <div id="login-container" class="form-panel active">
+                    <form id="login-form">
+                        <div class="input-group">
+                            <label>E-MAIL</label>
+                            <input type="email" id="login-email" placeholder="vendedor@zentropay.com" required>
+                        </div>
+                        <div class="input-group">
+                            <label>SENHA</label>
+                            <input type="password" id="login-senha" placeholder="••••••••" required>
+                        </div>
+                        <button type="submit" class="btn-auth" id="login-btn">ACESSAR PAINEL →</button>
+                        <div class="message" id="login-message"></div>
+                    </form>
+                </div>
+
+                <div id="cadastro-container" class="form-panel">
+                    <form id="cadastro-form">
+                        <div class="input-group">
+                            <label>NOME COMPLETO</label>
+                            <input type="text" id="cadastro-nome" placeholder="John Doe" required>
+                        </div>
+                        <div class="input-group">
+                            <label>E-MAIL</label>
+                            <input type="email" id="cadastro-email" placeholder="contato@empresa.com" required>
+                        </div>
+                        <div class="input-group">
+                            <label>NÚMERO DE CELULAR</label>
+                            <div style="display: flex; gap: 10px;">
+                                <span style="background: rgba(255,255,255,0.05); padding: 16px; border-radius: 16px; border: 1px solid var(--border); font-weight: 700;">+258</span>
+                                <input type="tel" id="cadastro-telefone" placeholder="84 123 4567" style="flex: 1; padding: 16px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 16px; color: white;" required>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>SENHA</label>
+                            <input type="password" id="cadastro-senha" placeholder="mínimo 6 caracteres" required>
+                        </div>
+                        <button type="submit" class="btn-auth" id="cadastro-btn">CRIAR CONTA AGORA →</button>
+                        <div class="message" id="cadastro-message"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="container">
+        <a href="#" class="logo footer-logo">
+            <span class="gradient-text">ZentroPay</span>
+        </a>
+        <div class="footer-links">
+            <a href="#features">Recursos</a>
+            <a href="#security">Segurança</a>
+            <a href="#">Privacidade</a>
+            <a href="#">Termos</a>
+            <a href="#">Contato</a>
+        </div>
+        <p class="copyright">&copy; 2026 ZentroPay Gateway de Pagamentos. Todos os direitos reservados.</p>
+    </footer>
 
     <script>
-        (function() {
-            // CREDENCIAIS DO SEU SUPABASE
-            const SUPABASE_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
-            const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
+        // Supabase Configuration (Mantendo as chaves originais)
+        const SUPABASE_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
+        
+        const ADMIN_EMAILS = ['blazeryannick@gmail.com', 'vantix.mz@gmail.com'];
+        const ADMIN_PASSWORD = 'yannick2k26zentropay'; // Usando a senha do acesso.html
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-            const ADMIN_EMAILS = ['blazeryannick@gmail.com', 'vantix.mz@gmail.com'];
-            const ADMIN_PASSWORD = 'ZentroPayAdMIN';
+        // Scroll Reveal Animation
+        const reveals = document.querySelectorAll('.reveal');
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.1 });
 
-            const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        reveals.forEach(el => revealObserver.observe(el));
 
-            function showMessage(elementId, message, type) {
-                const msgDiv = document.getElementById(elementId);
-                if (!msgDiv) return;
-                msgDiv.innerHTML = `<span>${message}</span>`;
-                msgDiv.className = `message ${type} show`;
-                setTimeout(() => msgDiv.classList.remove('show'), 5000);
+        // UI Logic
+        function showMessage(elementId, message, type) {
+            const msgDiv = document.getElementById(elementId);
+            msgDiv.innerText = message;
+            msgDiv.className = `message ${type} show`;
+            setTimeout(() => msgDiv.classList.remove('show'), 5000);
+        }
+
+        document.getElementById('tab-login-btn').onclick = () => {
+            document.getElementById('tab-login-btn').classList.add('active');
+            document.getElementById('tab-cadastro-btn').classList.remove('active');
+            document.getElementById('login-container').classList.add('active');
+            document.getElementById('cadastro-container').classList.remove('active');
+        };
+
+        document.getElementById('tab-cadastro-btn').onclick = () => {
+            document.getElementById('tab-cadastro-btn').classList.add('active');
+            document.getElementById('tab-login-btn').classList.remove('active');
+            document.getElementById('cadastro-container').classList.add('active');
+            document.getElementById('login-container').classList.remove('active');
+        };
+
+        // Auth Logic
+        document.getElementById('login-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim();
+            const senha = document.getElementById('login-senha').value;
+            const btn = document.getElementById('login-btn');
+
+            btn.innerText = 'AUTENTICANDO...';
+            btn.disabled = true;
+
+            if (ADMIN_EMAILS.includes(email) && senha === ADMIN_PASSWORD) {
+                location.href = 'zentroadmin.html';
+                return;
             }
 
-            // Alternar abas UI
-            document.getElementById('tab-login-btn').onclick = () => {
-                document.getElementById('tab-login-btn').classList.add('active');
-                document.getElementById('tab-cadastro-btn').classList.remove('active');
-                document.getElementById('login-container').classList.add('active');
-                document.getElementById('cadastro-container').classList.remove('active');
-            };
-            document.getElementById('tab-cadastro-btn').onclick = () => {
-                document.getElementById('tab-cadastro-btn').classList.add('active');
-                document.getElementById('tab-login-btn').classList.remove('active');
-                document.getElementById('cadastro-container').classList.add('active');
-                document.getElementById('login-container').classList.remove('active');
-            };
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password: senha });
 
-            // Verificar sessão existente
-            async function checkSession() {
-                const { data: { session } } = await supabase.auth.getSession();
-                if (session) {
-                    const email = session.user.email;
-                    window.location.href = ADMIN_EMAILS.includes(email) ? 'zentroadmin.html' : 'dashboard.html';
-                }
-            }
-
-            // LOGIN
-            document.getElementById('login-form').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const email = document.getElementById('login-email').value.trim();
-                const senha = document.getElementById('login-senha').value;
-                const btn = document.getElementById('login-btn');
-
-                btn.innerText = '⏳ AUTENTICANDO...';
-                btn.disabled = true;
-
-                // Fluxo Admin Local
-                if (ADMIN_EMAILS.includes(email) && senha === ADMIN_PASSWORD) {
-                    window.location.href = 'zentroadmin.html';
-                    return;
-                }
-
-                // Autenticação Supabase
-                const { data, error } = await supabase.auth.signInWithPassword({ email, password: senha });
-
-                if (error) {
-                    showMessage('login-message', 'E-mail ou senha inválidos', 'error');
+            if (error) {
+                showMessage('login-message', 'E-mail ou senha inválidos', 'error');
+                btn.innerText = 'ACESSAR PAINEL →';
+                btn.disabled = false;
+            } else if (data.user) {
+                // Verificar status
+                const { data: profile } = await supabase.from('usuarios').select('status').eq('id', data.user.id).maybeSingle();
+                
+                if (profile && profile.status !== 'active') {
+                    await supabase.auth.signOut();
+                    showMessage('login-message', 'Sua conta ainda não está ativa ou foi suspensa.', 'error');
                     btn.innerText = 'ACESSAR PAINEL →';
                     btn.disabled = false;
                 } else {
-                    window.location.href = ADMIN_EMAILS.includes(email) ? 'zentroadmin.html' : 'dashboard.html';
+                    location.href = 'infoproductos.html';
                 }
-            });
+            }
+        };
 
-            // CADASTRO
-            document.getElementById('cadastro-form').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                
-                const nome = document.getElementById('cadastro-nome').value.trim();
-                const email = document.getElementById('cadastro-email').value.trim();
-                const telefone = document.getElementById('cadastro-telefone').value.trim();
-                const senha = document.getElementById('cadastro-senha').value;
-                const confirmar = document.getElementById('cadastro-confirmar').value;
-                const btn = document.getElementById('cadastro-btn');
+        document.getElementById('cadastro-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const nome = document.getElementById('cadastro-nome').value.trim();
+            const email = document.getElementById('cadastro-email').value.trim();
+            const telefone = '+258' + document.getElementById('cadastro-telefone').value.replace(/\D/g, '');
+            const senha = document.getElementById('cadastro-senha').value;
+            const btn = document.getElementById('cadastro-btn');
 
-                if (senha !== confirmar) {
-                    showMessage('cadastro-message', 'As senhas não coincidem', 'error');
-                    return;
-                }
+            btn.innerText = 'PROCESSANDO...';
+            btn.disabled = true;
 
-                btn.innerText = '⏳ CRIANDO CONTA...';
-                btn.disabled = true;
+            try {
+                const { data, error: authError } = await supabase.auth.signUp({
+                    email: email,
+                    password: senha,
+                    options: { data: { nome: nome } }
+                });
 
-                try {
-                    // 1. Criar na Auth do Supabase
-                    const { data, error: authError } = await supabase.auth.signUp({
+                if (authError) throw authError;
+
+                if (data.user) {
+                    await supabase.from('usuarios').insert([{
+                        id: data.user.id,
+                        nome: nome,
                         email: email,
-                        password: senha,
-                        options: {
-                            data: { nome: nome, telefone: '+258' + telefone.replace(/\D/g, '') }
-                        }
-                    });
+                        telefone: telefone,
+                        status: 'pending'
+                    }]);
 
-                    if (authError) throw authError;
-
-                    if (data.user) {
-                        // 2. Inserir na tabela 'usuarios' do seu Banco de Dados
-                        const { error: dbError } = await supabase.from('usuarios').insert([{
-                            id: data.user.id,
-                            email: email,
-                            nome: nome,
-                            telefone: '+258' + telefone.replace(/\D/g, ''),
-                            tipo: 'vendedor'
-                        }]);
-
-                        showMessage('cadastro-message', '✅ Conta criada! Redirecionando...', 'success');
-                        
-                        // Login automático para levar ao dashboard
-                        setTimeout(async () => {
-                            await supabase.auth.signInWithPassword({ email, password: senha });
-                            window.location.href = 'dashboard.html';
-                        }, 1500);
-                    }
-                } catch (err) {
-                    showMessage('cadastro-message', err.message, 'error');
-                    btn.innerText = 'CRIAR CONTA →';
-                    btn.disabled = false;
+                    showMessage('cadastro-message', 'Conta criada! Aguarde aprovação.', 'success');
+                    setTimeout(() => {
+                        document.getElementById('tab-login-btn').click();
+                        document.getElementById('login-email').value = email;
+                    }, 3000);
                 }
-            });
+            } catch (err) {
+                showMessage('cadastro-message', err.message, 'error');
+                btn.innerText = 'CRIAR CONTA AGORA →';
+                btn.disabled = false;
+            }
+        };
 
-            checkSession();
+        // Session Check
+        (async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                // Opcional: redirecionar se já logado
+                // location.href = 'infoproductos.html';
+            }
         })();
     </script>
 </body>

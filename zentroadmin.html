@@ -139,6 +139,11 @@
         <div class="nav-item active" data-tab="dashboard"><i class="fas fa-home"></i> Dashboard</div>
         <div class="nav-item" data-tab="pendentes"><i class="fas fa-clock"></i> Pendentes <span class="nav-badge" id="badge-pendente">0</span></div>
         <div class="nav-item" data-tab="usuarios"><i class="fas fa-users"></i> Usuários</div>
+        <div class="nav-item" data-tab="saques">
+            <i class="fas fa-hand-holding-dollar"></i>
+            <span>Saques</span>
+            <span class="nav-badge" id="badge-saques">0</span>
+        </div>
         <div class="nav-item" data-tab="produtos"><i class="fas fa-boxes"></i> Produtos</div>
         <div class="nav-item" data-tab="vendas"><i class="fas fa-shopping-cart"></i> Vendas</div>
     </div>
@@ -194,11 +199,23 @@
         </table>
     </div>
 
+
+    <!-- PANEL: SAQUES -->
+    <div class="panel" id="panel-saques">
+        <div class="panel-header"><h3>Gestão de Saques</h3><p>Pedidos de retirada pendentes de aprovação</p></div>
+        <div class="table-container">
+            <table>
+                <thead><tr><th>Vendedor</th><th>Valor</th><th>Método</th><th>Destino</th><th>Data</th><th>Ações</th></tr></thead>
+                <tbody id="table-saques"></tbody>
+            </table>
+        </div>
+    </div>
+
     <!-- PANEL: PRODUTOS -->
     <div class="panel" id="panel-produtos">
         <div class="panel-header"><h3>Catálogo de Produtos</h3></div>
         <table>
-            <thead><tr><th>Produto</th><th>Vendedor</th><th>Preço</th><th>Status</th><th>Ações</th></tr></thead>
+            <thead><tr><th>Produto</th><th>Vendedor</th><th>Preço</th><th>Status</th><th>Links</th><th>Ações</th></tr></thead>
             <tbody id="table-produtos"></tbody>
         </table>
     </div>
@@ -212,7 +229,7 @@
     // RENOMEADO PARA EVITAR CONFLITO DE SINTAXE
     const _client = window.supabase.createClient(SUP_URL, SUP_KEY);
 
-    let cache = { users: [], prods: [], sales: [] };
+    let cache = { users: [], prods: [], sales: [], saques: [] };
 
     async function init() {
         const session = JSON.parse(localStorage.getItem('zentropay_session'));
@@ -228,28 +245,36 @@
 
     async function loadAllData() {
         try {
-            // Carregamento OTIMIZADO - Busca apenas o necessário para evitar erro 500
-            const [uRes, pRes, sRes] = await Promise.all([
-                _client.from('usuarios').select('*').order('criado_em', { ascending: false }),
-                _client.from('produtos').select('*').order('criado_em', { ascending: false }),
-                _client.from('vendas').select('*').order('criado_em', { ascending: false })
-            ]);
+            const uRes = await _client.from('usuarios').select('id,nome,email,telefone,status,criado_em').order('criado_em', { ascending: false });
+            if (uRes.error) console.error("Erro Usuários:", uRes.error.message);
+            
+            const pRes = await _client.from('produtos').select('id,nome,vendedor_id,preco,status,criado_em,link_produto,imagem').order('criado_em', { ascending: false });
+            if (pRes.error) console.error("Erro Produtos:", pRes.error.message);
+            
+            const sRes = await _client.from('vendas').select('id,vendedor_id,valor_total,status_venda,criado_em').order('criado_em', { ascending: false });
+            if (sRes.error) console.error("Erro Vendas:", sRes.error.message);
 
-            if (uRes.error || pRes.error || sRes.error) throw new Error("Falha na conexão.");
+            const saquesRes = await _client.from('saques').select('*').order('created_at', { ascending: false });
+            if (saquesRes.error) console.warn("Aviso Saques:", saquesRes.error.message);
+
+            if (uRes.error || pRes.error || sRes.error) {
+                throw new Error("Falha ao carregar dados parciais.");
+            }
 
             cache.users = uRes.data || [];
             cache.prods = pRes.data || [];
             cache.sales = sRes.data || [];
+            cache.saques = saquesRes.data || [];
 
             renderStats();
             renderCurrentTab();
         } catch (err) {
-            console.error("Erro de Rede:", err);
+            console.error("Erro de Carregamento:", err);
             document.getElementById('dashboard-content').innerHTML = `
                 <div style="text-align:center; padding:50px; color:var(--danger);">
-                    <i class="fas fa-wifi-slash" style="font-size:40px; margin-bottom:20px;"></i>
-                    <h3>Instabilidade de Rede</h3>
-                    <p>Não foi possível conectar ao servidor (Erro 500 ou Conexão). Tente novamente.</p>
+                    <i class="fas fa-exclamation-triangle" style="font-size:40px; margin-bottom:20px;"></i>
+                    <h3>Erro de Sincronização</h3>
+                    <p>${err.message || 'Verifique o console para mais detalhes.'}</p>
                     <button class="btn-action" style="margin-top:20px; border-color:var(--accent); color:var(--accent);" onclick="loadAllData()">TENTAR NOVAMENTE</button>
                 </div>
             `;
@@ -266,6 +291,9 @@
 
         const pCount = cache.users.filter(u => u.status === 'pending').length + cache.prods.filter(p => p.status === 'pending').length;
         document.getElementById('badge-pendente').innerText = pCount;
+
+        const pendingSaques = cache.saques.filter(s => s.status === 'pending').length;
+        document.getElementById('badge-saques').innerText = pendingSaques;
     }
 
     function renderCurrentTab() {
@@ -279,6 +307,7 @@
 
         if (activeTab === 'pendentes') renderPendentes();
         if (activeTab === 'usuarios') renderUsuarios();
+        if (activeTab === 'saques') renderSaques();
         if (activeTab === 'produtos') renderProdutos();
     }
 
@@ -287,7 +316,7 @@
         const pUsers = cache.users.filter(u => u.status === 'pending');
         document.getElementById('table-pendentes-users').innerHTML = pUsers.map(u => `
             <tr>
-                <td><div class="user-info"><strong>${u.nome}</strong><small>${u['e-mail']}</small></div></td>
+                <td><div class="user-info"><strong>${u.nome}</strong><small>${u.email}</small></div></td>
                 <td>${u.telefone}</td>
                 <td>
                     <button class="btn-action btn-approve" onclick="updateStatus('usuarios', '${u.id}', 'active')">APROVAR</button>
@@ -313,6 +342,32 @@
         `).join('') || '<tr><td colspan="4" style="text-align:center">Nenhum produto pendente</td></tr>';
     }
 
+    function renderSaques() {
+        const userMap = Object.fromEntries(cache.users.map(u => [u.id, u]));
+        const rows = cache.saques.map(s => {
+            const u = userMap[s.vendedor_id] || {};
+            return `
+            <tr>
+                <td><div class="user-info"><strong>${u.nome || 'Desconhecido'}</strong><small>${u.email || s.vendedor_id || ''}</small></div></td>
+                <td style="font-weight:bold; color:var(--accent)">MT ${parseFloat(s.valor || 0).toLocaleString()}</td>
+                <td>${(s.metodo || '—').toUpperCase()}</td>
+                <td><small>${s.dados_carteira || '—'}</small></td>
+                <td>${s.created_at ? new Date(s.created_at).toLocaleDateString('pt-MZ') : '—'}</td>
+                <td>
+                    ${s.status === 'pending' ? `
+                        <button class="btn-action btn-approve" onclick="updateStatus('saques', '${s.id}', 'paid')">PAGAR</button>
+                        <button class="btn-action btn-ban" onclick="updateStatus('saques', '${s.id}', 'rejected')">RECUSAR</button>
+                    ` : `
+                        <span class="status-badge status-${s.status}">${s.status === 'paid' ? '✅ PAGO' : '❌ RECUSADO'}</span>
+                    `}
+                </td>
+            </tr>`;
+        });
+        document.getElementById('table-saques').innerHTML = rows.length
+            ? rows.join('')
+            : '<tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:30px;">Nenhum pedido de saque encontrado</td></tr>';
+    }
+
     function renderUsuarios() {
         const revenueByUser = {};
         cache.sales.forEach(v => {
@@ -327,7 +382,7 @@
 
             return `
             <tr>
-                <td><div class="user-info"><strong>${u.nome}</strong><small>${u['e-mail']}</small></div></td>
+                <td><div class="user-info"><strong>${u.nome}</strong><small>${u.email}</small></div></td>
                 <td><span class="status-badge status-${u.status || 'active'}">${u.status || 'active'}</span></td>
                 <td style="font-weight:bold; color:var(--success)">MT ${(revenueByUser[u.id] || 0).toLocaleString()}</td>
                 <td>
@@ -341,18 +396,32 @@
 
     function renderProdutos() {
         const userMap = Object.fromEntries(cache.users.map(u => [u.id, u.nome]));
+        const baseUrl = window.location.origin;
         document.getElementById('table-produtos').innerHTML = cache.prods.map(p => {
             const isActive = p.status === 'active';
+            const isBanned = p.status === 'banned';
             const btnClass = isActive ? 'btn-ban' : 'btn-approve';
             const btnText = isActive ? 'BANIR' : (p.status === 'pending' ? 'APROVAR' : 'ATIVAR');
             const targetStatus = isActive ? 'banned' : 'active';
+            const checkoutUrl = baseUrl + '/checkoutip.html?id=' + p.id;
 
             return `
-            <tr>
-                <td><strong>${p.nome}</strong></td>
-                <td>${userMap[p.vendedor_id] || '—'}</td>
-                <td style="font-weight:bold">MT ${p.preco.toFixed(2)}</td>
+            <tr style="opacity: ${isBanned ? '0.5' : '1'}">
+                <td>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <img src="${p.imagem || 'https://placehold.co/40x40/1a1a2e/ffffff?text=P'}" style="width:42px;height:42px;border-radius:8px;object-fit:cover;border:1px solid var(--border);">
+                        <div><strong>${p.nome}</strong>${isBanned ? '<br><small style="color:var(--danger)">BANIDO</small>' : ''}</div>
+                    </div>
+                </td>
+                <td>${userMap[p.vendedor_id] || '&mdash;'}</td>
+                <td style="font-weight:bold">MT ${parseFloat(p.preco).toFixed(2)}</td>
                 <td><span class="status-badge status-${p.status || 'active'}">${p.status || 'active'}</span></td>
+                <td>
+                    <div style="display:flex;flex-direction:column;gap:4px;">
+                        ${p.link_produto ? `<a href="${p.link_produto}" target="_blank" style="color:var(--accent);font-size:11px;text-decoration:none;"><i class="fas fa-external-link-alt"></i> Ver Produto</a>` : '<small style="color:var(--text-dim)">—</small>'}
+                        <a href="${checkoutUrl}" target="_blank" style="color:var(--success);font-size:11px;text-decoration:none;"><i class="fas fa-shopping-cart"></i> Checkout</a>
+                    </div>
+                </td>
                 <td>
                     <button class="btn-action ${btnClass}" onclick="updateStatus('produtos', '${p.id}', '${targetStatus}')">
                         ${btnText}
