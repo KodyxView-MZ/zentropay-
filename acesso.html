@@ -538,6 +538,13 @@
                             notify('cadastro-message', '✦ Secure Registration Complete ✦', 'success');
                         }
 
+                        // Enviar e-mail de Boas-vindas via Backend
+                        fetch('/api/notify-welcome', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email: fEmail, nome: fNome })
+                        }).catch(err => console.error("Erro ao enviar email de boas-vindas:", err));
+
                         // UX: Transition to Login
                         setTimeout(() => {
                             ui.tabL.click();
