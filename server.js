@@ -191,6 +191,9 @@ app.post('/api/webhook', async (req, res) => {
     } catch (error) {
         console.error("Erro no webhook local:", error);
         res.status(500).json({ error: 'Erro interno' });
+    }
+});
+
 // ---------- ROTA: NOTIFICAÇÃO DE SAQUE ----------
 app.post('/api/notify-withdrawal', async (req, res) => {
     console.log("📨 Solicitação de email de saque recebida:", req.body);
