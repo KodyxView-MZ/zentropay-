@@ -182,9 +182,12 @@ app.post('/api/webhook', async (req, res) => {
             }
 
             await supabase.from('pedidos').update({ status: 'pago' }).eq('transaction_id', reference);
-
             console.log("✅ Venda registada com sucesso localmente!");
             return res.status(200).json({ success: true });
+        } else {
+            // NOVO: Se o pagamento falhou ou foi cancelado, atualizar o status no banco
+            console.log(`❌ Pagamento falhou para a referência: ${reference}`);
+            await supabase.from('pedidos').update({ status: 'falhou' }).eq('transaction_id', reference);
         }
 
         res.status(200).json({ received: true });
