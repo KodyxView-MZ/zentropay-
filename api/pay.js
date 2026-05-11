@@ -44,20 +44,16 @@ export default async function handler(req, res) {
     const DEBITO_API_URL = "https://gyqoaningqhurhvdugne.supabase.co/functions/v1/payment-orchestrator";
 
     // Formatar o Payload exigido pela Debito
-    const rawPhone = payload.customer.phone || '';
-    const formattedPhone = rawPhone.startsWith('258') ? rawPhone : '258' + rawPhone;
-
     const debitoPayload = {
       action: "process",
-      payment_method: payload.method, // 'mpesa' ou 'emola'
+      payment_method: payload.method,
       merchant_id: DEBITO_MERCHANT_ID,
       wallet_code: DEBITO_WALLET_CODE,
-      amount: parseFloat(parseFloat(payload.amount).toFixed(2)),
+      amount: parseFloat(payload.amount),
       currency: "MZN",
       source: "gateway",
       source_id: payload.reference,
-      phone: formattedPhone,
-      customer_phone: formattedPhone,
+      phone: payload.customer.phone,
       customer_name: payload.customer.name,
       customer_email: payload.customer.email,
       return_url: payload.return_url
