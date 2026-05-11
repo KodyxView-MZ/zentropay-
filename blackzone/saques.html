@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlackZone — Saques</title>
+    <link rel="icon" type="image/png" href="../bzlogo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { --bg: #000; --card: #0a0a0a; --gold: #d4af37; --border: rgba(255,255,255,0.05); }
+        body { background: var(--bg); color: #fff; font-family: 'Outfit', sans-serif; display: flex; }
+        .sidebar { width: 260px; height: 100vh; background: #050505; border-right: 1px solid var(--border); padding: 40px 24px; position: fixed; }
+        .main { margin-left: 260px; padding: 40px 60px; width: 100%; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 15px; color: #555; text-decoration: none; font-weight: 700; border-radius: 12px; margin-bottom: 5px; }
+        .nav-item.active { background: rgba(212,175,55,0.05); color: #fff; }
+        .panel { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 30px; margin-top: 20px; }
+        .withdraw-form { display: grid; gap: 15px; max-width: 400px; margin-bottom: 40px; }
+        input, select { background: #000; border: 1px solid var(--border); padding: 15px; border-radius: 12px; color: #fff; }
+        button { background: var(--gold); color: #000; border: none; padding: 15px; border-radius: 12px; font-weight: 900; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { text-align: left; color: #555; font-size: 12px; padding-bottom: 15px; }
+        td { padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.02); }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div style="margin-bottom: 50px;"><img src="../bzlogo.png" width="40"></div>
+        <a href="dashboard.html" class="nav-item"><i class="fas fa-th-large"></i> Dashboard</a>
+        <a href="infoproductos.html" class="nav-item"><i class="fas fa-box"></i> Produtos</a>
+        <a href="saques.html" class="nav-item active"><i class="fas fa-wallet"></i> Saques</a>
+    </aside>
+    <main class="main">
+        <h1>Solicitar Saque</h1>
+        <div class="panel">
+            <div class="withdraw-form">
+                <input type="number" id="valSaque" placeholder="Valor (MT)">
+                <select id="metodoSaque">
+                    <option value="mpesa">M-Pesa</option>
+                    <option value="emola">e-Mola</option>
+                </select>
+                <input type="text" id="carteiraSaque" placeholder="Número da Carteira">
+                <button onclick="requestWithdraw()">Confirmar Saque</button>
+            </div>
+            <h3>Histórico de Saques</h3>
+            <table id="withdrawTable">
+                <thead><tr><th>Data</th><th>Valor</th><th>Método</th><th>Status</th></tr></thead>
+                <tbody><tr><td colspan="4" style="text-align:center; padding: 20px; color: #333;">Nenhum saque solicitado.</td></tr></tbody>
+            </table>
+        </div>
+    </main>
+    <script>
+        const sb = supabase.createClient("https://ubrtzwehabosbzucures.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVienR6d2VoYWJvc2J6dWN1cmVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MTQ5MTIsImV4cCI6MjA5Mzk5MDkxMn0.3e1t7ROgxyllNNMkDXt6VCoObArTHSweVLBWrg70_f8");
+        async function loadWithdraws() {
+            const { data: { user } } = await sb.auth.getUser();
+            const { data: saques } = await sb.from('saques').select('*').eq('vendedor_id', user.id).order('created_at', {ascending: false});
+            if (saques && saques.length > 0) {
+                document.getElementById('withdrawTable').querySelector('tbody').innerHTML = saques.map(s => `
+                    <tr>
+                        <td>${new Date(s.created_at).toLocaleDateString()}</td>
+                        <td>MT ${parseFloat(s.valor).toLocaleString()}</td>
+                        <td>${s.metodo.toUpperCase()}</td>
+                        <td><span style="color:${s.status === 'pendente' ? '#d4af37' : '#00ff00'}">${s.status.toUpperCase()}</span></td>
+                    </tr>
+                `).join('');
+            }
+        }
+        async function requestWithdraw() {
+            const val = document.getElementById('valSaque').value;
+            const met = document.getElementById('metodoSaque').value;
+            const cart = document.getElementById('carteiraSaque').value;
+            if(!val || !cart) return alert("Preencha todos os campos.");
+            const { data: { user } } = await sb.auth.getUser();
+            const { error } = await sb.from('saques').insert([{ vendedor_id: user.id, valor: val, metodo: met, dados_carteira: cart, status: 'pendente' }]);
+            if (error) alert("Erro ao solicitar saque.");
+            else { alert("Saque solicitado com sucesso!"); location.reload(); }
+        }
+        loadWithdraws();
+    </script>
+</body>
+</html>

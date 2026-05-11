@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zenox Card | Acesso Premium</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <div class="auth-container">
+        <div class="auth-box fade-in">
+            <div class="logo-area">
+                <h1>ZENOX</h1>
+                <p id="auth-subtitle" style="color: var(--accent-primary); font-weight: 700; text-transform: uppercase; letter-spacing: 3px; font-size: 0.7rem; margin-top: 10px;">Cartão Virtual MZN</p>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-email">E-mail Corporativo</label>
+                    <input type="email" id="login-email" placeholder="seu@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Senha de Acesso</label>
+                    <input type="password" id="login-password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-primary">
+                    ENTRAR NA PLATAFORMA <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+
+            <!-- Signup Form -->
+            <form id="signup-form" class="hidden">
+                <div class="form-group">
+                    <label for="signup-name">Nome Completo</label>
+                    <input type="text" id="signup-name" placeholder="João da Silva" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-email">E-mail</label>
+                    <input type="email" id="signup-email" placeholder="seu@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-password">Criar Senha</label>
+                    <input type="password" id="signup-password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-primary">
+                    CRIAR MINHA CONTA <i class="fas fa-plus-circle"></i>
+                </button>
+            </form>
+
+            <div class="toggle-auth">
+                <p id="toggle-text">Ainda não tem conta? <span id="switch-to-signup">Cadastre-se</span></p>
+                <p id="toggle-text-signup" class="hidden">Já possui conta? <span id="switch-to-login">Fazer Login</span></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+</body>
+</html>

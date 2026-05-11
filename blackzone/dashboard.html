@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlackZone — Painel do Vendedor</title>
+    <link rel="icon" type="image/png" href="../bzlogo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@800&family=Outfit:wght@300;400;600;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --bg: #000000;
+            --surface: #060606;
+            --card: #0a0a0a;
+            --gold: #d4af37;
+            --border: rgba(255, 255, 255, 0.04);
+            --text-main: #ffffff;
+            --text-dim: #555555;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--bg);
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 40px 24px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            z-index: 100;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 50px;
+        }
+        .logo-area img { width: 35px; }
+        .logo-area span { font-family: 'Syne', sans-serif; font-size: 20px; color: var(--gold); text-transform: uppercase; }
+
+        .nav-list { list-style: none; flex: 1; }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            border-radius: 16px;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: 0.3s;
+            margin-bottom: 8px;
+        }
+        .nav-item:hover, .nav-item.active {
+            background: rgba(212, 175, 55, 0.05);
+            color: #fff;
+        }
+        .nav-item.active i { color: var(--gold); }
+
+        /* --- Main Content --- */
+        .content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 40px 60px;
+            width: calc(100% - 260px);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 50px;
+        }
+        .welcome h1 { font-size: 32px; font-weight: 900; letter-spacing: -1px; }
+
+        /* --- Stats Grid --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 24px;
+            border-radius: 24px;
+            transition: 0.3s;
+        }
+        .stat-card:hover { border-color: rgba(212, 175, 55, 0.2); }
+        .stat-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; font-weight: 800; margin-bottom: 10px; }
+        .stat-value { font-size: 26px; font-weight: 800; color: #fff; }
+        .stat-value span { color: var(--gold); font-size: 14px; margin-right: 4px; }
+
+        /* --- Panels --- */
+        .panel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 32px;
+            padding: 32px;
+        }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+
+        /* --- Table --- */
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 12px; font-size: 11px; color: var(--text-dim); text-transform: uppercase; border-bottom: 1px solid var(--border); }
+        td { padding: 16px 12px; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.02); }
+
+        .status-pill {
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-size: 10px;
+            font-weight: 800;
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--gold);
+            text-transform: uppercase;
+        }
+
+        .loading-shimmer {
+            color: #222;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo-area">
+            <img src="../bzlogo.png" alt="BZ">
+            <span>BlackZone</span>
+        </div>
+        <nav>
+            <ul class="nav-list">
+                <li><a href="#" class="nav-item active"><i class="fas fa-chart-pie"></i> Visão Geral</a></li>
+                <li><a href="infoproductos.html" class="nav-item"><i class="fas fa-box"></i> Meus Produtos</a></li>
+                <li><a href="saques.html" class="nav-item"><i class="fas fa-wallet"></i> Saques</a></li>
+                <li style="margin-top: 40px;"><a href="acesso.html" class="nav-item"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="content">
+        <header>
+            <div class="welcome">
+                <h1>Painel do Vendedor</h1>
+                <p id="user-display" style="color: var(--text-dim);">Carregando credenciais...</p>
+            </div>
+            <div id="status-tag" style="background: rgba(0,255,0,0.05); color: #00ff00; padding: 6px 14px; border-radius: 100px; font-size: 11px; font-weight: 800; border: 1px solid rgba(0,255,0,0.1);">
+                SISTEMA ATIVO
+            </div>
+        </header>
+
+        <section class="stats-grid">
+            <div class="stat-card">
+                <p class="stat-label">Vendas Concluídas</p>
+                <div class="stat-value" id="stat-pagos">0</div>
+            </div>
+            <div class="stat-card">
+                <p class="stat-label">Receita Total</p>
+                <div class="stat-value"><span id="receita-prefix">MT</span> <span id="stat-receita">0,00</span></div>
+            </div>
+            <div class="stat-card">
+                <p class="stat-label">Pendentes</p>
+                <div class="stat-value" id="stat-pendentes" style="color: #d4af37;">0</div>
+            </div>
+            <div class="stat-card">
+                <p class="stat-label">Vendas Falhadas</p>
+                <div class="stat-value" id="stat-falhas" style="color: #ff4444;">0</div>
+            </div>
+        </section>
+
+        <div class="panel">
+            <div class="panel-header">
+                <h3>Vendas Recentes (Sincronizado)</h3>
+                <i class="fas fa-sync-alt" style="color: var(--gold); font-size: 14px; cursor: pointer;" onclick="loadDashboardData()"></i>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Produto</th>
+                        <th>Valor</th>
+                        <th>Data</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="salesTable">
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: var(--text-dim); padding: 50px;">
+                            <div class="loading-shimmer">Buscando dados no Supabase...</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        // CREDENCIAIS SUPABASE
+        const SUP_URL = "https://ubrtzwehabosbzucures.supabase.co";
+        const SUP_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVienR6d2VoYWJvc2J6dWN1cmVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MTQ5MTIsImV4cCI6MjA5Mzk5MDkxMn0.3e1t7ROgxyllNNMkDXt6VCoObArTHSweVLBWrg70_f8";
+        const sb = window.supabase.createClient(SUP_URL, SUP_KEY);
+
+        async function loadDashboardData() {
+            // 1. Verificar se o usuário está logado
+            const { data: { user } } = await sb.auth.getUser();
+            if (!user) {
+                window.location.href = 'acesso.html';
+                return;
+            }
+            document.getElementById('user-display').innerText = `ID: ${user.email}`;
+
+            // 2. Buscar vendas filtradas pelo vendedor logado
+            const { data: pedidos, error } = await sb
+                .from('pedidos')
+                .select('*')
+                .eq('vendedor_id', user.id)
+                .order('criado_em', { ascending: false });
+
+            if (error) {
+                console.error("Erro Supabase:", error);
+                return;
+            }
+
+            if (pedidos) {
+                // Filtrar métricas
+                const pagos = pedidos.filter(p => p.status === 'pago');
+                const pendentes = pedidos.filter(p => p.status === 'pendente');
+                const falhas = pedidos.filter(p => p.status === 'falhou');
+
+                // Calcular receita total
+                const receitaTotal = pagos.reduce((acc, p) => acc + parseFloat(p.valor || 0), 0);
+
+                // Atualizar Dashboard
+                document.getElementById('stat-pagos').innerText = pagos.length;
+                document.getElementById('stat-pendentes').innerText = pendentes.length;
+                document.getElementById('stat-falhas').innerText = falhas.length;
+                document.getElementById('stat-receita').innerText = receitaTotal.toLocaleString('pt-MZ', { minimumFractionDigits: 2 });
+
+                // Preencher Tabela
+                const tableBody = document.getElementById('salesTable');
+                if (pedidos.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #333; padding: 40px;">Nenhuma venda encontrada.</td></tr>';
+                } else {
+                    tableBody.innerHTML = pedidos.map(p => `
+                        <tr>
+                            <td>${p.cliente_nome || 'Anônimo'}</td>
+                            <td>${p.produto_nome || 'Produto'}</td>
+                            <td>MT ${parseFloat(p.valor || 0).toLocaleString('pt-MZ')}</td>
+                            <td style="color: #444; font-size: 12px;">${new Date(p.criado_em).toLocaleDateString()}</td>
+                            <td><span class="status-pill" style="background:${getStatusColor(p.status)}; color:${p.status === 'pago' ? '#d4af37' : '#fff'}">${p.status}</span></td>
+                        </tr>
+                    `).join('');
+                }
+            }
+        }
+
+        function getStatusColor(status) {
+            if (status === 'pago') return 'rgba(212, 175, 55, 0.1)';
+            if (status === 'pendente') return 'rgba(255, 255, 255, 0.05)';
+            return 'rgba(255, 0, 0, 0.1)';
+        }
+
+        loadDashboardData();
+    </script>
+</body>
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlackZone — Restricted Access</title>
+    <!-- Adicionando Favicon -->
+    <link rel="icon" type="image/png" href="../bzlogo.png">
+    <!-- Fontes Premium: Syne para o Título e Outfit para o corpo -->
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@800&family=Outfit:wght@300;400;600;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --bg: #000000;
+            --surface: #060606;
+            --gold: #d4af37;
+            --border: rgba(255, 255, 255, 0.05);
+            --text-dim: #444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: var(--bg);
+            font-family: 'Outfit', sans-serif;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .glass-card {
+            width: 100%;
+            max-width: 400px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 44px;
+            padding: 60px 40px;
+            box-shadow: 0 50px 100px rgba(0,0,0,1);
+            text-align: center;
+            position: relative;
+        }
+
+        .logo-box { margin-bottom: 35px; }
+        .logo-img { width: 85px; margin-bottom: 10px; }
+        
+        /* Nova Fonte para BLACKZONE */
+        .brand-name { 
+            font-family: 'Syne', sans-serif;
+            font-size: 32px; 
+            font-weight: 800; 
+            color: var(--gold); 
+            text-transform: uppercase; 
+            letter-spacing: -1px; /* Estilo mais colado e moderno */
+            line-height: 1;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            margin: 40px 0;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
+        }
+
+        .tab {
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: 0.3s;
+        }
+
+        .tab.active { color: #fff; border-bottom: 2px solid var(--gold); padding-bottom: 13px; }
+
+        .form-section { display: none; animation: fadeIn 0.5s ease-out; }
+        .form-section.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .welcome-msg { margin-bottom: 30px; font-size: 14px; color: #777; }
+
+        .input-group { margin-bottom: 16px; position: relative; }
+        .input-group i { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: #333; }
+        .input-group input {
+            width: 100%;
+            background: #000;
+            border: 1px solid var(--border);
+            padding: 16px 16px 16px 52px;
+            border-radius: 18px;
+            color: #fff;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+        .input-group input:focus { border-color: rgba(212, 175, 55, 0.4); outline: none; }
+
+        .btn-main {
+            width: 100%;
+            background: #000;
+            color: var(--gold);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            padding: 18px;
+            border-radius: 18px;
+            font-weight: 800;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+        .btn-main:hover { background: var(--gold); color: #000; box-shadow: 0 15px 35px rgba(212, 175, 55, 0.15); }
+
+        .footer-secure { margin-top: 40px; font-size: 10px; color: #222; font-weight: 900; letter-spacing: 2px; }
+        .wa-link { color: #555; text-decoration: none; font-size: 11px; display: block; margin-top: 10px; font-weight: 700; transition: 0.3s; }
+        .wa-link:hover { color: var(--gold); }
+    </style>
+</head>
+<body>
+
+    <div class="glass-card">
+        <div class="logo-box">
+            <img src="../bzlogo.png" class="logo-img" alt="Logo BlackZone">
+            <div class="brand-name">BlackZone</div>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('login')">Acesso</div>
+            <div class="tab" onclick="switchTab('register')">Cadastro</div>
+        </div>
+
+        <div id="login-form" class="form-section active">
+            <div class="welcome-msg">Ambiente Restrito e Monitorado</div>
+            <div class="input-group">
+                <i class="fas fa-user-secret"></i>
+                <input type="email" id="login-email" placeholder="E-mail de Operador">
+            </div>
+            <div class="input-group">
+                <i class="fas fa-shield-alt"></i>
+                <input type="password" id="login-pass" placeholder="Chave Mestra">
+            </div>
+            <button class="btn-main" onclick="handleLogin()">Autenticar</button>
+        </div>
+
+        <div id="register-form" class="form-section">
+            <div class="welcome-msg">Solicite seu Registro no Sistema</div>
+            <div class="input-group"><i class="fas fa-id-card"></i><input type="text" id="reg-nome" placeholder="Nome Completo"></div>
+            <div class="input-group"><i class="fas fa-at"></i><input type="email" id="reg-email" placeholder="E-mail Pessoal"></div>
+            <div class="input-group"><i class="fas fa-mobile-alt"></i><input type="tel" id="reg-phone" placeholder="Celular (WhatsApp)"></div>
+            <div class="input-group"><i class="fas fa-lock"></i><input type="password" id="reg-pass" placeholder="Defina sua Senha"></div>
+            <button class="btn-main" onclick="handleRegister()">Enviar Solicitação</button>
+        </div>
+
+        <div class="footer-secure">
+            SECURE CONNECTION ACTIVE
+            <a href="https://wa.me/258833333264" class="wa-link" target="_blank">SUPORTE TÉCNICO</a>
+        </div>
+    </div>
+
+    <script>
+        // NOVAS CREDENCIAIS ATUALIZADAS
+        const SUP_URL = "https://ubrtzwehabosbzucures.supabase.co";
+        const SUP_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVienR6d2VoYWJvc2J6dWN1cmVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MTQ5MTIsImV4cCI6MjA5Mzk5MDkxMn0.3e1t7ROgxyllNNMkDXt6VCoObArTHSweVLBWrg70_f8";
+        
+        const sb = window.supabase.createClient(SUP_URL, SUP_KEY);
+
+        function switchTab(type) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.form-section').forEach(f => f.classList.remove('active'));
+            if (type === 'login') {
+                document.querySelector('.tab:nth-child(1)').classList.add('active');
+                document.getElementById('login-form').classList.add('active');
+            } else {
+                document.querySelector('.tab:nth-child(2)').classList.add('active');
+                document.getElementById('register-form').classList.add('active');
+            }
+        }
+
+        async function handleLogin() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-pass').value;
+            if(!email || !password) return;
+
+            const btn = document.querySelector('#login-form .btn-main');
+            btn.innerText = "PROCESSANDO...";
+
+            const { data, error } = await sb.auth.signInWithPassword({ email, password });
+            if (error) {
+                alert("ERRO DE AUTENTICAÇÃO: " + error.message);
+                btn.innerText = "AUTENTICAR";
+            } else {
+                window.location.href = 'dashboard.html';
+            }
+        }
+
+        async function handleRegister() {
+            const nome = document.getElementById('reg-nome').value;
+            const email = document.getElementById('reg-email').value;
+            const phone = document.getElementById('reg-phone').value;
+            const password = document.getElementById('reg-pass').value;
+            if(!nome || !email || !password) return alert("Preencha todos os campos!");
+
+            const btn = document.querySelector('#register-form .btn-main');
+            btn.innerText = "ENVIANDO...";
+
+            const { data, error } = await sb.auth.signUp({
+                email, password,
+                options: { data: { full_name: nome, phone: phone } }
+            });
+
+            if (error) {
+                alert("ERRO AO REGISTRAR: " + error.message);
+                btn.innerText = "ENVIAR SOLICITAÇÃO";
+            } else {
+                alert("REGISTRO ENVIADO COM SUCESSO! Faça login para continuar.");
+                switchTab('login');
+            }
+        }
+    </script>
+</body>
+</html>

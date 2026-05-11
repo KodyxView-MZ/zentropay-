@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zenox Card | Gestão Patrimonial</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="brand">ZENOX</div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-link active"><i class="fas fa-house"></i> Dashboard</a>
+                <a href="#" class="nav-link"><i class="fas fa-credit-card"></i> Cartões</a>
+                <a href="#" class="nav-link"><i class="fas fa-chart-line"></i> Investimentos</a>
+                <a href="#" class="nav-link"><i class="fas fa-user"></i> Perfil</a>
+                <a href="#" class="nav-link"><i class="fas fa-shield"></i> Segurança</a>
+            </nav>
+            <a href="#" onclick="logout()" class="nav-link" style="color: #ff4b4b; margin-top: auto;">
+                <i class="fas fa-power-off"></i> Sair do Sistema
+            </a>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header fade-in">
+                <div class="welcome-msg">
+                    <h2 id="user-greeting">Bem-vindo</h2>
+                    <p style="color: var(--text-dim); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 3px; font-weight: 700; margin-top: 5px;">PLATAFORMA ZENOX • MOÇAMBIQUE</p>
+                </div>
+                <div class="header-actions">
+                    <div class="trans-icon" style="background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); color: #fff; width: 55px; height: 55px; border-radius: 20px; box-shadow: 0 10px 20px rgba(112, 0, 255, 0.2);">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid fade-in" style="animation-delay: 0.1s;">
+                <div class="stat-box">
+                    <h4>Saldo Disponível</h4>
+                    <p id="main-balance">0,00 MT</p>
+                </div>
+                <div class="stat-box">
+                    <h4>Limite Mensal</h4>
+                    <p>75.000,00 MT</p>
+                </div>
+                <div class="stat-box">
+                    <h4>Status da Conta</h4>
+                    <p style="color: var(--success); font-size: 1.5rem;">VERIFICADA</p>
+                </div>
+            </div>
+
+            <!-- Card Section -->
+            <section class="card-section fade-in" style="animation-delay: 0.2s;">
+                <h3 style="margin-bottom: 25px; font-weight: 800; letter-spacing: -1px;">MEU CARTÃO VIRTUAL</h3>
+                <div class="v-card" id="virtual-card">
+                    <div class="card-brand">
+                        <div class="chip"></div>
+                        <div class="brand-name" style="font-weight: 900; font-style: italic; font-size: 1.4rem; color: #fff; opacity: 0.8;">ZENOX</div>
+                    </div>
+                    <div class="card-number" id="display-card-number">4532 •••• •••• ••••</div>
+                    <div class="card-info">
+                        <div class="info-group">
+                            <div class="info-label">Proprietário</div>
+                            <div class="info-value" id="display-card-holder">CARREGANDO...</div>
+                        </div>
+                        <div class="info-group">
+                            <div class="info-label">Validade</div>
+                            <div class="info-value" id="display-card-expiry">--/--</div>
+                        </div>
+                        <div class="info-group">
+                            <div class="info-label">CVV</div>
+                            <div class="info-value" id="display-card-cvv">---</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Transactions -->
+            <section class="transaction-list fade-in" style="animation-delay: 0.3s;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                    <h3 style="font-weight: 800; letter-spacing: -1px;">HISTÓRICO RECENTE</h3>
+                    <span style="font-size: 0.8rem; color: var(--accent-primary); cursor: pointer; font-weight: 700;">VER EXTRATO COMPLETO</span>
+                </div>
+                <div id="trans-container">
+                    <!-- Trans injected by JS -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Helper to generate a card if missing
+        const generateCard = () => {
+            const bin = "4532";
+            let number = bin;
+            for(let i=0; i<12; i++) number += Math.floor(Math.random() * 10);
+            const cvv = Math.floor(Math.random() * 900) + 100;
+            const expiry = "12/28";
+            return { number, cvv, expiry };
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Unify session key
+            const sessionData = localStorage.getItem('zenox_session') || localStorage.getItem('zen_session');
+            const session = JSON.parse(sessionData);
+            
+            if (!session) {
+                window.location.href = 'auth.html';
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('zenox_users') || '[]');
+            const userIndex = users.findIndex(u => u.email === session.email);
+            let user = users[userIndex];
+
+            if (!user) {
+                logout();
+                return;
+            }
+
+            // Fallback for old accounts without card/balance/transactions
+            let needsUpdate = false;
+            if (!user.card) {
+                user.card = generateCard();
+                needsUpdate = true;
+            }
+            if (user.balance === undefined) {
+                user.balance = 12500.00;
+                needsUpdate = true;
+            }
+            if (!user.transactions) {
+                user.transactions = [
+                    { id: 1, name: "Supermercado Recheio", date: "Hoje, 14:20", amount: -2450.00, status: "Concluído", icon: "fa-shopping-cart" },
+                    { id: 2, name: "Depósito Inicial", date: "Ontem, 09:15", amount: 15000.00, status: "Concluído", icon: "fa-arrow-up" }
+                ];
+                needsUpdate = true;
+            }
+
+            if (needsUpdate) {
+                users[userIndex] = user;
+                localStorage.setItem('zenox_users', JSON.stringify(users));
+            }
+
+            // Populate UI
+            document.getElementById('user-greeting').textContent = `Olá, ${user.name.split(' ')[0]}`;
+            document.getElementById('main-balance').textContent = `${user.balance.toLocaleString('pt-MZ', { minimumFractionDigits: 2 })} MT`;
+            
+            // Display Card Data
+            document.getElementById('display-card-number').textContent = formatCardNumber(user.card.number);
+            document.getElementById('display-card-holder').textContent = user.name.toUpperCase();
+            document.getElementById('display-card-expiry').textContent = user.card.expiry;
+            document.getElementById('display-card-cvv').textContent = user.card.cvv;
+
+            // Display Transactions
+            const transContainer = document.getElementById('trans-container');
+            if (user.transactions.length === 0) {
+                transContainer.innerHTML = '<p style="color: var(--text-dim); text-align: center; padding: 40px;">Sem transações registradas.</p>';
+            } else {
+                transContainer.innerHTML = user.transactions.map(t => `
+                    <div class="trans-item">
+                        <div class="trans-icon"><i class="fas ${t.icon}"></i></div>
+                        <div class="trans-info">
+                            <div class="trans-name">${t.name}</div>
+                            <div class="trans-date">${t.date}</div>
+                        </div>
+                        <div class="trans-amount">
+                            <span class="amount ${t.amount < 0 ? 'neg' : 'pos'}">
+                                ${t.amount < 0 ? '' : '+'}${t.amount.toLocaleString('pt-MZ', { minimumFractionDigits: 2 })} MT
+                            </span>
+                            <span class="status" style="color: ${t.status === 'Concluído' ? 'var(--success)' : 'var(--text-dim)'}">${t.status}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        });
+
+        function formatCardNumber(num) {
+            if (!num) return "0000 0000 0000 0000";
+            const parts = num.match(/.{1,4}/g);
+            return parts ? parts.join(' ') : num;
+        }
+
+        function logout() {
+            localStorage.removeItem('zenox_session');
+            localStorage.removeItem('zen_session');
+            window.location.href = 'auth.html';
+        }
+    </script>
+</body>
+</html>
