@@ -52,7 +52,7 @@ export default async function handler(req, res) {
       payment_method: payload.method, // 'mpesa' ou 'emola'
       merchant_id: DEBITO_MERCHANT_ID,
       wallet_code: DEBITO_WALLET_CODE,
-      amount: parseFloat(payload.amount).toFixed(2),
+      amount: parseFloat(parseFloat(payload.amount).toFixed(2)),
       currency: "MZN",
       source: "gateway",
       source_id: payload.reference,
