@@ -48,7 +48,7 @@ app.post('/api/pay', async (req, res) => {
             payment_method: payload.method,
             merchant_id: DEBITO_MERCHANT_ID,
             wallet_code: DEBITO_WALLET_CODE,
-            amount: parseFloat(payload.amount),
+            amount: parseFloat(payload.amount).toFixed(2),
             currency: "MZN",
             source: "gateway",
             source_id: payload.reference,
