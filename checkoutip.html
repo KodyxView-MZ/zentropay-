@@ -574,9 +574,9 @@
 
                     console.log("📤 Tentando Debito...", payload);
 
-                    // Timeout de 10 segundos para não travar
+                    // Timeout de 30 segundos para pagamentos móveis (M-Pesa/e-Mola)
                     const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 10000);
+                    const timeoutId = setTimeout(() => controller.abort(), 30000);
 
                     const response = await fetch('/api/pay', {
                         method: 'POST',
