@@ -70,7 +70,16 @@ app.post('/api/pay', async (req, res) => {
             body: JSON.stringify(debitoPayload)
         });
 
-        const data = await response.json();
+        const responseText = await response.text();
+        console.log("Resposta bruta da Debito:", responseText);
+
+        let data;
+        try {
+            data = JSON.parse(responseText);
+        } catch (e) {
+            console.error("Erro ao processar JSON da Debito:", e.message);
+            return res.status(500).json({ error: "Resposta inválida da API de pagamento", detail: responseText });
+        }
 
         if (!response.ok || !data.success) {
             console.error('Debito Error:', data);
@@ -80,7 +89,11 @@ app.post('/api/pay', async (req, res) => {
         return res.status(200).json(data);
     } catch (error) {
         console.error('Local Server Error (api/pay):', error);
-        return res.status(500).json({ error: 'Internal Server Error', message: error.message });
+        return res.status(500).json({ 
+            error: 'Internal Server Error', 
+            message: error.message,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined 
+        });
     }
 });
 
