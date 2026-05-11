@@ -254,10 +254,10 @@
             const sRes = await _client.from('vendas').select('id,vendedor_id,valor_total,status_venda,criado_em').order('criado_em', { ascending: false });
             if (sRes.error) console.error("Erro Vendas:", sRes.error.message);
 
-            const saquesRes = await _client.from('saques').select('*, usuarios(nome, email)').order('created_at', { ascending: false });
-            if (saquesRes.error) console.error("Erro Saques:", saquesRes.error.message);
+            const saquesRes = await _client.from('saques').select('*').order('created_at', { ascending: false });
+            if (saquesRes.error) console.warn("Aviso Saques:", saquesRes.error.message);
 
-            if (uRes.error || pRes.error || sRes.error || saquesRes.error) {
+            if (uRes.error || pRes.error || sRes.error) {
                 throw new Error("Falha ao carregar dados parciais.");
             }
 
@@ -343,23 +343,29 @@
     }
 
     function renderSaques() {
-        document.getElementById('table-saques').innerHTML = cache.saques.map(s => `
+        const userMap = Object.fromEntries(cache.users.map(u => [u.id, u]));
+        const rows = cache.saques.map(s => {
+            const u = userMap[s.vendedor_id] || {};
+            return `
             <tr>
-                <td><div class="user-info"><strong>${s.usuarios?.nome || 'Desconhecido'}</strong><small>${s.usuarios?.email || ''}</small></div></td>
-                <td style="font-weight:bold; color:var(--accent)">MT ${parseFloat(s.valor).toLocaleString()}</td>
-                <td>${s.metodo.toUpperCase()}</td>
-                <td><small>${s.dados_carteira}</small></td>
-                <td>${new Date(s.created_at).toLocaleDateString()}</td>
+                <td><div class="user-info"><strong>${u.nome || 'Desconhecido'}</strong><small>${u.email || s.vendedor_id || ''}</small></div></td>
+                <td style="font-weight:bold; color:var(--accent)">MT ${parseFloat(s.valor || 0).toLocaleString()}</td>
+                <td>${(s.metodo || '—').toUpperCase()}</td>
+                <td><small>${s.dados_carteira || '—'}</small></td>
+                <td>${s.created_at ? new Date(s.created_at).toLocaleDateString('pt-MZ') : '—'}</td>
                 <td>
                     ${s.status === 'pending' ? `
                         <button class="btn-action btn-approve" onclick="updateStatus('saques', '${s.id}', 'paid')">PAGAR</button>
                         <button class="btn-action btn-ban" onclick="updateStatus('saques', '${s.id}', 'rejected')">RECUSAR</button>
                     ` : `
-                        <span class="status-badge status-${s.status}">${s.status === 'paid' ? 'PAGO' : 'RECUSADO'}</span>
+                        <span class="status-badge status-${s.status}">${s.status === 'paid' ? '✅ PAGO' : '❌ RECUSADO'}</span>
                     `}
                 </td>
-            </tr>
-        `).join('');
+            </tr>`;
+        });
+        document.getElementById('table-saques').innerHTML = rows.length
+            ? rows.join('')
+            : '<tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:30px;">Nenhum pedido de saque encontrado</td></tr>';
     }
 
     function renderUsuarios() {
