@@ -52,7 +52,7 @@ app.post('/api/pay', async (req, res) => {
             currency: "MZN",
             source: "gateway",
             source_id: payload.reference,
-            phone: payload.customer.phone,
+            phone: payload.customer.phone.startsWith('258') ? payload.customer.phone : '258' + payload.customer.phone,
             customer_name: payload.customer.name,
             customer_email: payload.customer.email,
             return_url: payload.return_url
