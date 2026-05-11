@@ -44,6 +44,9 @@ export default async function handler(req, res) {
     const DEBITO_API_URL = "https://gyqoaningqhurhvdugne.supabase.co/functions/v1/payment-orchestrator";
 
     // Formatar o Payload exigido pela Debito
+    const rawPhone = payload.customer.phone || '';
+    const formattedPhone = rawPhone.startsWith('258') ? rawPhone : '258' + rawPhone;
+
     const debitoPayload = {
       action: "process",
       payment_method: payload.method, // 'mpesa' ou 'emola'
@@ -53,7 +56,8 @@ export default async function handler(req, res) {
       currency: "MZN",
       source: "gateway",
       source_id: payload.reference,
-      phone: payload.customer.phone.startsWith('258') ? payload.customer.phone : '258' + payload.customer.phone,
+      phone: formattedPhone,
+      customer_phone: formattedPhone,
       customer_name: payload.customer.name,
       customer_email: payload.customer.email,
       return_url: payload.return_url
