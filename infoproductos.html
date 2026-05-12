@@ -735,6 +735,19 @@
                 </div>
             </div>
 
+            <!-- MODAL DETALHES DA VENDA -->
+            <div id="detailsModal" class="modal">
+                <div class="modal-content" style="max-width: 500px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                        <h2 style="font-size: 20px; font-weight: 800; color: #a855f7;">Detalhes do Lead</h2>
+                        <button onclick="closeDetailsModal()" style="color: #9ca3af; font-size: 20px; cursor: pointer;"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div id="leadDetailsContent" style="display: flex; flex-direction: column; gap: 15px;">
+                        <!-- Conteúdo dinâmico aqui -->
+                    </div>
+                </div>
+            </div>
+
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 20px;">
                 <div class="methods-container" style="margin-bottom: 0;">
                     <div class="method-pill">
@@ -1143,10 +1156,21 @@
             const pendenteEl = document.getElementById('funnelPendente');
             const falhouEl = document.getElementById('funnelFalhou');
             
+            // Leads (Checkout Iniciado)
             if (checkoutEl) checkoutEl.innerText = pedidos.length;
-            if (dadosEl) dadosEl.innerText = pedidos.length;
-            if (pagamentoEl) pagamentoEl.innerText = pedidos.length;
-            if (abandonadoEl) abandonadoEl.innerText = pedidos.filter(p => p.status === 'falhou' || p.status === 'abandonado').length;
+            
+            // Dados Preenchidos (Lead com nome/email)
+            const comDados = pedidos.filter(p => p.cliente_nome || p.cliente_email).length;
+            if (dadosEl) dadosEl.innerText = comDados;
+            
+            // Pagamento Tentado (Vendas geradas, independente do status)
+            if (pagamentoEl) pagamentoEl.innerText = vendas.length;
+            
+            // Abandonado (Leads que não viraram vendas)
+            const idsVendas = new Set(vendas.map(v => v.transaction_id));
+            const abandonados = pedidos.filter(p => !idsVendas.has(p.transaction_id)).length;
+            if (abandonadoEl) abandonadoEl.innerText = abandonados;
+            
             if (sucessoEl) sucessoEl.innerText = vendas.filter(v => v.status_venda === 'sucesso').length;
             if (pendenteEl) pendenteEl.innerText = vendas.filter(v => v.status_venda === 'pendente').length;
             if (falhouEl) falhouEl.innerText = vendas.filter(v => v.status_venda === 'falhou').length;
@@ -1195,21 +1219,70 @@
             if (allActivity.length === 0) {
                 salesBody.innerHTML = '<tr><td colspan="6">Nenhuma atividade registrada no período</div></tr>';
             } else {
-                salesBody.innerHTML = allActivity.slice(0, 10).map(v => {
+                salesBody.innerHTML = allActivity.map((v, index) => {
                     const statusClass = (v.status === 'pago' || v.status === 'sucesso' || v.status === 'completed') ? 'badge-active' : (v.status === 'falhou' ? 'badge-rejected' : 'badge-pending');
                     const statusText = (v.status === 'pago' || v.status === 'sucesso' || v.status === 'completed') ? 'Pago' : (v.status === 'falhou' ? 'Falhou' : 'Pendente');
                     const netValue = calculateNetAmount(v.valor || 0);
+                    
+                    // Guardar dados no window para o modal
+                    window[`lead_data_${index}`] = v;
+
                     return `<tr>
                         <td><strong>${v.nome_produto}</strong></td>
                         <td>${v.cliente}<br><small style="color:#9ca3af;">${v.email}</small></td>
                         <td><strong>${formatMoneyMZN(v.valor || 0)} MZN</strong></td>
                         <td><span style="color: #10b981;">${formatMoneyMZN(netValue)} MZN</span></td>
                         <td><span class="badge ${statusClass}">${statusText}</span></td>
-                        <td><small>${new Date(v.data).toLocaleDateString('pt-BR')} ${new Date(v.data).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'})}</small></td>
+                        <td style="display: flex; align-items: center; gap: 10px;">
+                            <small>${new Date(v.data).toLocaleDateString('pt-BR')} ${new Date(v.data).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'})}</small>
+                            <button class="action-btn" onclick="openDetailsModal(${index})" title="Ver Detalhes"><i class="fas fa-eye"></i></button>
+                        </td>
                     </tr>`;
                 }).join('');
             }
         }
+
+        window.openDetailsModal = function(index) {
+            const data = window[`lead_data_${index}`];
+            if (!data) return;
+            
+            const content = document.getElementById('leadDetailsContent');
+            content.innerHTML = `
+                <div class="form-group">
+                    <label>Cliente</label>
+                    <p style="font-weight: 600;">${data.cliente || 'N/A'}</p>
+                </div>
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <p>${data.email || 'N/A'}</p>
+                </div>
+                <div class="form-group">
+                    <label>Telefone</label>
+                    <p>${data.telefone || 'N/A'}</p>
+                </div>
+                <div class="form-group">
+                    <label>Produto</label>
+                    <p>${data.nome_produto}</p>
+                </div>
+                <div class="form-group">
+                    <label>Valor Bruto</label>
+                    <p>MT ${parseFloat(data.valor || 0).toLocaleString()}</p>
+                </div>
+                <div class="form-group">
+                    <label>Status Atual</label>
+                    <p class="badge ${data.status === 'sucesso' ? 'badge-active' : 'badge-pending'}">${data.status.toUpperCase()}</p>
+                </div>
+                <div class="form-group">
+                    <label>Data/Hora</label>
+                    <p>${new Date(data.data).toLocaleString('pt-BR')}</p>
+                </div>
+            `;
+            document.getElementById('detailsModal').classList.add('active');
+        };
+
+        window.closeDetailsModal = function() {
+            document.getElementById('detailsModal').classList.remove('active');
+        };
 
         function updatePaymentMethods(sales) {
             const successful = sales.filter(s => s.status_venda === 'sucesso');
@@ -1323,7 +1396,7 @@
                         link_produto: document.getElementById('prodContentLink').value,
                         urgent_enabled: document.getElementById('prodTimer').value === 'true',
                         urgent_minutes: parseInt(document.getElementById('prodTimerMinutes').value) || 0,
-                        status: 'pending',
+                        status: 'active',
                         serial: 'ESC-' + Math.random().toString(36).substring(2, 10).toUpperCase()
                     };
                     const { error } = await supabase.from('produtos').insert([newProd]);

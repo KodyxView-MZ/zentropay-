@@ -460,39 +460,62 @@
                     }
 
                     const { data, error } = await query;
-                    if (error) throw error;
-
-                    if (data) {
-                        // --- VERIFICAÇÃO DE BANIMENTO ---
-                        if (data.status === 'banned') {
-                            document.body.innerHTML = `
-                                <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:#050508;color:#fff;font-family:'Inter',sans-serif;text-align:center;padding:20px;">
-                                    <div style="font-size:60px;margin-bottom:20px;">🚫</div>
-                                    <h2 style="font-size:24px;font-weight:800;color:#ef4444;margin-bottom:10px;">Produto Indisponível</h2>
-                                    <p style="color:#94a3b8;font-size:15px;max-width:380px;">Este produto foi removido da plataforma e não está disponível para compra.</p>
-                                </div>`;
-                            return;
-                        }
-
-                        produtoAtual = { id: data.id, nome: data.nome, preco: parseFloat(data.preco) };
-                        document.getElementById('p-nome').innerText = data.nome;
-                        const precoFmt = Number(data.preco).toLocaleString('pt-MZ', { minimumFractionDigits: 2 });
-                        document.getElementById('p-preco').innerText = precoFmt;
-                        document.getElementById('p-subtotal').innerHTML = "MT " + precoFmt;
-                        document.getElementById('p-total').innerHTML = "MT " + precoFmt;
-                        document.getElementById('btn-val').innerText = precoFmt;
-                        if (data.imagem) document.getElementById('p-img').src = data.imagem;
+                    
+                    if (error || !data) {
+                        console.warn('Produto não encontrado ou erro no Supabase, usando fallback.');
+                        setProductFallback();
+                        return;
                     }
+
+                    // --- VERIFICAÇÃO DE BANIMENTO ---
+                    if (data.status === 'banned') {
+                        document.body.innerHTML = `
+                            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:#050508;color:#fff;font-family:'Inter',sans-serif;text-align:center;padding:20px;">
+                                <div style="font-size:60px;margin-bottom:20px;">🚫</div>
+                                <h2 style="font-size:24px;font-weight:800;color:#ef4444;margin-bottom:10px;">Produto Indisponível</h2>
+                                <p style="color:#94a3b8;font-size:15px;max-width:380px;">Este produto foi removido da plataforma e não está disponível para compra.</p>
+                            </div>`;
+                        return;
+                    }
+
+                    updateUI(data);
+
                 } catch (err) {
-                    console.error('Erro:', err);
-                    document.getElementById('p-nome').innerText = "Produto Demo";
-                    produtoAtual = { id: "demo", nome: "Produto Demo", preco: 197 };
-                    const precoFmt = "197,00";
-                    document.getElementById('p-preco').innerText = precoFmt;
-                    document.getElementById('p-subtotal').innerHTML = "MT " + precoFmt;
-                    document.getElementById('p-total').innerHTML = "MT " + precoFmt;
-                    document.getElementById('btn-val').innerText = precoFmt;
+                    console.error('Erro crítico no fetchData:', err);
+                    setProductFallback();
                 }
+            }
+
+            function updateUI(data) {
+                produtoAtual = { 
+                    id: data.id || "demo", 
+                    nome: data.nome || "Produto ZentroPay", 
+                    preco: parseFloat(data.preco) || 197 
+                };
+
+                const elements = {
+                    'p-nome': produtoAtual.nome,
+                    'p-preco': produtoAtual.preco.toLocaleString('pt-MZ', { minimumFractionDigits: 2 }),
+                    'btn-val': produtoAtual.preco.toLocaleString('pt-MZ', { minimumFractionDigits: 2 }),
+                    'p-subtotal': "MT " + produtoAtual.preco.toLocaleString('pt-MZ', { minimumFractionDigits: 2 }),
+                    'p-total': "MT " + produtoAtual.preco.toLocaleString('pt-MZ', { minimumFractionDigits: 2 })
+                };
+
+                for (const [id, val] of Object.entries(elements)) {
+                    const el = document.getElementById(id);
+                    if (el) el.innerText = val;
+                }
+                
+                const imgEl = document.getElementById('p-img');
+                if (imgEl && data.imagem) imgEl.src = data.imagem;
+            }
+
+            function setProductFallback() {
+                updateUI({
+                    id: "demo",
+                    nome: "ZentroPay - Curso Premium",
+                    preco: 197.00
+                });
             }
 
             function showMessage(text, type) {
@@ -574,22 +597,34 @@
 
                     console.log("📤 Tentando Debito...", payload);
 
-                    // Timeout de 30 segundos para pagamentos móveis (M-Pesa/e-Mola)
+                    // --- MELHORIA DE UX: Mostrar mensagem antes de chamar a API para mobile money ---
+                    if (method === 'mpesa' || method === 'emola' || method === 'mkesh') {
+                        showMessage("⏳ Pedido enviado! Por favor, confirme o PIN no seu telemóvel agora...", "success");
+                    }
+
+                    // Timeout de 60 segundos para pagamentos móveis (M-Pesa/e-Mola)
                     const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 30000);
-
-                    const response = await fetch('/api/pay', {
+                    const timeoutId = setTimeout(() => controller.abort(), 60000);
+                    let data;
+                    try {
+                      const response = await fetch('/api/pay', {
                         method: 'POST',
+                        signal: controller.signal,
                         headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
+                          'Content-Type': 'application/json',
+                          'Accept': 'application/json'
                         },
-                        body: JSON.stringify(payload),
-                        signal: controller.signal
-                    });
-
-                    clearTimeout(timeoutId);
-                    const data = await response.json();
+                        body: JSON.stringify(payload)
+                      });
+                      clearTimeout(timeoutId);
+                      data = await response.json();
+                    } catch (e) {
+                      if (e.name === 'AbortError') {
+                        console.warn('Request aborted due to timeout, attempting fallback to PaySuite');
+                        throw e;
+                      }
+                      throw e;
+                    }
                     console.log("📥 Resposta Debito:", data);
 
                     if (data?.success) {

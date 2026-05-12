@@ -6,6 +6,7 @@
     <title>Vantix — Criar Produto</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -421,11 +422,16 @@
     </div>
 
     <script>
-        const sessao = JSON.parse(localStorage.getItem('vantix_session'));
+        // Configuração Supabase
+        const SUP_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
+        const SUP_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
+        const supabase = window.supabase.createClient(SUP_URL, SUP_KEY);
+
+        const sessao = JSON.parse(localStorage.getItem('zentropay_session'));
         
-        if (sessao && sessao.nome) {
-            const nomePrimeiro = sessao.nome.split(' ')[0];
-            document.getElementById('user-name').innerText = nomePrimeiro;
+        if (sessao && sessao.identity) {
+            const nomeExibicao = sessao.identity.split('@')[0];
+            document.getElementById('user-name').innerText = nomeExibicao;
         } else {
             window.location.href = 'acesso.html';
         }
@@ -458,29 +464,30 @@
         }
 
         function goToDashboard() {
-            window.location.href = 'dashboard.html';
+            window.location.href = 'infoproductos.html';
         }
 
         function logout() {
-            localStorage.removeItem('vantix_session');
+            localStorage.removeItem('zentropay_session');
             window.location.href = 'acesso.html';
         }
 
-        // Salvar produto no localStorage
-        function saveProduct(product) {
-            let produtos = JSON.parse(localStorage.getItem('vantix_produtos')) || [];
-            produtos.push({
-                ...product,
-                id: Date.now(),
-                dataCriacao: new Date().toISOString(),
-                vendedorId: sessao.usuarioId,
-                vendedorNome: sessao.nome
-            });
-            localStorage.setItem('vantix_produtos', JSON.stringify(produtos));
+        // Salvar produto no Supabase
+        async function saveProduct(product) {
+            const { error } = await supabase.from('produtos').insert([
+                {
+                    ...product,
+                    vendedor_id: sessao.uid,
+                    status: 'active',
+                    serial: 'ZTP-' + Math.random().toString(36).substring(2, 8).toUpperCase()
+                }
+            ]);
+            
+            if (error) throw error;
         }
 
         // Submit do formulário
-        document.getElementById('product-form').addEventListener('submit', function(e) {
+        document.getElementById('product-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const nome = document.getElementById('product-name').value.trim();
@@ -504,30 +511,29 @@
             
             const produto = {
                 nome: nome,
-                descricao: descricao || '',
+                descricao_curta: descricao || '',
                 preco: preco,
-                capa: capaBase64
+                imagem: capaBase64
             };
             
-            saveProduct(produto);
-            showMessage('✅ Produto criado com sucesso!', 'success');
-            
-            // Limpar formulário
-            document.getElementById('product-name').value = '';
-            document.getElementById('product-description').value = '';
-            document.getElementById('product-price').value = '';
-            capaInput.value = '';
-            previewImage.style.display = 'none';
-            capaBase64 = null;
-            
-            // Opcional: redirecionar após 2 segundos
-            setTimeout(() => {
-                if(confirm('Produto criado! Deseja criar outro produto?')) {
-                    // continua na página
-                } else {
-                    window.location.href = 'dashboard.html';
-                }
-            }, 1500);
+            try {
+                await saveProduct(produto);
+                showMessage('✅ Produto criado e ativado com sucesso!', 'success');
+                
+                // Limpar formulário
+                document.getElementById('product-name').value = '';
+                document.getElementById('product-description').value = '';
+                document.getElementById('product-price').value = '';
+                capaInput.value = '';
+                previewImage.style.display = 'none';
+                capaBase64 = null;
+                
+                setTimeout(() => {
+                    window.location.href = 'infoproductos.html';
+                }, 1500);
+            } catch (err) {
+                showMessage('Erro ao criar produto: ' + err.message, 'error');
+            }
         });
     </script>
 </body>

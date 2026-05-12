@@ -32,7 +32,8 @@ app.post('/api/pay', async (req, res) => {
         const WALLET_CODES = {
             "mpesa": "28409",
             "emola": "26724",
-            "mkesh": "58843"
+            "mkesh": "58843",
+            "visa_mastercard": "28409"
         };
 
         const DEBITO_WALLET_CODE = WALLET_CODES[payload.method];
@@ -43,29 +44,42 @@ app.post('/api/pay', async (req, res) => {
 
         const DEBITO_API_URL = "https://gyqoaningqhurhvdugne.supabase.co/functions/v1/payment-orchestrator";
 
+        // Formatar Telefone conforme o método
+        const rawPhone = payload.customer.phone || '';
+        let formattedPhone = rawPhone.replace(/\D/g, ''); 
+        if (!formattedPhone.startsWith('258') && formattedPhone.length === 9) {
+            formattedPhone = '258' + formattedPhone;
+        }
+
+        // M-Pesa exige o prefixo '+' conforme documentação
+        if (payload.method === 'mpesa' && !formattedPhone.startsWith('+')) {
+            formattedPhone = '+' + formattedPhone;
+        }
+
         const debitoPayload = {
             action: "process",
             payment_method: payload.method,
             merchant_id: DEBITO_MERCHANT_ID,
             wallet_code: DEBITO_WALLET_CODE,
-            amount: parseFloat(payload.amount).toFixed(2),
+            amount: parseFloat(payload.amount),
             currency: "MZN",
             source: "gateway",
             source_id: payload.reference,
-            phone: payload.customer.phone.startsWith('258') ? payload.customer.phone : '258' + payload.customer.phone,
+            phone: formattedPhone,
             customer_name: payload.customer.name,
             customer_email: payload.customer.email,
-            return_url: payload.return_url
+            customer_phone: formattedPhone
         };
 
-        console.log("Enviando para Debito:", debitoPayload);
+        console.log("📤 Enviando para Debito (Payload Completo):", debitoPayload);
 
         const response = await fetch(DEBITO_API_URL, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${DEBITO_API_KEY}`,
                 'Content-Type': 'application/json',
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'X-Idempotency-Key': payload.reference
             },
             body: JSON.stringify(debitoPayload)
         });

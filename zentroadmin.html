@@ -423,12 +423,27 @@
                     </div>
                 </td>
                 <td>
-                    <button class="btn-action ${btnClass}" onclick="updateStatus('produtos', '${p.id}', '${targetStatus}')">
-                        ${btnText}
-                    </button>
+                    <div style="display:flex; gap:5px;">
+                        <button class="btn-action ${btnClass}" onclick="updateStatus('produtos', '${p.id}', '${targetStatus}')">
+                            ${btnText}
+                        </button>
+                        <button class="btn-action btn-ban" onclick="deleteEntry('produtos', '${p.id}')" title="Excluir Definitivamente">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
                 </td>
             </tr>`;
         }).join('');
+    }
+
+    async function deleteEntry(table, id) {
+        if (!confirm("⚠️ ATENÇÃO: Esta ação é irreversível. Deseja excluir este registro permanentemente?")) return;
+        const { error } = await _client.from(table).delete().eq('id', id);
+        if (error) {
+            alert("Erro ao excluir: " + error.message);
+        } else {
+            await loadAllData();
+        }
     }
 
     async function updateStatus(table, id, newStatus) {

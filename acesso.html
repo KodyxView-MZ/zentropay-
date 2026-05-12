@@ -95,19 +95,25 @@
             margin-bottom: 44px; 
         }
         .logo-image { 
-            width: 140px; 
+            width: 180px; 
             height: auto; 
-            margin: 0 auto 18px auto; 
+            margin: 0 auto 10px auto; 
             display: block; 
-            filter: drop-shadow(0 0 15px rgba(255,255,255,0.1));
+            filter: drop-shadow(0 0 25px rgba(168, 85, 247, 0.3));
+            animation: logoPulse 4s ease-in-out infinite;
+        }
+        @keyframes logoPulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 25px rgba(168, 85, 247, 0.3)); }
+            50% { transform: scale(1.05); filter: drop-shadow(0 0 40px rgba(168, 85, 247, 0.5)); }
         }
         .tagline { 
-            font-size: 10px; 
+            font-size: 11px; 
             text-transform: uppercase; 
-            letter-spacing: 5px; 
-            color: rgba(255,255,255,0.3); 
-            margin-top: 10px; 
-            font-weight: 700;
+            letter-spacing: 6px; 
+            color: rgba(255,255,255,0.4); 
+            margin-top: 15px; 
+            font-weight: 800;
+            text-align: center;
         }
 
         /* Navigation Tab System */
@@ -299,8 +305,8 @@
     <div class="container">
         <div class="glass-panel">
             <div class="logo-area">
-                <img src="logo.png" alt="ZentroPay" style="width: 100px; height: auto; object-fit: contain; margin-bottom: 15px;">
-                <h1 style="font-size: 32px; font-weight: 900; background: linear-gradient(135deg, #fff, #a855f7); -webkit-background-clip: text; background-clip: text; color: transparent; letter-spacing: -1px;">ZentroPay</h1>
+                <img src="logo.png" alt="ZentroPay" class="logo-image">
+                <div class="tagline">PREMIUM ECOSYSTEM</div>
             </div>
 
             <div class="tabs">
@@ -462,8 +468,8 @@
                     if (!profile || profile.status !== 'active') {
                         await client.auth.signOut();
                         const alertMsg = (!profile || profile.status === 'pending') 
-                            ? '⚠️ Sua conta está em análise. Aguarde a aprovação.' 
-                            : '❌ Esta conta foi suspensa ou banida.';
+                            ? '⚠️ Sua conta ainda não foi ativada. Entre em contato com o suporte.' 
+                            : '❌ Esta conta foi suspensa ou banida por violação de termos.';
                         notify('login-message', alertMsg, 'error');
                         trigger.innerText = 'INITIALIZE SESSION →';
                         trigger.disabled = false;
@@ -527,7 +533,7 @@
                                     [COL_NAME]: fNome,
                                     [COL_EMAIL]: fEmail,
                                     [COL_PHONE]: fPhone,
-                                    status: 'pending'
+                                    status: 'active'
                                 }
                             ]);
 
