@@ -39,11 +39,10 @@
         }
 
         .logo-area { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; padding: 0 10px; }
-        .logo-area { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; padding: 0 10px; }
-        .logo-area svg { width: 40px; height: 40px; }
+        .logo-area img { width: 32px; height: 32px; object-fit: contain; }
         .logo-area span { 
             font-weight: 800; 
-            font-size: 22px; 
+            font-size: 20px; 
             background: linear-gradient(135deg, #fff, var(--accent)); 
             -webkit-background-clip: text; 
             background-clip: text; 
@@ -248,13 +247,13 @@
             const uRes = await _client.from('usuarios').select('id,nome,email,telefone,status,criado_em').order('criado_em', { ascending: false });
             if (uRes.error) console.error("Erro Usuários:", uRes.error.message);
             
-            const pRes = await _client.from('produtos').select('id,nome,vendedor_id,preco,status,criado_em,link_produto,imagem').order('criado_em', { ascending: false });
+            const pRes = await _client.from('produtos').select('id,nome,vendedor_id,preco,status,criado_em,link_produto').order('criado_em', { ascending: false });
             if (pRes.error) console.error("Erro Produtos:", pRes.error.message);
             
             const sRes = await _client.from('vendas').select('id,vendedor_id,valor_total,status_venda,criado_em').order('criado_em', { ascending: false });
             if (sRes.error) console.error("Erro Vendas:", sRes.error.message);
 
-            const saquesRes = await _client.from('saques').select('*').order('created_at', { ascending: false });
+            const saquesRes = await _client.from('saques').select('*').order('criado_em', { ascending: false });
             if (saquesRes.error) console.warn("Aviso Saques:", saquesRes.error.message);
 
             if (uRes.error || pRes.error || sRes.error) {
@@ -386,9 +385,11 @@
                 <td><span class="status-badge status-${u.status || 'active'}">${u.status || 'active'}</span></td>
                 <td style="font-weight:bold; color:var(--success)">MT ${(revenueByUser[u.id] || 0).toLocaleString()}</td>
                 <td>
-                    <button class="btn-action ${btnClass}" onclick="updateStatus('usuarios', '${u.id}', '${targetStatus}')">
-                        ${btnText}
-                    </button>
+                    <select class="btn-action" style="background: var(--sidebar); border: 1px solid var(--border);" onchange="updateStatus('usuarios', '${u.id}', this.value)">
+                        <option value="active" ${u.status === 'active' ? 'selected' : ''}>Ativo</option>
+                        <option value="pending" ${u.status === 'pending' ? 'selected' : ''}>Pendente</option>
+                        <option value="banned" ${u.status === 'banned' ? 'selected' : ''}>Banido</option>
+                    </select>
                 </td>
             </tr>`;
         }).join('');
@@ -424,10 +425,12 @@
                 </td>
                 <td>
                     <div style="display:flex; gap:5px;">
-                        <button class="btn-action ${btnClass}" onclick="updateStatus('produtos', '${p.id}', '${targetStatus}')">
-                            ${btnText}
-                        </button>
-                        <button class="btn-action btn-ban" onclick="deleteEntry('produtos', '${p.id}')" title="Excluir Definitivamente">
+                        <select class="btn-action" style="background: var(--sidebar); border: 1px solid var(--border);" onchange="updateStatus('produtos', '${p.id}', this.value)">
+                            <option value="active" ${p.status === 'active' ? 'selected' : ''}>Ativo</option>
+                            <option value="pending" ${p.status === 'pending' ? 'selected' : ''}>Pendente</option>
+                            <option value="banned" ${p.status === 'banned' ? 'selected' : ''}>Banido</option>
+                        </select>
+                        <button class="btn-action btn-ban" onclick="deleteEntry('produtos', '${p.id}')" title="Excluir">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -447,13 +450,21 @@
     }
 
     async function updateStatus(table, id, newStatus) {
-        if (!confirm(`Deseja alterar o status para ${newStatus}?`)) return;
+        console.log(`[Admin] Tentando atualizar ${table} (${id}) para status: ${newStatus}`);
         
-        const { error } = await _client.from(table).update({ status: newStatus }).eq('id', id);
+        const { data, error } = await _client.from(table).update({ status: newStatus }).eq('id', id);
+        
         if (error) {
-            alert("Erro ao atualizar: " + error.message);
+            console.error(`[Admin Error] Falha ao atualizar ${table}:`, error);
+            // Mensagem mais detalhada para o utilizador
+            let msg = "Erro ao atualizar: " + error.message;
+            if (error.message.includes("policy") || error.code === "42501") {
+                msg += "\n\n⚠️ MOTIVO: O Supabase bloqueou esta ação (RLS). Você precisa permitir 'UPDATE' na tabela '" + table + "' para utilizadores anónimos/autenticados no seu Dashboard do Supabase.";
+            }
+            alert(msg);
         } else {
-            await loadAllData(); // Recarrega tudo para manter consistência
+            console.log(`[Admin Success] ${table} atualizado com sucesso.`);
+            await loadAllData(); 
         }
     }
 
