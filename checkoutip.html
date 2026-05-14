@@ -377,14 +377,22 @@
         </div>
 
         <label>Selecione o método de pagamento *</label>
-        <div class="payment-methods">
-            <div class="method-card active" data-method="emola">
+        <div class="payment-methods" id="paymentMethodsContainer">
+            <div class="method-card active" data-method="emola" id="method-emola">
                 <img src="emolalogo.png?v=2" alt="e-Mola" onerror="this.src='https://placehold.co/32x32?text=EM'">
-                <span style="font-size:14px; font-weight:600">e-Mola</span>
+                <span style="font-size:13px; font-weight:600">e-Mola</span>
             </div>
-            <div class="method-card" data-method="mpesa">
+            <div class="method-card" data-method="mpesa" id="method-mpesa">
                 <img src="mpesalogo.png?v=2" alt="M-Pesa" onerror="this.src='https://placehold.co/32x32?text=MP'">
-                <span style="font-size:14px; font-weight:600">M-Pesa</span>
+                <span style="font-size:13px; font-weight:600">M-Pesa</span>
+            </div>
+            <div class="method-card" data-method="mkesh" id="method-mkesh">
+                <img src="mkeshlogo.jpg" alt="mKesh" style="border-radius: 4px;">
+                <span style="font-size:13px; font-weight:600">mKesh</span>
+            </div>
+            <div class="method-card" data-method="visa_mastercard" id="method-card">
+                <i class="fas fa-credit-card" style="font-size: 20px; color: #3b82f6;"></i>
+                <span style="font-size:13px; font-weight:600">Cartão</span>
             </div>
         </div>
 
@@ -437,15 +445,37 @@
             startTimer();
 
             // Troca de Métodos
-            document.querySelectorAll('.method-card').forEach(card => {
-                card.addEventListener('click', function () {
-                    document.querySelectorAll('.method-card').forEach(c => c.classList.remove('active'));
-                    this.classList.add('active');
-                    metodoSelecionado = this.getAttribute('data-method');
-                    const label = metodoSelecionado === 'emola' ? 'e-Mola' : 'M-Pesa';
-                    document.getElementById('label-carteira').innerHTML = `Número ${label} *`;
+            function setupMethodToggle() {
+                document.querySelectorAll('.method-card').forEach(card => {
+                    card.addEventListener('click', function () {
+                        document.querySelectorAll('.method-card').forEach(c => c.classList.remove('active'));
+                        this.classList.add('active');
+                        metodoSelecionado = this.getAttribute('data-method');
+                        
+                        const labelMap = {
+                            'emola': 'e-Mola',
+                            'mpesa': 'M-Pesa',
+                            'mkesh': 'mKesh',
+                            'visa_mastercard': 'Cartão'
+                        };
+                        
+                        document.getElementById('label-carteira').innerHTML = `Número ${labelMap[metodoSelecionado]} *`;
+                        
+                        // Ocultar prefixo se for Cartão (geralmente cartão precisa de outros dados, mas aqui manteremos telefone por agora conforme pedido)
+                        const prefix = document.querySelector('.prefix');
+                        if (metodoSelecionado === 'visa_mastercard') {
+                            if (prefix) prefix.style.display = 'none';
+                            document.getElementById('c-numero_carteira').style.paddingLeft = '18px';
+                            document.getElementById('c-numero_carteira').placeholder = 'Número do Cartão ou Telefone';
+                        } else {
+                            if (prefix) prefix.style.display = 'block';
+                            document.getElementById('c-numero_carteira').style.paddingLeft = '95px';
+                            document.getElementById('c-numero_carteira').placeholder = '84 000 0000';
+                        }
+                    });
                 });
-            });
+            }
+            setupMethodToggle();
 
             async function fetchData() {
                 const urlParams = new URLSearchParams(window.location.search);
@@ -508,6 +538,37 @@
                 
                 const imgEl = document.getElementById('p-img');
                 if (imgEl && data.imagem) imgEl.src = data.imagem;
+
+                // --- CONFIGURAR MÉTODOS DE PAGAMENTO DINÂMICOS ---
+                const allMethodCards = document.querySelectorAll('.method-card');
+                
+                if (data.metodos_pagamento) {
+                    try {
+                        let allowed = data.metodos_pagamento;
+                        if (typeof allowed === 'string') allowed = JSON.parse(allowed);
+
+                        if (Array.isArray(allowed) && allowed.length > 0) {
+                            allMethodCards.forEach(c => c.style.display = 'none');
+                            let firstVisible = null;
+                            allowed.forEach(m => {
+                                const id = m === 'visa_mastercard' ? 'method-card' : `method-${m}`;
+                                const el = document.getElementById(id);
+                                if (el) {
+                                    el.style.display = 'flex';
+                                    if (!firstVisible) firstVisible = el;
+                                }
+                            });
+                            if (firstVisible) firstVisible.click();
+                        } else {
+                            allMethodCards.forEach(c => c.style.display = 'flex');
+                        }
+                    } catch (e) { 
+                        console.error("Erro ao processar métodos, mostrando todos:", e); 
+                        allMethodCards.forEach(c => c.style.display = 'flex');
+                    }
+                } else {
+                    allMethodCards.forEach(c => c.style.display = 'flex');
+                }
             }
 
             function setProductFallback() {
@@ -587,7 +648,7 @@
                         description: produtoAtual.nome,
                         method: method,
                         return_url: window.location.origin + "/obrigado.html",
-                        webhook_url: "https://zentropay.digital/api/webhook",
+                        webhook_url: `${window.location.origin}/api/webhook`,
                         customer: {
                             name: nome,
                             phone: carteira,
@@ -650,17 +711,20 @@
                                 checkCount++;
                                 console.log(`Verificando status (${checkCount}/${maxChecks})...`);
 
-                                const { data: statusData } = await supabase
-                                    .from('pedidos')
-                                    .select('status')
-                                    .eq('transaction_id', reference)
-                                    .single();
+                                try {
+                                    const statusRes = await fetch(`/api/check-status/${reference}`);
+                                    const statusData = await statusRes.json();
 
-                                if (statusData?.status === 'pago') {
-                                    clearInterval(interval);
-                                    showMessage("✅ Pagamento confirmado!", "success");
-                                    setTimeout(() => { window.location.href = "obrigado.html?transacao=" + reference; }, 1500);
-                                } else if (checkCount >= maxChecks) {
+                                    if (statusData?.status === 'pago') {
+                                        clearInterval(interval);
+                                        showMessage("✅ Pagamento confirmado!", "success");
+                                        setTimeout(() => { window.location.href = "obrigado.html?transacao=" + reference; }, 1500);
+                                    }
+                                } catch (err) {
+                                    console.warn("Erro ao verificar status, tentando novamente...", err);
+                                }
+
+                                if (checkCount >= maxChecks) {
                                     clearInterval(interval);
                                     const overlay = document.getElementById('loadingOverlay');
                                     if (overlay) overlay.classList.remove('active');

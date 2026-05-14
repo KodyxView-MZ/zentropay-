@@ -831,28 +831,90 @@
 <div id="productModal" class="modal">
     <div class="modal-content">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2 style="font-size: 28px; font-weight: 800;">Criar infoproduto</h2>
+            <h2 id="modalTitle" style="font-size: 28px; font-weight: 800;">Criar infoproduto</h2>
             <button onclick="closeProductModal()" style="background: none; border: none; color: white; font-size: 26px;"><i class="fas fa-times"></i></button>
         </div>
         <form id="productForm">
+            <div style="text-align: center; margin-bottom: 25px;">
+                <img src="logo.png" alt="ZentroPay" style="height: 40px; margin-bottom: 10px;">
+                <p style="color: #94a3b8; font-size: 13px;">Configure o seu produto e checkout</p>
+            </div>
+
             <div class="form-group">
                 <label>Capa do produto *</label>
-                <div class="upload-area" onclick="document.getElementById('productImageFile').click()">
+                <div class="upload-area" onclick="document.getElementById('productImageFile').click()" style="border: 2px dashed rgba(168, 85, 247, 0.3); border-radius: 20px; padding: 30px; text-align: center; cursor: pointer; transition: 0.3s; background: rgba(255,255,255,0.02);">
                     <i class="fas fa-cloud-upload-alt fa-2x" style="color:#a855f7;"></i>
-                    <p style="margin-top: 8px;">Clique para enviar imagem</p>
+                    <p style="margin-top: 8px; font-size: 13px; color: #94a3b8;">Clique ou arraste para enviar imagem</p>
                     <input type="file" id="productImageFile" accept="image/*" style="display: none;">
                 </div>
-                <div id="imagePreviewContainer" style="margin-top: 10px; display: none;">
-                    <img id="imagePreview" class="preview-img-mini" alt="Preview">
+                <div id="imagePreviewContainer" style="margin-top: 15px; display: none; text-align: center;">
+                    <img id="imagePreview" class="preview-img-mini" alt="Preview" style="max-width: 150px; border-radius: 12px; border: 2px solid #a855f7;">
                 </div>
             </div>
-            <div class="form-group"><label>Título do produto *</label><input type="text" id="prodTitle" placeholder="Ex: Mapeamento Mental" required></div>
-            <div class="form-group"><label>Descrição curta</label><textarea id="prodDesc" rows="2" placeholder="Benefícios do produto..."></textarea></div>
-            <div class="form-group"><label>Preço (MZN) *</label><input type="number" id="prodPrice" step="0.01" placeholder="1250.00" required></div>
-            <div class="form-group"><label>Link de acesso (conteúdo) *</label><input type="url" id="prodContentLink" placeholder="https://drive.google.com/..." required></div>
-            <div class="form-group"><label>Oferta urgente (timer)</label><select id="prodTimer"><option value="false">Desativado</option><option value="true">Ativar contagem (minutos)</option></select></div>
-            <div class="form-group" id="timerMinutesGroup" style="display: none;"><label>Minutos de urgência</label><input type="number" id="prodTimerMinutes" placeholder="15"></div>
-            <button type="submit" class="btn-primary-sm full-width" style="background:#a855f7; width:100%; justify-content:center; padding:14px;"><i class="fas fa-rocket"></i> Enviar para revisão</button>
+
+            <div class="form-group">
+                <label>Título do produto *</label>
+                <input type="text" id="prodTitle" placeholder="Ex: Curso de Marketing Digital" required>
+            </div>
+
+            <div class="form-group">
+                <label>Descrição curta</label>
+                <textarea id="prodDesc" rows="2" placeholder="Descreva os principais benefícios..."></textarea>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group">
+                    <label>Preço (MZN) *</label>
+                    <input type="number" id="prodPrice" step="0.01" placeholder="1250.00" required>
+                </div>
+                <div class="form-group">
+                    <label>Link de acesso *</label>
+                    <input type="url" id="prodContentLink" placeholder="https://..." required>
+                </div>
+            </div>
+
+            <!-- SELEÇÃO DE MÉTODOS DE PAGAMENTO -->
+            <div class="form-group" style="margin-top: 10px; padding: 20px; background: rgba(255,255,255,0.02); border-radius: 24px; border: 1px solid rgba(255,255,255,0.05);">
+                <label style="color: #fff; margin-bottom: 15px; display: block;"><i class="fas fa-wallet" style="color: #a855f7;"></i> Métodos de Pagamento Ativos</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;" id="paymentMethodsGrid">
+                    <label style="display: flex; align-items: center; gap: 10px; background: #1c1c24; padding: 12px; border-radius: 15px; cursor: pointer; border: 1px solid transparent; transition: 0.2s;" class="method-option">
+                        <input type="checkbox" name="pay_method" value="mpesa" checked style="width: auto;">
+                        <img src="mpesalogo.png" style="width: 20px; height: 20px; border-radius: 4px;"> 
+                        <span style="font-size: 13px;">M-Pesa</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px; background: #1c1c24; padding: 12px; border-radius: 15px; cursor: pointer; border: 1px solid transparent; transition: 0.2s;" class="method-option">
+                        <input type="checkbox" name="pay_method" value="emola" checked style="width: auto;">
+                        <img src="emolalogo.png" style="width: 20px; height: 20px; border-radius: 4px;"> 
+                        <span style="font-size: 13px;">e-Mola</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px; background: #1c1c24; padding: 12px; border-radius: 15px; cursor: pointer; border: 1px solid transparent; transition: 0.2s;" class="method-option">
+                        <input type="checkbox" name="pay_method" value="mkesh" checked style="width: auto;">
+                        <img src="mkeshlogo.jpg" style="width: 20px; height: 20px; border-radius: 4px;"> 
+                        <span style="font-size: 13px;">mKesh</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px; background: #1c1c24; padding: 12px; border-radius: 15px; cursor: pointer; border: 1px solid transparent; transition: 0.2s;" class="method-option">
+                        <input type="checkbox" name="pay_method" value="visa_mastercard" checked style="width: auto;">
+                        <i class="fas fa-credit-card" style="color: #3b82f6; font-size: 18px;"></i> 
+                        <span style="font-size: 13px;">Cartão</span>
+                    </label>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group">
+                    <label>Oferta urgente</label>
+                    <select id="prodTimer">
+                        <option value="false">Desativado</option>
+                        <option value="true">Ativar contagem</option>
+                    </select>
+                </div>
+                <div class="form-group" id="timerMinutesGroup" style="display: none;">
+                    <label>Minutos</label>
+                    <input type="number" id="prodTimerMinutes" placeholder="15">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary-sm full-width" style="background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%); width:100%; justify-content:center; padding:16px; border-radius: 20px; font-weight: 700; font-size: 15px; box-shadow: 0 10px 20px rgba(124, 58, 237, 0.3);"><i class="fas fa-rocket" style="margin-right: 10px;"></i> <span id="submitBtnText">Lançar Infoproduto</span></button>
         </form>
     </div>
 </div>
@@ -914,6 +976,7 @@
         
         let currentUser = null;
         let currentImageBase64 = null;
+        let editingProductId = null; // ID do produto sendo editado
         let currentFilter = 'today';
         let allSalesData = [];
         let allTentativasData = [];
@@ -1028,13 +1091,20 @@
         }
 
         async function loadAllData() {
-            const [salesRes, tentativasRes] = await Promise.all([
-                supabase.from('vendas').select('*, produtos(nome)').eq('vendedor_id', currentUser.id).order('criado_em', { ascending: false }),
-                supabase.from('pedidos').select('*, produtos!inner(nome, vendedor_id)').eq('produtos.vendedor_id', currentUser.id).order('criado_em', { ascending: false })
-            ]);
+            const { data: allData, error } = await supabase
+                .from('pedidos')
+                .select('*, produtos!inner(nome, vendedor_id)')
+                .eq('produtos.vendedor_id', currentUser.id)
+                .order('criado_em', { ascending: false });
             
-            if (!salesRes.error && salesRes.data) allSalesData = salesRes.data;
-            if (!tentativasRes.error && tentativasRes.data) allTentativasData = tentativasRes.data;
+            if (error) {
+                console.error("Erro ao carregar dados:", error);
+                return;
+            }
+
+            // Separar o que é venda (pago) do que é apenas tentativa (pendente/falhou)
+            allSalesData = allData.filter(p => ['pago', 'sucesso', 'completed'].includes(p.status));
+            allTentativasData = allData; // O funil usa todas as tentativas
             
             await applyFilterAndUpdate();
         }
@@ -1171,15 +1241,15 @@
             const abandonados = pedidos.filter(p => !idsVendas.has(p.transaction_id)).length;
             if (abandonadoEl) abandonadoEl.innerText = abandonados;
             
-            if (sucessoEl) sucessoEl.innerText = vendas.filter(v => v.status_venda === 'sucesso').length;
-            if (pendenteEl) pendenteEl.innerText = vendas.filter(v => v.status_venda === 'pendente').length;
-            if (falhouEl) falhouEl.innerText = vendas.filter(v => v.status_venda === 'falhou').length;
+            if (sucessoEl) sucessoEl.innerText = vendas.filter(v => ['pago', 'sucesso', 'completed'].includes(v.status)).length;
+            if (pendenteEl) pendenteEl.innerText = vendas.filter(v => v.status === 'pendente').length;
+            if (falhouEl) falhouEl.innerText = vendas.filter(v => v.status === 'falhou').length;
         }
 
         async function updateMetricsAndSalesList(sales, attempts) {
-            const successful = sales.filter(s => s.status_venda === 'sucesso');
-            const totalRevenue = successful.reduce((sum, s) => sum + (s.valor_total || 0), 0);
-            const totalNetRevenue = successful.reduce((sum, s) => sum + calculateNetAmount(s.valor_total || 0), 0);
+            const successful = sales.filter(s => ['pago', 'sucesso', 'completed'].includes(s.status));
+            const totalRevenue = successful.reduce((sum, s) => sum + (s.valor || 0), 0);
+            const totalNetRevenue = successful.reduce((sum, s) => sum + calculateNetAmount(s.valor || 0), 0);
             const totalUnits = successful.length;
             
             const revenueEl = document.getElementById('totalRevenueValue');
@@ -1204,14 +1274,13 @@
             
             // Unir pedidos e vendas para mostrar "Atividade Recente" filtrada
             const allActivity = [...attempts].map(p => {
-                const venda = sales.find(v => v.transaction_id === p.transaction_id);
                 return {
                     nome_produto: p.produtos?.nome || 'Produto',
                     cliente: p.cliente_nome || p.cliente_email?.split('@')[0] || 'Cliente',
                     email: p.cliente_email || '',
                     telefone: p.cliente_telefone || '',
                     valor: p.valor,
-                    status: venda ? 'sucesso' : p.status,
+                    status: p.status, // Usa o status da tabela pedidos
                     data: p.criado_em
                 };
             }).sort((a, b) => new Date(b.data) - new Date(a.data));
@@ -1295,21 +1364,22 @@
         };
 
         function updatePaymentMethods(sales) {
-            const successful = sales.filter(s => s.status_venda === 'sucesso');
+            const successful = sales.filter(s => ['pago', 'sucesso', 'completed'].includes(s.status));
             const total = successful.length || 1;
-            let mpesa = 0, emola = 0, outros = 0;
+            let mpesa = 0, emola = 0, mkesh = 0, cartao = 0;
             successful.forEach(v => {
                 const method = (v.metodo_pagamento || '').toLowerCase();
-                if (method.includes('mpesa') || method.includes('pesa')) mpesa++;
-                else if (method.includes('mola') || method.includes('emola')) emola++;
-                else outros++;
+                if (method.includes('mpesa')) mpesa++;
+                else if (method.includes('emola')) emola++;
+                else if (method.includes('mkesh')) mkesh++;
+                else if (method.includes('visa') || method.includes('card') || method.includes('cartao')) cartao++;
             });
             const mpesaEl = document.getElementById('mpesaPercent');
             const emolaEl = document.getElementById('emolaPercent');
             const mkeshEl = document.getElementById('mkeshPercent');
             if (mpesaEl) mpesaEl.innerText = Math.round((mpesa/total)*100)+'%';
             if (emolaEl) emolaEl.innerText = Math.round((emola/total)*100)+'%';
-            if (mkeshEl) mkeshEl.innerText = Math.round((outros/total)*100)+'%';
+            if (mkeshEl) mkeshEl.innerText = Math.round(((mkesh + cartao)/total)*100)+'%';
         }
 
         async function loadProducts() {
@@ -1330,7 +1400,10 @@
                         <td><div class="product-cell"><img class="product-img-small" src="${p.imagem || 'https://placehold.co/42x54/1e1e2a/fff?text=Cover'}" onerror="this.src='https://placehold.co/42x54/1e1e2a/fff?text=Cover'"><span><strong>${escapeHtml(p.nome)}</strong><br><span style="font-size:10px;color:#6b7280;">#${p.serial || p.id.slice(0,6)}</span></span></div></div>
                         <td>${priceMZN} MZN</div>
                         <td><span class="badge ${statusClass}">${statusLabel}</span></div>
-                        <td><button class="action-btn" onclick="window.copyCheckoutLink('${p.id}')" ${p.status !== 'active' ? 'disabled style="opacity:0.4"' : ''} title="Copiar link checkout"><i class="fas fa-copy"></i></button></div>
+                        <td>
+                            <button class="action-btn" onclick="window.copyCheckoutLink('${p.id}')" ${p.status !== 'active' ? 'disabled style="opacity:0.4"' : ''} title="Copiar link checkout"><i class="fas fa-copy"></i></button>
+                            <button class="action-btn" onclick="window.editProduct('${p.id}')" title="Editar produto"><i class="fas fa-edit"></i></button>
+                        </div>
                         <td><button class="action-btn danger" onclick="window.deleteProduct('${p.id}')"><i class="fas fa-trash-alt"></i></button></div>
                     </tr>`;
                 }).join('');
@@ -1351,8 +1424,56 @@
             loadProducts();
         };
 
-        window.openProductModal = function() { document.getElementById('productModal').classList.add('active'); };
-        window.closeProductModal = function() { document.getElementById('productModal').classList.remove('active'); resetForm(); };
+        window.openProductModal = function() { 
+            editingProductId = null;
+            const titleEl = document.getElementById('modalTitle');
+            const btnEl = document.getElementById('submitBtnText');
+            if (titleEl) titleEl.innerText = "Criar infoproduto";
+            if (btnEl) btnEl.innerText = "Lançar Infoproduto";
+            document.getElementById('productModal').classList.add('active'); 
+        };
+
+        window.editProduct = async function(id) {
+            editingProductId = id;
+            const { data: p, error } = await supabase.from('produtos').select('*').eq('id', id).single();
+            if (error || !p) return alert("Erro ao carregar produto.");
+
+            const titleEl = document.getElementById('modalTitle');
+            const btnEl = document.getElementById('submitBtnText');
+            if (titleEl) titleEl.innerText = "Editar infoproduto";
+            if (btnEl) btnEl.innerText = "Salvar Alterações";
+            
+            document.getElementById('prodTitle').value = p.nome;
+            document.getElementById('prodDesc').value = p.descricao_curta || '';
+            document.getElementById('prodPrice').value = p.preco;
+            document.getElementById('prodContentLink').value = p.link_produto;
+            document.getElementById('prodTimer').value = p.urgent_enabled ? 'true' : 'false';
+            document.getElementById('prodTimerMinutes').value = p.urgent_minutes || 0;
+            document.getElementById('timerMinutesGroup').style.display = p.urgent_enabled ? 'block' : 'none';
+            
+            currentImageBase64 = p.imagem;
+            if (p.imagem) {
+                document.getElementById('imagePreview').src = p.imagem;
+                document.getElementById('imagePreviewContainer').style.display = 'block';
+            }
+
+            // Marcar métodos de pagamento
+            if (p.metodos_pagamento) {
+                let methods = p.metodos_pagamento;
+                if (typeof methods === 'string') methods = JSON.parse(methods);
+                
+                document.querySelectorAll('input[name="pay_method"]').forEach(cb => {
+                    cb.checked = methods.includes(cb.value);
+                });
+            }
+
+            document.getElementById('productModal').classList.add('active');
+        };
+
+        window.closeProductModal = function() { 
+            document.getElementById('productModal').classList.remove('active'); 
+            resetForm(); 
+        };
         
         function resetForm() {
             document.getElementById('productForm').reset();
@@ -1397,8 +1518,9 @@
                     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
                 }
                 try {
-                    const newProd = {
-                        vendedor_id: currentUser.id,
+                    const selectedMethods = Array.from(document.querySelectorAll('input[name="pay_method"]:checked')).map(cb => cb.value);
+
+                    const productData = {
                         nome: document.getElementById('prodTitle').value,
                         descricao_curta: document.getElementById('prodDesc').value,
                         preco: parseFloat(document.getElementById('prodPrice').value),
@@ -1406,12 +1528,22 @@
                         link_produto: document.getElementById('prodContentLink').value,
                         urgent_enabled: document.getElementById('prodTimer').value === 'true',
                         urgent_minutes: parseInt(document.getElementById('prodTimerMinutes').value) || 0,
-                        status: 'active',
-                        serial: 'ESC-' + Math.random().toString(36).substring(2, 10).toUpperCase()
+                        metodos_pagamento: selectedMethods
                     };
-                    const { error } = await supabase.from('produtos').insert([newProd]);
-                    if(error) throw error;
-                    alert("✅ Produto criado com sucesso!");
+
+                    if (editingProductId) {
+                        const { error } = await supabase.from('produtos').update(productData).eq('id', editingProductId);
+                        if (error) throw error;
+                        alert("✅ Produto atualizado com sucesso!");
+                    } else {
+                        productData.vendedor_id = currentUser.id;
+                        productData.status = 'active';
+                        productData.serial = 'ESC-' + Math.random().toString(36).substring(2, 10).toUpperCase();
+                        const { error } = await supabase.from('produtos').insert([productData]);
+                        if (error) throw error;
+                        alert("✅ Produto criado com sucesso!");
+                    }
+
                     closeProductModal();
                     loadProducts();
                 } catch(err) { alert("Erro: "+err.message); }

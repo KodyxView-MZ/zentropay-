@@ -12,7 +12,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 
 // Configurar o parser para JSON
 app.use(express.json());
@@ -33,7 +33,7 @@ app.post('/api/pay', async (req, res) => {
             "mpesa": "28409",
             "emola": "26724",
             "mkesh": "58843",
-            "visa_mastercard": "28409"
+            "visa_mastercard": "21544"
         };
 
         const DEBITO_WALLET_CODE = WALLET_CODES[payload.method];
@@ -68,7 +68,8 @@ app.post('/api/pay', async (req, res) => {
             phone: formattedPhone,
             customer_name: payload.customer.name,
             customer_email: payload.customer.email,
-            customer_phone: formattedPhone
+            customer_phone: formattedPhone,
+            webhook_url: payload.webhook_url
         };
 
         console.log("📤 Enviando para Debito (Payload Completo):", debitoPayload);
@@ -106,8 +107,44 @@ app.post('/api/pay', async (req, res) => {
         return res.status(500).json({ 
             error: 'Internal Server Error', 
             message: error.message,
-            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined 
         });
+    }
+});
+
+// ---------- ROTA: VERIFICAR STATUS (SINCRO) ----------
+app.get('/api/check-status/:reference', async (req, res) => {
+    const { reference } = req.params;
+    console.log(`🔍 Verificando status da transação: ${reference}`);
+
+    try {
+        const DEBITO_API_KEY = process.env.DEBITO_API_KEY || "sk_live_ItHJ7fJQT5BL4vlqzqwwTjEYhx3ZuROg";
+        // Nota: Ajustar URL se a Debito mudar o endpoint de status
+        const DEBITO_API_URL = `https://gyqoaningqhurhvdugne.supabase.co/functions/v1/payment-orchestrator?action=status&reference=${reference}`;
+
+        const response = await fetch(DEBITO_API_URL, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${DEBITO_API_KEY}`,
+                'Accept': 'application/json'
+            }
+        });
+
+        const data = await response.json();
+        console.log(`📥 Resposta Status (${reference}):`, data);
+
+        if (data.success && (data.status === 'completed' || data.status === 'success' || data.status === 'paid')) {
+            const SUPABASE_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
+            const SUPABASE_KEY = process.env.SUPABASE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
+            const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+            await supabase.from('pedidos').update({ status: 'pago' }).eq('transaction_id', reference);
+            return res.json({ success: true, status: 'pago' });
+        }
+
+        res.json({ success: true, status: data.status || 'pending' });
+    } catch (error) {
+        console.error("Erro ao verificar status:", error);
+        res.status(500).json({ error: 'Erro ao verificar status' });
     }
 });
 
@@ -123,19 +160,29 @@ app.post('/api/webhook', async (req, res) => {
 
     try {
         const paymentData = req.body;
-        const isDebito = paymentData.event !== undefined && paymentData.data !== undefined;
+        console.log("📦 Payload recebido do Webhook:", JSON.stringify(paymentData));
+
+        const isDebito = paymentData.event !== undefined || paymentData.data !== undefined;
 
         let reference, status;
 
         if (isDebito) {
-            status = paymentData.event === 'payment.completed' ? 'completed' : 'failed';
-            reference = paymentData.data.source_id || paymentData.data.payment_id || paymentData.data.reference;
+            // Debito Pay pode enviar 'payment.completed' ou vir dentro de data.status
+            status = paymentData.event === 'payment.completed' || paymentData.data?.status === 'completed' || paymentData.status === 'success' ? 'completed' : 'failed';
+            reference = paymentData.data?.source_id || paymentData.data?.payment_id || paymentData.reference || paymentData.data?.reference;
         } else {
             reference = paymentData.reference;
             status = paymentData.status;
         }
 
-        if (status === 'completed' || status === 'success' || status === 'paid') {
+        console.log(`🔍 Processando Webhook - Ref: ${reference} | Status: ${status}`);
+
+        if (status === 'completed' || status === 'success' || status === 'paid' || status === 'pago') {
+            // 1. ATUALIZAR STATUS NO PEDIDO IMEDIATAMENTE (Prioridade)
+            await supabase.from('pedidos').update({ status: 'pago' }).eq('transaction_id', reference);
+            console.log("✅ Tabela 'pedidos' atualizada para 'pago'.");
+
+            // 2. BUSCAR DADOS COMPLETOS PARA NOTIFICAÇÃO E VENDA
             const { data: pedido, error: pedidoError } = await supabase
                 .from('pedidos')
                 .select('*, produtos(*)')
@@ -143,22 +190,29 @@ app.post('/api/webhook', async (req, res) => {
                 .single();
 
             if (pedidoError || !pedido) {
-                console.error("Pedido não encontrado:", reference);
-                return res.status(404).json({ error: 'Pedido não encontrado' });
+                console.error("⚠️ Pedido não encontrado para processamento de venda:", reference);
+                return res.status(200).json({ received: true, warning: "Pedido não encontrado no banco" });
             }
 
             const taxa_plataforma = pedido.valor * 0.10;
             const valor_liquido = pedido.valor - taxa_plataforma;
 
+            // Se o join falhou, buscar o vendedor na mão
+            let vendedor_id = pedido.produtos?.vendedor_id;
+            if (!vendedor_id && pedido.produto_id) {
+                const { data: prodData } = await supabase.from('produtos').select('vendedor_id').eq('id', pedido.produto_id).single();
+                vendedor_id = prodData?.vendedor_id;
+            }
+
             const venda = {
-                vendedor_id: pedido.produtos?.vendedor_id || null,
+                vendedor_id: vendedor_id || null,
                 produto_id: pedido.produto_id,
                 cliente_nome: pedido.cliente_nome,
                 cliente_email: pedido.cliente_email,
                 cliente_telefone: pedido.cliente_telefone,
                 valor_total: pedido.valor,
                 valor_liquido: valor_liquido,
-                metodo_pagamento: pedido.metodo_pagamento,
+                metodo_pagamento: pedido.metodo_pagamento || 'debito',
                 status_venda: 'sucesso',
                 transaction_id: reference,
                 criado_em: new Date().toISOString(),
@@ -216,13 +270,50 @@ app.post('/api/webhook', async (req, res) => {
             console.log(`❌ Pagamento falhou para a referência: ${reference}`);
             await supabase.from('pedidos').update({ status: 'falhou' }).eq('transaction_id', reference);
         }
-
         res.status(200).json({ received: true });
     } catch (error) {
         console.error("Erro no webhook local:", error);
         res.status(500).json({ error: 'Erro interno' });
     }
 });
+
+// ---------- ROTA: ATUALIZAR STATUS (ADMIN) ----------
+app.post('/api/admin/update-status', async (req, res) => {
+    const { table, id, status } = req.body;
+    console.log(`[Admin API] Atualizando ${table} ID: ${id} para Status: ${status}`);
+
+    const SUPABASE_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
+    const SUPABASE_KEY = process.env.SUPABASE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
+    const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    try {
+        // Usamos .select() para confirmar se a linha foi realmente alterada
+        const { data, error } = await supabaseAdmin
+            .from(table)
+            .update({ status: status })
+            .eq('id', id)
+            .select();
+
+        if (error) {
+            console.error("Erro Supabase Admin:", error.message);
+            return res.status(500).json({ error: error.message });
+        }
+
+        if (!data || data.length === 0) {
+            console.warn("⚠️ Nenhuma linha atualizada. Verifique se a chave no .env é a 'service_role'.");
+            return res.status(403).json({ 
+                error: "Permissão Negada", 
+                detail: "O Supabase não permitiu a alteração. Use a chave 'service_role' no seu ficheiro .env para ter permissões de admin." 
+            });
+        }
+
+        res.json({ success: true, data });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.use(express.static(path.join(__dirname)));
 
 // ---------- ROTA: NOTIFICAÇÃO DE SAQUE ----------
 app.post('/api/notify-withdrawal', async (req, res) => {
@@ -310,8 +401,7 @@ app.post('/api/notify-welcome', async (req, res) => {
 
 // Iniciar servidor
 app.listen(PORT, () => {
-    console.log(`\n🚀 SERVIDOR ZENTROPAY RODANDO!\n`);
+    console.log(`\n🚀 SERVIDOR ZENTROPAY RODANDO NA PORTA ${PORT}!\n`);
     console.log(`🔗 Checkout: http://localhost:${PORT}/checkoutip.html`);
     console.log(`🔗 Dashboard: http://localhost:${PORT}/infoproductos.html`);
-    console.log(`\nUse o atalho F5 no VS Code para iniciar.\n`);
 });

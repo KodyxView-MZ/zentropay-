@@ -482,18 +482,24 @@
     }
 
     async function updateStatus(table, id, newStatus) {
-        const { error } = await _client.from(table).update({ status: newStatus }).eq('id', id);
-        
-        if (error) {
-            console.error(`[Admin Error] Falha ao atualizar ${table}:`, error);
-            let msg = "Erro ao atualizar: " + error.message;
-            if (error.message.includes("policy") || error.code === "42501") {
-                msg += "\n\n⚠️ MOTIVO: O Supabase bloqueou esta ação (RLS).";
+        try {
+            const response = await fetch('/api/admin/update-status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ table, id, status: newStatus })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                showToast("Sucesso", `${table.toUpperCase()} atualizado para ${newStatus}`);
+                await loadAllData(); 
+            } else {
+                alert("Erro ao atualizar: " + (result.error || "Erro desconhecido"));
             }
-            alert(msg);
-        } else {
-            showToast("Sucesso", `${table.slice(0,-1).toUpperCase()} atualizado para ${newStatus}`);
-            await loadAllData(); 
+        } catch (err) {
+            console.error("Erro na comunicação com o servidor:", err);
+            alert("Erro de conexão com o servidor.");
         }
     }
 
