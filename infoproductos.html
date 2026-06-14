@@ -53,13 +53,12 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            background: #F1F5F9;
+            background: linear-gradient(135deg, #7C3AED, #A855F7);
         }
 
-        .logo-icon img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
+        .logo-icon i {
+            font-size: 24px;
+            color: white;
         }
 
         .logo-text {
@@ -359,11 +358,9 @@
             overflow: hidden;
         }
 
-        .method-icon img {
-            width: 32px;
-            height: 32px;
-            object-fit: contain;
-            border-radius: 50%;
+        .method-icon i {
+            font-size: 28px;
+            color: #7C3AED;
         }
 
         .method-name {
@@ -525,7 +522,7 @@
             gap: 12px;
         }
 
-        /* MODAIS MELHORADOS */
+        /* MODAIS */
         .modal {
             position: fixed;
             inset: 0;
@@ -713,7 +710,7 @@
     <div class="header">
         <div class="logo-area">
             <div class="logo-icon">
-                <img src="zentrologo.png" alt="ZentroPay" onerror="this.style.display='none'; this.parentElement.innerHTML='Z'">
+                <i class="fas fa-chart-line"></i>
             </div>
             <span class="logo-text">ZentroPay</span>
         </div>
@@ -771,9 +768,9 @@
         <div class="methods-card">
             <div class="funnel-title"><i class="fas fa-credit-card"></i> Métodos de pagamento</div>
             <div class="methods-icons">
-                <div class="method-item"><div class="method-icon"><img src="mpesalogo.png" alt="M-PESA" onerror="this.src='https://placehold.co/32x32?text=MP'"></div><div class="method-name">M-PESA</div><div class="method-percent" id="mpesaPercent">0%</div></div>
-                <div class="method-item"><div class="method-icon"><img src="emolalogo.png" alt="E-MOLA" onerror="this.src='https://placehold.co/32x32?text=EM'"></div><div class="method-name">E-MOLA</div><div class="method-percent" id="emolaPercent">0%</div></div>
-                <div class="method-item"><div class="method-icon"><i class="fas fa-credit-card" style="font-size:28px; color:#7C3AED;"></i></div><div class="method-name">CARTÃO</div><div class="method-percent" id="cartaoPercent">0%</div></div>
+                <div class="method-item"><div class="method-icon"><i class="fas fa-mobile-alt"></i></div><div class="method-name">M-PESA</div><div class="method-percent" id="mpesaPercent">0%</div></div>
+                <div class="method-item"><div class="method-icon"><i class="fas fa-wallet"></i></div><div class="method-name">E-MOLA</div><div class="method-percent" id="emolaPercent">0%</div></div>
+                <div class="method-item"><div class="method-icon"><i class="fas fa-credit-card"></i></div><div class="method-name">CARTÃO</div><div class="method-percent" id="cartaoPercent">0%</div></div>
             </div>
         </div>
     </div>
@@ -795,8 +792,10 @@
         <div class="data-card">
             <div class="table-responsive">
                 <table>
-                    <thead><tr><th>Produto</th><th>Cliente</th><th>Valor</th><th>Status</th><th>Data</th><th></th></tr></thead>
-                    <tbody id="salesTableBody"><tr><td colspan="6">Carregando...</td></tr></tbody>
+                    <thead>
+                        <tr><th>Produto</th><th>Cliente</th><th>Valor</th><th>Status</th><th>Data</th><th></th></tr>
+                    </thead>
+                    <tbody id="salesTableBody"><tr><td colspan="6">Carregando...</div></tr></tbody>
                 </table>
             </div>
         </div>
@@ -811,8 +810,10 @@
         <div class="data-card">
             <div class="table-responsive">
                 <table>
-                    <thead><tr><th>Produto</th><th>Preço</th><th>Status</th><th></th></tr></thead>
-                    <tbody id="productsTableBody"><tr><td colspan="4">Carregando...</td></tr></tbody>
+                    <thead>
+                        <tr><th>Produto</th><th>Preço</th><th>Status</th><th>Ações</th></tr>
+                    </thead>
+                    <tbody id="productsTableBody"><tr><td colspan="4">Carregando...</div></tr></tbody>
                 </table>
             </div>
         </div>
@@ -827,8 +828,10 @@
         <div class="data-card">
             <div class="table-responsive">
                 <table>
-                    <thead><tr><th>Valor</th><th>Líquido</th><th>Status</th><th>Data</th></tr></thead>
-                    <tbody id="withdrawalsTableBody"><tr><td colspan="4">Carregando...</td></tr></tbody>
+                    <thead>
+                        <tr><th>Valor</th><th>Líquido</th><th>Status</th><th>Data</th></tr>
+                    </thead>
+                    <tbody id="withdrawalsTableBody"><tr><td colspan="4">Carregando...</div></table></tbody>
                 </table>
             </div>
         </div>
@@ -843,7 +846,7 @@
     <button class="menu-item" data-nav="withdrawals"><i class="fas fa-hand-holding-usd"></i><span>Saques</span></button>
 </div>
 
-<!-- MODAL PRODUTO MELHORADO -->
+<!-- MODAL PRODUTO -->
 <div id="productModal" class="modal">
     <div class="modal-content">
         <button class="modal-close" onclick="closeProductModal()"><i class="fas fa-times"></i></button>
@@ -863,7 +866,7 @@
     </div>
 </div>
 
-<!-- MODAL SAQUE MELHORADO -->
+<!-- MODAL SAQUE -->
 <div id="withdrawalModal" class="modal">
     <div class="modal-content">
         <button class="modal-close" onclick="closeWithdrawalModal()"><i class="fas fa-times"></i></button>
@@ -882,7 +885,7 @@
     </div>
 </div>
 
-<!-- MODAL DETALHES DO LEAD MELHORADO -->
+<!-- MODAL DETALHES DO LEAD -->
 <div id="leadModal" class="modal">
     <div class="modal-content">
         <button class="modal-close" onclick="closeLeadModal()"><i class="fas fa-times"></i></button>
@@ -911,7 +914,16 @@
         const formatMoney = (val) => val.toLocaleString('pt-MZ', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         const netAmountCalc = (gross) => gross * 0.9;
 
-        // Set today's date
+        // Função para copiar link do checkout
+        window.copyCheckoutLink = function(productId) {
+            const checkoutUrl = `https://kodyxview-mz.github.io/zentropay-/checkoutip.html?id=${productId}`;
+            navigator.clipboard.writeText(checkoutUrl).then(() => {
+                alert("✅ Link de checkout copiado!\n\n" + checkoutUrl);
+            }).catch(() => {
+                alert("❌ Erro ao copiar link. Copie manualmente:\n" + checkoutUrl);
+            });
+        };
+
         const today = new Date();
         const options = { timeZone: 'Africa/Maputo', day: '2-digit', month: '2-digit', year: 'numeric' };
         document.getElementById('todayDate').innerText = today.toLocaleDateString('pt-MZ', options);
@@ -1011,14 +1023,16 @@
                 let statusClass = s.status === 'pago' ? 'badge-active' : (s.status === 'falhou' ? 'badge-rejected' : 'badge-pending');
                 let statusText = s.status === 'pago' ? 'Pago' : (s.status === 'falhou' ? 'Falhou' : 'Pendente');
                 window[`lead_${idx}`] = s;
-                return `<tr>
-                    <td><strong>${s.produtos?.nome || 'Produto'}</strong></div>
-                    <td>${s.cliente_nome || s.cliente_email?.split('@')[0] || '-'}</div>
-                    <td>${formatMoney(s.valor||0)} MZN</div>
-                    <td><span class="badge ${statusClass}">${statusText}</span></div>
-                    <td><small>${new Date(s.criado_em).toLocaleDateString('pt-MZ')}</small></div>
-                    <td><button class="action-btn" onclick="window.viewLead(${idx})" title="Ver detalhes"><i class="fas fa-eye"></i></button></div>
-                </tr>`;
+                return `
+                    <tr>
+                        <td><strong>${s.produtos?.nome || 'Produto'}</strong></div>
+                        <td>${s.cliente_nome || s.cliente_email?.split('@')[0] || '-'}</div>
+                        <td>${formatMoney(s.valor||0)} MZN</div>
+                        <td><span class="badge ${statusClass}">${statusText}</span></div>
+                        <td><small>${new Date(s.criado_em).toLocaleDateString('pt-MZ')}</small></div>
+                        <td><button class="action-btn" onclick="window.viewLead(${idx})" title="Ver detalhes"><i class="fas fa-eye"></i></button></div>
+                    </tr>
+                `;
             }).join('');
         }
 
@@ -1044,23 +1058,31 @@
         function renderProductsTable() {
             const tbody = document.getElementById('productsTableBody');
             if(!produtos.length){ tbody.innerHTML='<tr><td colspan="4">Nenhum produto</div></tr>'; return; }
-            tbody.innerHTML = produtos.map(p => `<tr>
-                <td><div class="product-cell"><img class="product-img-small" src="${p.imagem||'https://placehold.co/42x52'}" onerror="this.src='https://placehold.co/42x52'"><span>${p.nome}</span></div></div>
-                <td>${formatMoney(p.preco)} MZN</div>
-                <td><span class="badge badge-active">Ativo</span></div>
-                <td><button class="action-btn" onclick="window.editProduct('${p.id}')"><i class="fas fa-edit"></i></button><button class="action-btn" onclick="window.deleteProduct('${p.id}')"><i class="fas fa-trash"></i></button></div>
-            </tr>`).join('');
+            tbody.innerHTML = produtos.map(p => `
+                <tr>
+                    <td><div class="product-cell"><div class="product-img-small" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#7C3AED20,#A855F720);"><i class="fas fa-box" style="font-size:24px;color:#7C3AED;"></i></div><span>${p.nome}</span></div></div>
+                    <td>${formatMoney(p.preco)} MZN</div>
+                    <td><span class="badge badge-active">Ativo</span></div>
+                    <td>
+                        <button class="action-btn" onclick="window.copyCheckoutLink('${p.id}')" title="Copiar link do checkout"><i class="fas fa-copy"></i></button>
+                        <button class="action-btn" onclick="window.editProduct('${p.id}')" title="Editar produto"><i class="fas fa-edit"></i></button>
+                        <button class="action-btn" onclick="window.deleteProduct('${p.id}')" title="Eliminar produto"><i class="fas fa-trash"></i></button>
+                    </div>
+                </tr>
+            `).join('');
         }
 
         function renderWithdrawalsTable() {
             const tbody = document.getElementById('withdrawalsTableBody');
-            if(!allWithdrawals.length){ tbody.innerHTML='<tr><td colspan="4">Nenhum saque</div></tr>'; return; }
-            tbody.innerHTML = allWithdrawals.map(w => `<tr>
-                <td>${formatMoney(w.valor_solicitado)} MZN</div>
-                <td>${formatMoney(w.valor_liquido)} MZN</div>
-                <td><span class="badge ${w.status==='aprovado'?'badge-active':'badge-pending'}">${w.status}</span></div>
-                <td><small>${new Date(w.criado_em).toLocaleDateString()}</small></div>
-            </tr>`).join('');
+            if(!allWithdrawals.length){ tbody.innerHTML='<tr><td colspan="4">Nenhum saque</div></table>'; return; }
+            tbody.innerHTML = allWithdrawals.map(w => `
+                <tr>
+                    <td>${formatMoney(w.valor_solicitado)} MZN</div>
+                    <td>${formatMoney(w.valor_liquido)} MZN</div>
+                    <td><span class="badge ${w.status==='aprovado'?'badge-active':'badge-pending'}">${w.status}</span></div>
+                    <td><small>${new Date(w.criado_em).toLocaleDateString()}</small></div>
+                </tr>
+            `).join('');
         }
 
         window.deleteProduct = async (id) => { if(confirm("Remover produto?")){ await supabase.from('produtos').delete().eq('id',id); loadData(); } };
