@@ -83,9 +83,7 @@
         }
 
         @keyframes shine {
-            to {
-                background-position: 200% center;
-            }
+            to { background-position: 200% center; }
         }
 
         .product-card {
@@ -112,9 +110,7 @@
             background: #eee;
         }
 
-        .prod-info {
-            flex: 1;
-        }
+        .prod-info { flex: 1; }
 
         .prod-info h2 {
             font-size: 16px;
@@ -290,9 +286,7 @@
             gap: 15px;
         }
 
-        .loading-overlay.active {
-            display: flex;
-        }
+        .loading-overlay.active { display: flex; }
 
         .loading-spinner {
             width: 50px;
@@ -304,9 +298,7 @@
         }
 
         @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+            to { transform: rotate(360deg); }
         }
 
         .loading-text {
@@ -329,15 +321,16 @@
 
     <div class="container">
         <header class="checkout-header">
-            <img src="logo.png?v=2" alt="ZentroPay Logo" class="brand-logo"
-                onerror="this.src='https://placehold.co/40x40?text=Z'">
+            <!-- BUG FIX 1: Imagens com onerror robusto apontando para CDN externo caso o ficheiro local falhe -->
+            <img src="logo.png?v=3" alt="ZentroPay Logo" class="brand-logo"
+                onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/KodyxView-MZ/zentropay-/fd622269e8d62ba7fd89c73176b664f9fadda44e/logo.png'">
             <span class="brand-name">ZentroPay</span>
         </header>
 
         <div class="product-card">
             <div class="prod-header">
                 <img src="" id="p-img" class="prod-img"
-                    onerror="this.src='https://placehold.co/100x100?text=ZentroPay'">
+                    onerror="this.onerror=null;this.src='https://placehold.co/100x100?text=ZentroPay'">
                 <div class="prod-info">
                     <h2 id="p-nome">Sincronizando...</h2>
                     <div class="prod-price">MT <span id="p-preco">0,00</span></div>
@@ -379,15 +372,19 @@
         <label>Selecione o método de pagamento *</label>
         <div class="payment-methods" id="paymentMethodsContainer">
             <div class="method-card active" data-method="emola" id="method-emola">
-                <img src="emolalogo.png?v=2" alt="e-Mola" onerror="this.src='https://placehold.co/32x32?text=EM'">
+                <!-- BUG FIX 1: onerror com fallback para URL raw do GitHub -->
+                <img src="emolalogo.png?v=3" alt="e-Mola"
+                    onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/KodyxView-MZ/zentropay-/fd622269e8d62ba7fd89c73176b664f9fadda44e/emolalogo.png'">
                 <span style="font-size:13px; font-weight:600">e-Mola</span>
             </div>
             <div class="method-card" data-method="mpesa" id="method-mpesa">
-                <img src="mpesalogo.png?v=2" alt="M-Pesa" onerror="this.src='https://placehold.co/32x32?text=MP'">
+                <img src="mpesalogo.png?v=3" alt="M-Pesa"
+                    onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/KodyxView-MZ/zentropay-/fd622269e8d62ba7fd89c73176b664f9fadda44e/mpesalogo.png'">
                 <span style="font-size:13px; font-weight:600">M-Pesa</span>
             </div>
             <div class="method-card" data-method="mkesh" id="method-mkesh">
-                <img src="mkeshlogo.jpg" alt="mKesh" style="border-radius: 4px;">
+                <img src="mkeshlogo.jpg" alt="mKesh" style="border-radius: 4px;"
+                    onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/KodyxView-MZ/zentropay-/fd622269e8d62ba7fd89c73176b664f9fadda44e/mkeshlogo.jpg'">
                 <span style="font-size:13px; font-weight:600">mKesh</span>
             </div>
             <div class="method-card" data-method="visa_mastercard" id="method-card">
@@ -409,7 +406,7 @@
             <i class="fas fa-shopping-cart"></i> Finalizar Compra - MT <span id="btn-val">0,00</span>
         </button>
 
-        <div id="error-display" class="error-message"></div>
+        <div id="erro-display" class="error-message"></div>
         <div id="success-display" class="success-message"></div>
     </div>
 
@@ -420,9 +417,6 @@
             const SUP_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
             const supabase = window.supabase.createClient(SUP_URL, SUP_KEY);
 
-            // A API de pagamentos (Debito) agora é chamada no servidor (/api/pay)
-            // Não coloque chaves secretas no frontend!
-
             let produtoAtual = { nome: "Carregando...", preco: 0 };
             let metodoSelecionado = 'emola';
             let timerInterval = null;
@@ -432,7 +426,6 @@
             function startTimer() {
                 const timerDisplay = document.getElementById('timer');
                 if (!timerDisplay) return;
-
                 timerInterval = setInterval(() => {
                     let minutes = Math.floor(timerSeconds / 60);
                     let seconds = timerSeconds % 60;
@@ -451,17 +444,16 @@
                         document.querySelectorAll('.method-card').forEach(c => c.classList.remove('active'));
                         this.classList.add('active');
                         metodoSelecionado = this.getAttribute('data-method');
-                        
+
                         const labelMap = {
                             'emola': 'e-Mola',
                             'mpesa': 'M-Pesa',
                             'mkesh': 'mKesh',
                             'visa_mastercard': 'Cartão'
                         };
-                        
+
                         document.getElementById('label-carteira').innerHTML = `Número ${labelMap[metodoSelecionado]} *`;
-                        
-                        // Ocultar prefixo se for Cartão (geralmente cartão precisa de outros dados, mas aqui manteremos telefone por agora conforme pedido)
+
                         const prefix = document.querySelector('.prefix');
                         if (metodoSelecionado === 'visa_mastercard') {
                             if (prefix) prefix.style.display = 'none';
@@ -490,18 +482,18 @@
                     }
 
                     const { data, error } = await query;
-                    
+
                     if (error || !data) {
                         console.warn('Produto não encontrado ou erro no Supabase, usando fallback.');
                         setProductFallback();
                         return;
                     }
 
-                    // --- VERIFICAÇÃO DE BANIMENTO ---
+                    // VERIFICAÇÃO DE BANIMENTO
                     if (data.status === 'banned') {
                         document.body.innerHTML = `
                             <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:#050508;color:#fff;font-family:'Inter',sans-serif;text-align:center;padding:20px;">
-                                <div style="font-size:60px;margin-bottom:20px;">🚫</div>
+                                <div style="font-size:60px;margin-bottom:20px;">😫</div>
                                 <h2 style="font-size:24px;font-weight:800;color:#ef4444;margin-bottom:10px;">Produto Indisponível</h2>
                                 <p style="color:#94a3b8;font-size:15px;max-width:380px;">Este produto foi removido da plataforma e não está disponível para compra.</p>
                             </div>`;
@@ -517,10 +509,10 @@
             }
 
             function updateUI(data) {
-                produtoAtual = { 
-                    id: data.id || "demo", 
-                    nome: data.nome || "Produto ZentroPay", 
-                    preco: parseFloat(data.preco) || 197 
+                produtoAtual = {
+                    id: data.id || "demo",
+                    nome: data.nome || "Produto ZentroPay",
+                    preco: parseFloat(data.preco) || 197
                 };
 
                 const elements = {
@@ -535,13 +527,13 @@
                     const el = document.getElementById(id);
                     if (el) el.innerText = val;
                 }
-                
+
                 const imgEl = document.getElementById('p-img');
                 if (imgEl && data.imagem) imgEl.src = data.imagem;
 
-                // --- CONFIGURAR MÉTODOS DE PAGAMENTO DINÂMICOS ---
+                // CONFIGURAR MÉTODOS DE PAGAMENTO DINÂMICOS
                 const allMethodCards = document.querySelectorAll('.method-card');
-                
+
                 if (data.metodos_pagamento) {
                     try {
                         let allowed = data.metodos_pagamento;
@@ -562,8 +554,8 @@
                         } else {
                             allMethodCards.forEach(c => c.style.display = 'flex');
                         }
-                    } catch (e) { 
-                        console.error("Erro ao processar métodos, mostrando todos:", e); 
+                    } catch (e) {
+                        console.error("Erro ao processar métodos, mostrando todos:", e);
                         allMethodCards.forEach(c => c.style.display = 'flex');
                     }
                 } else {
@@ -580,7 +572,7 @@
             }
 
             function showMessage(text, type) {
-                const errorDiv = document.getElementById('error-display');
+                const errorDiv = document.getElementById('erro-display');
                 const successDiv = document.getElementById('success-display');
                 const overlay = document.getElementById('loadingOverlay');
 
@@ -640,8 +632,10 @@
                     await supabase.from('pedidos').insert([pedido]);
                     console.log("✅ Pedido salvo no Supabase:", reference);
 
-                    // 2. TENTAR API DA DEBITO
-                    const method = metodoSelecionado === 'emola' ? 'emola' : 'mpesa';
+                    // BUG FIX 3: era "metodoSelecionado === 'emola' ? 'emola' : 'mpesa'"
+                    // o que hardcodava mkesh e visa_mastercard como 'mpesa' — corrigido:
+                    const method = metodoSelecionado;
+
                     const payload = {
                         amount: produtoAtual.preco,
                         reference: reference,
@@ -658,34 +652,38 @@
 
                     console.log("📤 Tentando Debito...", payload);
 
-                    // --- MELHORIA DE UX: Mostrar mensagem antes de chamar a API para mobile money ---
+                    // Mostrar mensagem de espera para mobile money
                     if (method === 'mpesa' || method === 'emola' || method === 'mkesh') {
                         showMessage("⏳ Pedido enviado! Por favor, confirme o PIN no seu telemóvel agora...", "success");
                     }
 
-                    // Timeout de 60 segundos para pagamentos móveis (M-Pesa/e-Mola)
+                    // Timeout de 60 segundos para pagamentos móveis
                     const controller = new AbortController();
                     const timeoutId = setTimeout(() => controller.abort(), 60000);
+
                     let data;
                     try {
-                      const response = await fetch('/api/pay', {
-                        method: 'POST',
-                        signal: controller.signal,
-                        headers: {
-                          'Content-Type': 'application/json',
-                          'Accept': 'application/json'
-                        },
-                        body: JSON.stringify(payload)
-                      });
-                      clearTimeout(timeoutId);
-                      data = await response.json();
+                        // BUG FIX 2: /api/pay retornava 404 porque o vercel.json estava quebrado.
+                        // Corrigido no vercel.json com routes correctas para funções serverless.
+                        const response = await fetch('/api/pay', {
+                            method: 'POST',
+                            signal: controller.signal,
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify(payload)
+                        });
+                        clearTimeout(timeoutId);
+                        data = await response.json();
                     } catch (e) {
-                      if (e.name === 'AbortError') {
-                        console.warn('Request aborted due to timeout, attempting fallback to PaySuite');
+                        clearTimeout(timeoutId);
+                        if (e.name === 'AbortError') {
+                            console.warn('Request aborted due to timeout');
+                        }
                         throw e;
-                      }
-                      throw e;
                     }
+
                     console.log("📥 Resposta Debito:", data);
 
                     if (data?.success) {
@@ -701,11 +699,11 @@
                             showMessage("✅ Pagamento concluído com sucesso!", "success");
                             setTimeout(() => { window.location.href = "obrigado.html?transacao=" + reference; }, 2000);
                         } else {
-                            // CASO PENDENTE (USSD/Push): Iniciar Polling para verificar se o cliente pagou
+                            // CASO PENDENTE (USSD/Push): Iniciar Polling
                             showMessage("⏳ Aguardando confirmação no seu celular...", "success");
 
                             let checkCount = 0;
-                            const maxChecks = 40; // 40 vezes * 3 segundos = 120 segundos (2 minutos)
+                            const maxChecks = 40; // 40 * 3s = 120s
 
                             const interval = setInterval(async () => {
                                 checkCount++;
@@ -715,7 +713,7 @@
                                     const statusRes = await fetch(`/api/check-status/${reference}`);
                                     const statusData = await statusRes.json();
 
-                                    if (statusData?.status === 'pago') {
+                                    if (statusData?.status === 'pago' || statusData?.status === 'completed' || statusData?.status === 'paid') {
                                         clearInterval(interval);
                                         showMessage("✅ Pagamento confirmado!", "success");
                                         setTimeout(() => { window.location.href = "obrigado.html?transacao=" + reference; }, 1500);
@@ -738,8 +736,8 @@
                         throw new Error(data?.error || data?.message || "Erro ao processar o pagamento com a Debito.");
                     }
 
-                } catch (paysuiteError) {
-                    console.error("⚠️ Erro no processamento:", paysuiteError.message);
+                } catch (paysuite_error) {
+                    console.error("⚠️ Erro no processamento:", paysuite_error.message);
 
                     await supabase.from('pedidos').update({ status: 'falhou' }).eq('transaction_id', reference);
                     const overlay = document.getElementById('loadingOverlay');
