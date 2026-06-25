@@ -53,1372 +53,22 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            background: linear-gradient(135deg, #7C3AED, #A855F7);
-        }
-
-        .logo-icon i {
-            font-size: 24px;
-            color: white;
-        }
-
-        .logo-text {
-            font-weight: 800;
-            font-size: 22px;
-            background: linear-gradient(135deg, #1E293B, #7C3AED);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            letter-spacing: -0.5px;
-        }
-
-        .header-greeting {
-            background: white;
-            padding: 8px 16px;
-            border-radius: 40px;
-            font-size: 13px;
-            font-weight: 600;
-            color: #1E293B;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            border: 1px solid #E2E8F0;
-        }
-
-        .header-greeting i {
-            color: #7C3AED;
-            margin-right: 6px;
-        }
-
-        /* WELCOME BANNER */
-        .welcome-banner {
-            background: linear-gradient(135deg, #7C3AED, #A855F7);
-            border-radius: 28px;
-            padding: 20px 24px;
-            margin-bottom: 24px;
-            color: white;
-            box-shadow: 0 8px 20px rgba(124, 58, 237, 0.25);
-        }
-
-        .welcome-banner h2 {
-            font-size: 20px;
-            font-weight: 800;
-            margin-bottom: 6px;
-        }
-
-        .welcome-banner p {
-            font-size: 13px;
-            opacity: 0.9;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .welcome-banner .date-badge {
-            background: rgba(255,255,255,0.2);
-            padding: 4px 12px;
-            border-radius: 40px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        /* FILTER DROPDOWN */
-        .filter-section {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 16px;
-        }
-        .filter-wrapper {
-            position: relative;
-        }
-        .filter-btn {
-            background: white;
-            border: 1px solid #E2E8F0;
-            padding: 10px 18px;
-            border-radius: 40px;
-            color: #1E293B;
-            font-size: 13px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-        }
-        .filter-dropdown {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
-            min-width: 150px;
-            z-index: 100;
-            display: none;
-            margin-top: 8px;
-            border: 1px solid #E9EEF3;
-            overflow: hidden;
-        }
-        .filter-dropdown.show {
-            display: block;
-        }
-        .filter-option {
-            padding: 12px 20px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 500;
-            transition: 0.2s;
-            color: #475569;
-        }
-        .filter-option:hover {
-            background: #F8FAFE;
-            color: #7C3AED;
-        }
-        .filter-option.active {
-            background: #F3E8FF;
-            color: #7C3AED;
-            font-weight: 600;
-        }
-
-        /* CARDS */
-        .balance-card {
-            background: white;
-            border-radius: 32px;
-            padding: 28px 24px;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.05);
-            border: 1px solid #E9EEF3;
-        }
-
-        .balance-label {
-            font-size: 14px;
-            color: #64748B;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 500;
-        }
-
-        .balance-amount {
-            font-size: 52px;
-            font-weight: 800;
-            letter-spacing: -1.5px;
-            margin-bottom: 16px;
-            color: #0F172A;
-        }
-
-        .balance-amount small {
-            font-size: 18px;
-            font-weight: 500;
-            color: #94A3B8;
-        }
-
-        .pending-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 16px;
-            border-top: 1px solid #E9EEF3;
-            font-size: 14px;
-        }
-
-        .pending-label {
-            color: #64748B;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .pending-value {
-            font-weight: 700;
-            color: #F59E0B;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-            margin-bottom: 24px;
-        }
-
-        .stat-card-kv {
-            background: white;
-            border-radius: 24px;
-            padding: 20px;
-            border: 1px solid #E9EEF3;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-        }
-
-        .stat-card-kv .stat-title {
-            font-size: 12px;
-            color: #64748B;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-weight: 600;
-        }
-
-        .stat-card-kv .stat-number {
-            font-size: 32px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            color: #0F172A;
-        }
-
-        .stat-card-kv .stat-sub {
-            font-size: 11px;
-            color: #94A3B8;
-            margin-top: 8px;
-        }
-
-        /* FUNIL */
-        .funnel-wrapper {
-            background: white;
-            border-radius: 28px;
-            padding: 20px;
-            margin-bottom: 24px;
-            border: 1px solid #E9EEF3;
-        }
-
-        .funnel-title {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 18px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #1E293B;
-        }
-
-        .funnel-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .funnel-step {
-            text-align: center;
-            background: #F8FAFE;
-            padding: 14px 8px;
-            border-radius: 20px;
-        }
-
-        .funnel-step span {
-            font-size: 11px;
-            color: #64748B;
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-
-        .funnel-step strong {
-            font-size: 22px;
-            font-weight: 800;
-            color: #0F172A;
-        }
-
-        .funnel-secondary {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-        }
-
-        /* MÉTODOS */
-        .methods-card {
-            background: white;
-            border-radius: 28px;
-            padding: 20px;
-            margin-bottom: 24px;
-            border: 1px solid #E9EEF3;
-        }
-
-        .methods-icons {
-            display: flex;
-            gap: 20px;
-            margin-top: 16px;
-            justify-content: space-around;
-        }
-
-        .method-item {
-            text-align: center;
-            flex: 1;
-        }
-
-        .method-icon {
-            width: 56px;
-            height: 56px;
-            background: #F8FAFE;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 10px;
-            border: 1px solid #E9EEF3;
-            overflow: hidden;
-        }
-
-        .method-icon i {
-            font-size: 28px;
-            color: #7C3AED;
-        }
-
-        .method-name {
-            font-size: 12px;
-            color: #64748B;
-            font-weight: 500;
-        }
-
-        .method-percent {
-            font-weight: 800;
-            font-size: 15px;
-            color: #1E293B;
-        }
-
-        /* BOTTOM MENU */
-        .bottom-menu {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: calc(100% - 32px);
-            max-width: 440px;
-            background: rgba(255, 255, 255, 0.96);
-            backdrop-filter: blur(20px);
-            border-radius: 60px;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 12px 20px;
-            z-index: 1000;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-            border: 1px solid rgba(124, 58, 237, 0.15);
-        }
-
-        .menu-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            background: none;
-            border: none;
-            color: #94A3B8;
-            font-size: 11px;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            padding: 6px 12px;
-            border-radius: 40px;
-        }
-
-        .menu-item i {
-            font-size: 22px;
-            margin-bottom: 2px;
-        }
-
-        .menu-item.active {
-            color: #7C3AED;
-            background: rgba(124, 58, 237, 0.08);
-        }
-
-        /* TABELAS */
-        .data-card {
-            background: white;
-            border-radius: 28px;
-            padding: 20px;
-            margin-top: 16px;
-            border: 1px solid #E9EEF3;
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .section-header h2 {
-            font-size: 22px;
-            font-weight: 800;
-            color: #0F172A;
-        }
-
-        .btn-small {
-            background: #7C3AED;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 40px;
-            font-weight: 700;
-            font-size: 13px;
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(124, 58, 237, 0.2);
-        }
-
-        .table-responsive {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th {
-            text-align: left;
-            padding: 14px 8px;
-            font-size: 11px;
-            color: #64748B;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        td {
-            padding: 14px 8px;
-            font-size: 13px;
-            border-top: 1px solid #F1F5F9;
-            color: #334155;
-        }
-
-        .badge {
-            padding: 4px 12px;
-            border-radius: 40px;
-            font-size: 10px;
-            font-weight: 700;
-            display: inline-block;
-        }
-
-        .badge-active { background: rgba(34,197,94,0.12); color: #059669; }
-        .badge-pending { background: rgba(245,158,11,0.12); color: #D97706; }
-        .badge-rejected { background: rgba(239,68,68,0.12); color: #DC2626; }
-
-        .action-btn {
             background: transparent;
-            border: none;
-            color: #94A3B8;
-            font-size: 16px;
-            cursor: pointer;
-            margin: 0 4px;
-            transition: color 0.2s;
-        }
-        .action-btn:hover { color: #7C3AED; }
-
-        .product-img-small {
-            width: 42px;
-            height: 52px;
-            object-fit: cover;
-            border-radius: 12px;
-            background: #F1F5F9;
-        }
-        .product-cell {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        /* MODAIS */
-        .modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(8px);
-            z-index: 2000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        .modal.active { display: flex; }
-        .modal-content {
-            background: white;
-            border-radius: 40px;
-            width: 100%;
-            max-width: 460px;
-            max-height: 85vh;
-            overflow-y: auto;
-            padding: 28px;
-            position: relative;
-            animation: modalFadeIn 0.3s ease;
-        }
-        @keyframes modalFadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        .modal-close {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: #F1F5F9;
-            border: none;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.2s;
-            color: #64748B;
-        }
-        .modal-close:hover {
-            background: #E2E8F0;
-            transform: scale(1.05);
-        }
-        .modal-header {
-            text-align: center;
-            margin-bottom: 24px;
-        }
-        .modal-header .modal-icon {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, #7C3AED20, #A855F720);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 16px;
-            font-size: 32px;
-            color: #7C3AED;
-        }
-        .modal-header h3 {
-            font-size: 24px;
-            font-weight: 800;
-            color: #0F172A;
-        }
-        .modal-header p {
-            font-size: 13px;
-            color: #64748B;
-            margin-top: 6px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-group label {
-            font-size: 12px;
-            font-weight: 700;
-            color: #475569;
-            display: block;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-        }
-        .form-group input, .form-group textarea, .form-group select {
-            width: 100%;
-            background: #F8FAFE;
-            border: 1px solid #E2E8F0;
-            padding: 14px 18px;
-            border-radius: 20px;
-            color: #0F172A;
-            font-family: inherit;
-            font-size: 14px;
-            transition: 0.2s;
-        }
-        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
-            outline: none;
-            border-color: #7C3AED;
-            box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
-        }
-        .tax-info {
-            background: #F1F5F9;
-            border-radius: 24px;
-            padding: 16px;
-            text-align: center;
-            margin: 16px 0;
-            font-weight: 600;
-        }
-        .full-width { width: 100%; }
-        .radio-group {
-            display: flex;
-            gap: 24px;
-            margin: 12px 0;
-            flex-wrap: wrap;
-        }
-        .radio-group label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 500;
-            text-transform: none;
-            cursor: pointer;
-        }
-        .upload-area {
-            border: 2px dashed #C7D2FE;
-            border-radius: 24px;
-            padding: 24px;
-            text-align: center;
-            cursor: pointer;
-            background: #F8FAFE;
-            transition: 0.2s;
-        }
-        .upload-area:hover {
-            border-color: #7C3AED;
-            background: #F3E8FF;
-        }
-        .lead-details {
-            background: #F8FAFE;
-            border-radius: 24px;
-            padding: 20px;
-            margin-top: 8px;
-        }
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #E2E8F0;
-        }
-        .detail-row:last-child {
-            border-bottom: none;
-        }
-        .detail-label {
-            font-weight: 600;
-            color: #64748B;
-            font-size: 12px;
-        }
-        .detail-value {
-            font-weight: 500;
-            color: #1E293B;
-            text-align: right;
-        }
-        .btn-primary-modal {
-            background: #7C3AED;
-            width: 100%;
-            padding: 16px;
-            border: none;
-            border-radius: 32px;
-            font-weight: 700;
-            font-size: 15px;
-            color: white;
-            margin-top: 16px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .btn-primary-modal:hover {
-            background: #6D28D9;
-            transform: scale(0.98);
-        }
-    </style>
-</head>
-<body>
-<div class="app-container" id="appContainer">
-    <!-- HEADER -->
-    <div class="header">
-        <div class="logo-area">
-            <div class="logo-icon">
-                <img src="logo.png" alt="ZentroPay Logo" style="width: 100%; height: 100%; object-fit: contain;"
-                     onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/KodyxView-MZ/zentropay-/main/logo.png'">
-            </div>
-            <span class="logo-text">ZentroPay</span>
-        </div>
-        <div class="header-greeting" id="greetingMessage">
-            <i class="fas fa-user"></i> Carregando...
-        </div>
-    </div>
-
-    <!-- WELCOME BANNER -->
-    <div class="welcome-banner">
-        <h2>Olá! Parceiro</h2>
-        <p>Boas vendas <span class="date-badge" id="todayDate"></span></p>
-    </div>
-
-    <!-- DASHBOARD -->
-    <div id="dashboardSection">
-        <div class="filter-section">
-            <div class="filter-wrapper">
-                <button class="filter-btn" id="dashboardFilterBtn"><i class="fas fa-calendar"></i> <span id="dashboardFilterLabel">Hoje</span> <i class="fas fa-chevron-down"></i></button>
-                <div class="filter-dropdown" id="dashboardFilterDropdown">
-                    <div class="filter-option active" data-filter="today">📅 Hoje</div>
-                    <div class="filter-option" data-filter="7days">📊 Últimos 7 dias</div>
-                    <div class="filter-option" data-filter="30days">📈 Últimos 30 dias</div>
-                    <div class="filter-option" data-filter="all">🎯 Sempre</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="balance-card">
-            <div class="balance-label"><i class="fas fa-wallet"></i> Saldo disponível</div>
-            <div class="balance-amount"><span id="availableBalance">0,00</span><small> MZN</small></div>
-            <div class="pending-row"><span class="pending-label"><i class="fas fa-clock"></i> Pendente:</span><span class="pending-value" id="pendingBalance">0,00 MZN</span></div>
-        </div>
-
-        <div class="stats-grid">
-            <div class="stat-card-kv"><div class="stat-title"><i class="fas fa-chart-simple"></i> Vendas aprovadas</div><div class="stat-number" id="approvedSalesCount">0</div><div class="stat-sub">total de pedidos</div></div>
-            <div class="stat-card-kv"><div class="stat-title"><i class="fas fa-ticket"></i> Ticket médio</div><div class="stat-number" id="avgTicket">0</div><div class="stat-sub">MZN por venda</div></div>
-        </div>
-
-        <div class="funnel-wrapper">
-            <div class="funnel-title"><i class="fas fa-funnel-dollar"></i> Funil de vendas</div>
-            <div class="funnel-grid">
-                <div class="funnel-step"><span>Checkout</span><strong id="funnelCheckout">0</strong></div>
-                <div class="funnel-step"><span>Pagamento</span><strong id="funnelPagamento">0</strong></div>
-                <div class="funnel-step"><span>Sucesso</span><strong id="funnelSucesso">0</strong></div>
-                <div class="funnel-step"><span>Pendente</span><strong id="funnelPendente">0</strong></div>
-            </div>
-            <div class="funnel-secondary">
-                <div class="funnel-step"><span>Falhou</span><strong id="funnelFalhou">0</strong></div>
-                <div class="funnel-step"><span>Reembolso</span><strong id="funnelReembolso">0</strong></div>
-                <div class="funnel-step"><span>Abandonado</span><strong id="funnelAbandonado">0</strong></div>
-            </div>
-        </div>
-
-        <div class="methods-card">
-            <div class="funnel-title"><i class="fas fa-credit-card"></i> Métodos de pagamento</div>
-            <div class="methods-icons">
-                <div class="method-item"><div class="method-icon"><img src="mpesalogo.png" alt="M-Pesa" style="width: 100%; height: 100%; object-fit: contain;" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/KodyxView-MZ/zentropay-/main/mpesalogo.png'"></div><div class="method-name">M-PESA</div><div class="method-percent" id="mpesaPercent">0%</div></div>
-                <div class="method-item"><div class="method-icon"><img src="emolalogo.png" alt="e-Mola" style="width: 100%; height: 100%; object-fit: contain;" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/KodyxView-MZ/zentropay-/main/emolalogo.png'"></div><div class="method-name">E-MOLA</div><div class="method-percent" id="emolaPercent">0%</div></div>
-                <div class="method-item"><div class="method-icon"><i class="fas fa-credit-card"></i></div><div class="method-name">CARTÃO</div><div class="method-percent" id="cartaoPercent">0%</div></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- VENDAS SECTION -->
-    <div id="allSalesSection" style="display: none;">
-        <div class="section-header">
-            <h2>Todas as vendas</h2>
-            <div class="filter-wrapper">
-                <button class="filter-btn" id="salesFilterBtn"><i class="fas fa-calendar"></i> <span id="salesFilterLabel">Hoje</span> <i class="fas fa-chevron-down"></i></button>
-                <div class="filter-dropdown" id="salesFilterDropdown">
-                    <div class="filter-option active" data-filter="today">📅 Hoje</div>
-                    <div class="filter-option" data-filter="7days">📊 Últimos 7 dias</div>
-                    <div class="filter-option" data-filter="30days">📈 Últimos 30 dias</div>
-                    <div class="filter-option" data-filter="all">🎯 Sempre</div>
-                </div>
-            </div>
-        </div>
-        <div class="data-card">
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr><th>Produto</th><th>Cliente</th><th>Valor</th><th>Status</th><th>Data</th><th></th></tr>
-                    </thead>
-                    <tbody id="salesTableBody"><tr><td colspan="6" style="text-align:center;">Carregando...</td></tr></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- PRODUTOS SECTION -->
-    <div id="productSection" style="display: none;">
-        <div class="section-header">
-            <h2>Produtos</h2>
-            <button class="btn-small" onclick="openProductModal()"><i class="fas fa-plus"></i> Novo</button>
-        </div>
-        <div class="data-card">
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr><th>Produto</th><th>Preço</th><th>Status</th><th>Ações</th></tr>
-                    </thead>
-                    <tbody id="productsTableBody"><tr><td colspan="4" style="text-align:center;">Carregando...</td></tr></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- SAQUES SECTION -->
-    <div id="withdrawalsSection" style="display: none;">
-        <div class="section-header">
-            <h2>Saques</h2>
-            <button class="btn-small" onclick="openWithdrawalModal()"><i class="fas fa-money-bill"></i> Solicitar</button>
-        </div>
-        <div class="data-card">
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr><th>Valor</th><th>Líquido</th><th>Status</th><th>Data</th></tr>
-                    </thead>
-                    <tbody id="withdrawalsTableBody"><tr><td colspan="4" style="text-align:center;">Carregando...</td></tr></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- BOTTOM MENU -->
-<div class="bottom-menu">
-    <button class="menu-item active" data-nav="dashboard"><i class="fas fa-chart-line"></i><span>Início</span></button>
-    <button class="menu-item" data-nav="allSales"><i class="fas fa-receipt"></i><span>Vendas</span></button>
-    <button class="menu-item" data-nav="products"><i class="fas fa-box"></i><span>Produtos</span></button>
-    <button class="menu-item" data-nav="withdrawals"><i class="fas fa-hand-holding-usd"></i><span>Saques</span></button>
-</div>
-
-<!-- MODAL PRODUTO -->
-<div id="productModal" class="modal">
-    <div class="modal-content">
-        <button class="modal-close" onclick="closeProductModal()"><i class="fas fa-times"></i></button>
-        <div class="modal-header">
-            <div class="modal-icon"><i class="fas fa-box"></i></div>
-            <h3>Novo Produto</h3>
-            <p>Adicione um infoproduto à sua loja</p>
-        </div>
-        <form id="productForm">
-            <div class="form-group"><label>Capa do produto</label><div class="upload-area" onclick="document.getElementById('productImageFile').click()"><i class="fas fa-cloud-upload-alt" style="font-size:28px;color:#7C3AED;"></i><p style="margin-top:8px;">Clique para enviar imagem</p><input type="file" id="productImageFile" accept="image/*" style="display:none"></div><div id="imagePreviewContainer" style="margin-top:12px;display:none;text-align:center;"><img id="imagePreview" style="width:80px;border-radius:16px;"></div></div>
-            <div class="form-group"><label>Título</label><input type="text" id="prodTitle" required placeholder="Ex: Curso de Marketing Digital"></div>
-            <div class="form-group"><label>Preço (MZN)</label><input type="number" id="prodPrice" required placeholder="1250.00"></div>
-            <div class="form-group"><label>Link de acesso</label><input type="url" id="prodContentLink" required placeholder="https://seusite.com/acesso"></div>
-            <div class="form-group"><label>Métodos de pagamento</label><div><label style="margin-right:16px;"><input type="checkbox" name="pay_method" value="mpesa"> M-Pesa</label><label style="margin-right:16px;"><input type="checkbox" name="pay_method" value="emola"> E-Mola</label><label><input type="checkbox" name="pay_method" value="cartao"> Cartão</label></div></div>
-            <button type="submit" class="btn-primary-modal">Salvar Produto</button>
-        </form>
-    </div>
-</div>
-
-<!-- MODAL SAQUE -->
-<div id="withdrawalModal" class="modal">
-    <div class="modal-content">
-        <button class="modal-close" onclick="closeWithdrawalModal()"><i class="fas fa-times"></i></button>
-        <div class="modal-header">
-            <div class="modal-icon"><i class="fas fa-money-bill-wave"></i></div>
-            <h3>Solicitar Saque</h3>
-            <p>Retire seus ganhos da plataforma</p>
-        </div>
-        <form id="withdrawalForm">
-            <div class="form-group"><label>Valor (MZN)</label><input type="number" id="withdrawalAmount" min="500" max="10000" placeholder="500 - 10.000" required></div>
-            <div class="tax-info">💰 Taxa da plataforma: -10% → <strong><span id="netAmount">0</span> MZN</strong> (valor líquido)</div>
-            <div class="form-group"><label>Método de recebimento</label><div class="radio-group"><label><input type="radio" name="withdrawalMethod" value="emola" checked> 📱 E-Mola</label><label><input type="radio" name="withdrawalMethod" value="mpesa"> 📱 M-Pesa</label></div></div>
-            <div class="form-group"><label>Número celular</label><input type="tel" id="withdrawalPhone" placeholder="84 000 0000" required></div>
-            <button type="submit" class="btn-primary-modal">Solic<!-- MODAL DETALHES DO LEAD -->
-<div id="leadModal" class="modal">
-    <div class="modal-content">
-        <button class="modal-close" onclick="closeLeadModal()"><i class="fas fa-times"></i></button>
-        <div class="modal-header">
-            <div class="modal-icon"><i class="fas fa-user-circle"></i></div>
-            <h3>Informações do Cliente</h3>
-            <p>Dados preenchidos no checkout</p>
-        </div>
-        <div id="leadDetailsContent" class="lead-details"></div>
-    </div>
-</div>
-
-<script>
-    (function() {
-        const SUPABASE_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
-        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
-        
-        let supabase = null;
-        try {
-            if (window.supabase) {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-            } else {
-                console.error("Supabase CDN não foi carregado corretamente.");
-            }
-        } catch (e) {
-            console.error("Erro ao inicializar cliente Supabase:", e);
-        }
-
-        let currentUser = null;
-        let allSales = [], allPedidos = [], allWithdrawals = [], produtos = [];
-        let currentFilter = 'today';
-        let currentSalesFilter = 'today';
-        let currentSection = 'dashboard';
-        let editingProductId = null;
-        let currentImageBase64 = null;
-
-        const formatMoney = (val) => {
-            const num = parseFloat(val) || 0;
-            return num.toLocaleString('pt-MZ', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        };
-        const netAmountCalc = (gross) => (parseFloat(gross) || 0) * 0.9;
-
-        // Função para copiar link do checkout
-        window.copyCheckoutLink = function(productId) {
-            const checkoutUrl = `${window.location.origin}/checkoutip.html?id=${productId}`;
-            navigator.clipboard.writeText(checkoutUrl).then(() => {
-                alert("✅ Link de checkout copiado!\n\n" + checkoutUrl);
-            }).catch(() => {
-                alert("❌ Erro ao copiar link. Copie manualmente:\n" + checkoutUrl);
-            });
-        };
-
-        const today = new Date();
-        const options = { timeZone: 'Africa/Maputo', day: '2-digit', month: '2-digit', year: 'numeric' };
-        const todayDateEl = document.getElementById('todayDate');
-        if (todayDateEl) {
-            todayDateEl.innerText = today.toLocaleDateString('pt-MZ', options);
-        }
-
-        function getDateFilter(dateField, filterValue) {
-            const now = new Date();
-            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            const weekAgo = new Date(today); weekAgo.setDate(today.getDate()-7);
-            const monthAgo = new Date(today); monthAgo.setDate(today.getDate()-30);
-            return (item) => {
-                if (!item || !item[dateField]) return false;
-                const itemDate = new Date(item[dateField]);
-                if (isNaN(itemDate.getTime())) return false;
-                if(filterValue === 'today') return itemDate >= today;
-                if(filterValue === '7days') return itemDate >= weekAgo;
-                if(filterValue === '30days') return itemDate >= monthAgo;
-                return true;
-            };
-        }
-
-        async function init() {
-            // Inicializar a UI imediatamente para que guias e botões funcionem de qualquer forma
-            setupNavigation();
-            setupFilters();
-            setupForms();
-
-            if (!supabase) {
-                console.error("Supabase indisponível. A interface estática continuará funcionando.");
-                const greetingEl = document.getElementById('greetingMessage');
-                if (greetingEl) greetingEl.innerHTML = `<i class="fas fa-user-slash"></i> Offline (Supabase Erro)`;
-                return;
-            }
-
-            try {
-                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-                if (sessionError) throw sessionError;
-                if (!session) { 
-                    console.warn("Sem sessão. Redirecionando para acesso.html...");
-                    window.location.href = 'acesso.html'; 
-                    return; 
-                }
-                currentUser = session.user;
-                
-                const { data: profile, error: profileError } = await supabase.from('usuarios').select('status').eq('id', currentUser.id).maybeSingle();
-                if (profile?.status === 'banned') { 
-                    document.body.innerHTML = '<div style="text-align:center;padding:40px;color:#ef4444;font-weight:800;font-family:sans-serif;">Conta suspensa</div>'; 
-                    return; 
-                }
-                
-                const nome = currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || 'Usuário';
-                const greetingEl = document.getElementById('greetingMessage');
-                if (greetingEl) greetingEl.innerHTML = `<i class="fas fa-user"></i> Olá, ${nome}`;
-                
-                await loadData();
-            } catch (err) {
-                console.error('Erro crítico durante inicialização do Supabase:', err);
-                const greetingEl = document.getElementById('greetingMessage');
-                if (greetingEl) greetingEl.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Erro de Conexão`;
-            }
-        }
-
-        async function loadData() {
-            if (!supabase || !currentUser) return;
-            try {
-                const { data: pedidos, error: pedidosErr } = await supabase.from('pedidos').select('*, produtos!inner(nome, vendedor_id)').eq('produtos.vendedor_id', currentUser.id);
-                if (pedidosErr) console.warn("Erro ao buscar pedidos:", pedidosErr.message);
-                
-                const { data: prods, error: prodsErr } = await supabase.from('produtos').select('*').eq('vendedor_id', currentUser.id);
-                if (prodsErr) console.warn("Erro ao buscar produtos:", prodsErr.message);
-                
-                const { data: saques, error: saquesErr } = await supabase.from('saques').select('*').eq('vendedor_id', currentUser.id);
-                if (saquesErr) console.warn("Erro ao buscar saques:", saquesErr.message);
-
-                allPedidos = pedidos || [];
-                allSales = allPedidos.filter(p => ['pago','sucesso','completed'].includes(p.status));
-                produtos = prods || [];
-                allWithdrawals = saques || [];
-
-                renderDashboard();
-                renderProductsTable();
-                renderWithdrawalsTable();
-                renderSalesTable();
-            } catch (err) {
-                console.error("Erro em loadData:", err);
-            }
-        }
-
-        function renderDashboard() {
-            const filterFn = getDateFilter('criado_em', currentFilter);
-            const filteredSales = allSales.filter(filterFn);
-            const filteredAll = allPedidos.filter(filterFn);
-            const totalRevenue = filteredSales.reduce((sum, s) => sum + (parseFloat(s.valor) || 0), 0);
-            const pendingOrders = filteredAll.filter(p => p.status === 'pendente');
-            const pendingTotal = pendingOrders.reduce((sum, p) => sum + (parseFloat(p.valor) || 0), 0);
-            const approvedCount = filteredSales.length;
-            const avgTicket = approvedCount > 0 ? totalRevenue / approvedCount : 0;
-
-            const elAvailable = document.getElementById('availableBalance');
-            if (elAvailable) elAvailable.innerText = formatMoney(totalRevenue);
-            
-            const elPending = document.getElementById('pendingBalance');
-            if (elPending) elPending.innerText = formatMoney(pendingTotal) + " MZN";
-            
-            const elApproved = document.getElementById('approvedSalesCount');
-            if (elApproved) elApproved.innerText = approvedCount;
-            
-            const elAvgTicket = document.getElementById('avgTicket');
-            if (elAvgTicket) elAvgTicket.innerHTML = formatMoney(avgTicket);
-
-            const checkoutTotal = filteredAll.length;
-            const pagamento = filteredSales.length;
-            const sucesso = filteredSales.filter(v => v.status === 'pago').length;
-            const pendenteCount = filteredAll.filter(v => v.status === 'pendente').length;
-            const falhou = filteredAll.filter(v => v.status === 'falhou').length;
-            const reembolso = filteredAll.filter(v => v.status === 'reembolsado').length;
-            const abandonado = filteredAll.filter(v => !['pago','sucesso','completed','pendente','falhou','reembolsado'].includes(v.status)).length;
-
-            const updateText = (id, val) => {
-                const el = document.getElementById(id);
-                if (el) el.innerText = val;
-            };
-
-            updateText('funnelCheckout', checkoutTotal);
-            updateText('funnelPagamento', pagamento);
-            updateText('funnelSucesso', sucesso);
-            updateText('funnelPendente', pendenteCount);
-            updateText('funnelFalhou', falhou);
-            updateText('funnelReembolso', reembolso);
-            updateText('funnelAbandonado', abandonado);
-
-            let mpesa=0, emola=0, cartao=0;
-            filteredSales.forEach(v => {
-                let m = (v.metodo_pagamento || '').toLowerCase();
-                if(m.includes('mpesa')) mpesa++;
-                else if(m.includes('emola')) emola++;
-                else if(m.includes('cartao') || m.includes('visa')) cartao++;
-            });
-            let total = filteredSales.length || 1;
-            
-            updateText('mpesaPercent', Math.round((mpesa/total)*100)+'%');
-            updateText('emolaPercent', Math.round((emola/total)*100)+'%');
-            updateText('cartaoPercent', Math.round((cartao/total)*100)+'%');
-        }
-
-        function renderSalesTable() {
-            const filterFn = getDateFilter('criado_em', currentSalesFilter);
-            const filtered = allPedidos.filter(filterFn).sort((a,b)=>new Date(b.criado_em)-new Date(a.criado_em));
-            const tbody = document.getElementById('salesTableBody');
-            if(!tbody) return;
-            if(!filtered.length){ tbody.innerHTML='<tr><td colspan="6" style="text-align:center;">Nenhuma venda</td></tr>'; return; }
-            tbody.innerHTML = filtered.map((s, idx) => {
-                let statusClass = s.status === 'pago' ? 'badge-active' : (s.status === 'falhou' ? 'badge-rejected' : 'badge-pending');
-                let statusText = s.status === 'pago' ? 'Pago' : (s.status === 'falhou' ? 'Falhou' : 'Pendente');
-                window[`lead_${idx}`] = s;
-                return `
-                    <tr>
-                        <td><strong>${s.produtos?.nome || 'Produto'}</strong></td>
-                        <td>${s.cliente_nome || s.cliente_email?.split('@')[0] || '-'}</td>
-                        <td>${formatMoney(s.valor||0)} MZN</td>
-                        <td><span class="badge ${statusClass}">${statusText}</span></td>
-                        <td><small>${new Date(s.criado_em).toLocaleDateString('pt-MZ')}</small></td>
-                        <td><button class="action-btn" onclick="window.viewLead(${idx})" title="Ver detalhes"><i class="fas fa-eye"></i></button></td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        window.viewLead = (idx) => {
-            const data = window[`lead_${idx}`];
-            if(!data) return;
-            const content = document.getElementById('leadDetailsContent');
-            if (!content) return;
-            content.innerHTML = `
-                <div class="detail-row"><span class="detail-label">Cliente</span><span class="detail-value">${data.cliente_nome || 'N/A'}</span></div>
-                <div class="detail-row"><span class="detail-label">E-mail</span><span class="detail-value">${data.cliente_email || 'N/A'}</span></div>
-                <div class="detail-row"><span class="detail-label">Telefone</span><span class="detail-value">${data.cliente_telefone || 'N/A'}</span></div>
-                <div class="detail-row"><span class="detail-label">Produto</span><span class="detail-value">${data.produtos?.nome || 'N/A'}</span></div>
-                <div class="detail-row"><span class="detail-label">Valor</span><span class="detail-value">${formatMoney(data.valor||0)} MZN</span></div>
-                <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value">${data.status}</span></div>
-                <div class="detail-row"><span class="detail-label">Método</span><span class="detail-value">${data.metodo_pagamento || 'N/A'}</span></div>
-                <div class="detail-row"><span class="detail-label">Data</span><span class="detail-value">${new Date(data.criado_em).toLocaleString('pt-MZ')}</span></div>
-            `;
-            const modal = document.getElementById('leadModal');
-            if (modal) modal.classList.add('active');
-        };
-
-        window.closeLeadModal = () => {
-            const modal = document.getElementById('leadModal');
-            if (modal) modal.classList.remove('active');
-        };
-
-        function renderProductsTable() {
-            const tbody = document.getElementById('productsTableBody');
-            if(!tbody) return;
-            if(!produtos.length){ tbody.innerHTML='<tr><td colspan="4" style="text-align:center;">Nenhum produto</td></tr>'; return; }
-            tbody.innerHTML = produtos.map(p => `
-                <tr>
-                    <td><div class="product-cell"><div class="product-img-small" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#7C3AED20,#A855F720);"><i class="fas fa-box" style="font-size:24px;color:#7C3AED;"></i></div><span>${p.nome}</span></div></td>
-                    <td>${formatMoney(p.preco)} MZN</td>
-                    <td><span class="badge badge-active">Ativo</span></td>
-                    <td>
-                        <button class="action-btn" onclick="window.copyCheckoutLink('${p.id}')" title="Copiar link do checkout"><i class="fas fa-copy"></i></button>
-                        <button class="action-btn" onclick="window.editProduct('${p.id}')" title="Editar produto"><i class="fas fa-edit"></i></button>
-                        <button class="action-btn" onclick="window.deleteProduct('${p.id}')" title="Eliminar produto"><i class="fas fa-trash"></i></button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function renderWithdrawalsTable() {
-            const tbody = document.getElementById('withdrawalsTableBody');
-            if(!tbody) return;
-            if(!allWithdrawals.length){ tbody.innerHTML='<tr><td colspan="4" style="text-align:center;">Nenhum saque</td></tr>'; return; }
-            tbody.innerHTML = allWithdrawals.map(w => `
-                <tr>
-                    <td>${formatMoney(w.valor_solicitado)} MZN</td>
-                    <td>${formatMoney(w.valor_liquido)} MZN</td>
-                    <td><span class="badge ${w.status==='aprovado'?'badge-active':'badge-pending'}">${w.status}</span></td>
-                    <td><small>${new Date(w.criado_em).toLocaleDateString()}</small></td>
-                </tr>
-            `).join('');
-        }
-
-        window.deleteProduct = async (id) => { 
-            if(confirm("Remover produto?")){ 
-                if (!supabase) return alert("Erro: Supabase offline");
-                await supabase.from('produtos').delete().eq('id',id); 
-                loadData(); 
-            } 
-        };
-        
-        window.editProduct = async (id) => { 
-            const p = produtos.find(pr=>pr.id===id); 
-            if(p){ 
-                editingProductId=id; 
-                document.getElementById('prodTitle').value=p.nome; 
-                document.getElementById('prodPrice').value=p.preco; 
-                document.getElementById('prodContentLink').value=p.link_produto; 
-                currentImageBase64=p.imagem; 
-                if(p.imagem) { 
-                    document.getElementById('imagePreviewContainer').style.display='block'; 
-                    document.getElementById('imagePreview').src=p.imagem; 
-                } 
-                document.getElementById('productModal').classList.add('active'); 
-            } 
-        };
-        
-        window.openProductModal = () => { 
-            editingProductId=null; 
-            document.getElementById('productForm').reset(); 
-            currentImageBase64=null; 
-            document.getElementById('imagePreviewContainer').style.display='none'; 
-            document.getElementById('productModal').classList.add('active'); 
-        };
-        
-        window.closeProductModal = () => {
-            const modal = document.getElementById('productModal');
-            if (modal) modal.classList.remove('active');
-        };
-        
-        window.openWithdrawalModal = () => {
-            const modal = document.getElementById('withdrawalModal');
-            if (modal) modal.classList.add('active');
-        };
-        
-        window.closeWithdrawalModal = () => {
-            const modal = document.getElementById('withdrawalModal');
-            if (modal) modal.classList.remove('active');
-        };
-
-        function setupForms() {
-            const pForm = document.getElementById('productForm');
-            if (pForm) {
-                pForm.addEventListener('submit', async(e)=>{
-                    e.preventDefault();
-                    if (!supabase || !currentUser) return alert("Erro de autenticação ou Supabase offline.");
-                    const selected = Array.from(document.querySelectorAll('input[name="pay_method"]:checked')).map(c=>c.value);
-                    const data = { nome:document.getElementById('prodTitle').value, preco:parseFloat(document.getElementById('prodPrice').value), link_produto:document.getElementById('prodContentLink').value, imagem:currentImageBase64, metodos_pagamento:selected, vendedor_id:currentUser.id, status:'active' };
-                    try {
-                        if(editingProductId) await supabase.from('produtos').update(data).eq('id', editingProductId);
-                        else await supabase.from('produtos').insert([data]);
-                        closeProductModal(); 
-                        loadData();
-                    } catch (err) {
-                        alert("Erro ao salvar produto: " + err.message);
-                    }
-                });
-            }
-
-            const wForm = document.getElementById('withdrawalForm');
-            if (wForm) {
-                wForm.addEventListener('submit', async(e)=>{
-                    e.preventDefault();
-                    if (!supabase || !currentUser) return alert("Erro de autenticação ou Supabase offline.");
-                    let valor = parseFloat(document.getElementById('withdrawalAmount').value);
-                    let metodo = document.querySelector('input[name="withdrawalMethod"]:checked').value;
-                    let telefone = document.getElementById('withdrawalPhone').value;
-                    if(valor<500 || valor>10000) return alert("Valor mínimo 500 MZN, máximo 10.000 MZN");
-                    const liquid = netAmountCalc(valor);
-                    try {
-                        await supabase.from('saques').insert({ vendedor_id:currentUser.id, valor_solicitado:valor, valor_liquido:liquid, metodo, dados_carteira:`${metodo}:${telefone}`, status:'pendente' });
-                        alert("✅ Saque solicitado com sucesso! Aguarde aprovação.");
-                        closeWithdrawalModal(); 
-                        loadData();
-                    } catch (err) {
-                        alert("Erro ao solicitar saque: " + err.message);
-                    }
-                });
-            }
-
-            const imgFile = document.getElementById('productImageFile');
-            if (imgFile) {
-                imgFile.addEventListener('change', (e) => { 
-                    const file=e.target.files[0]; 
-                    if(file){ 
-                        const reader=new FileReader(); 
-                        reader.onload=(ev)=>{ 
-                            currentImageBase64=ev.target.result; 
-                            const preview = document.getElementById('imagePreview');
-                            const container = document.getElementById('imagePreviewContainer');
-                            if (preview) preview.src=currentImageBase64; 
-                            if (container) container.style.display='block'; 
-                        }; 
-                        reader.readAsDataURL(file); 
-                    } 
-                });
-            }
-
-            const wAmount = document.getElementById('withdrawalAmount');
-            if (wAmount) {
-                wAmount.addEventListener('input', function(){ 
-                    let v=parseFloat(this.value)||0; 
-                    const netSpan = document.getElementById('netAmount');
-                    if (netSpan) netSpan.innerText=formatMoney(netAmountCalc(v)); 
-                });
-            }
-        }
-
-        function setupFilters() {
-            const dashboardBtn = document.getElementById('dashboardFilterBtn');
-            const dashboardDropdown = document.getElementById('dashboardFilterDropdown');
-            if(dashboardBtn && dashboardDropdown) {
-                dashboardBtn.addEventListener('click', (e) => { e.stopPropagation(); dashboardDropdown.classList.toggle('show'); });
-                document.querySelectorAll('#dashboardFilterDropdown .filter-option').forEach(opt => {
-                    opt.addEventListener('click', () => {
-                        currentFilter = opt.dataset.filter;
-                        const labels = { today:'Hoje', '7days':'7 dias', '30days':'30 dias', all:'Sempre' };
-                        const labelEl = document.getElementById('dashboardFilterLabel');
-                        if (labelEl) labelEl.innerText = labels[currentFilter];
-                        dashboardDropdown.classList.remove('show');
-                        renderDashboard();
-                    });
-                });
-            }
-            const salesBtn = document.getElementById('salesFilterBtn');
-            const salesDropdown = document.getElementById('salesFilterDropdown');
-            if(salesBtn && salesDropdown) {
-                salesBtn.addEventListener('click', (e) => { e.stopPropagation(); salesDropdown.classList.toggle('show'); });
-                document.querySelectorAll('#salesFilterDropdown .filter-option').forEach(opt => {
-                    opt.addEventListener('click', () => {
-                        currentSalesFilter = opt.dataset.filter;
-                        const labels = { today:'Hoje', '7days':'7 dias', '30days':'30 dias', all:'Sempre' };
-                        const labelEl = document.getElementById('salesFilterLabel');
-                        if (labelEl) labelEl.innerText = labels[currentSalesFilter];
-                        salesDropdown.classList.remove('show');
-                        renderSalesTable();
-                    });
-                });
-            }
-            document.addEventListener('click', () => { 
-                if (dashboardDropdown) dashboardDropdown.classList.remove('show'); 
-                if (salesDropdown) salesDropdown.classList.remove('show'); 
-            });
-        }
-
-        function setupNavigation() {
-            document.querySelectorAll('.menu-item').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const section = btn.dataset.nav;
-                    currentSection = section;
-                    
-                    const setDisplay = (id, show) => {
-                        const el = document.getElementById(id);
-                        if (el) el.style.display = show ? 'block' : 'none';
-                    };
-                    
-                    setDisplay('dashboardSection', section === 'dashboard');
-                    setDisplay('allSalesSection', section === 'allSales');
-                    setDisplay('productSection', section === 'products');
-                    setDisplay('withdrawalsSection', section === 'withdrawals');
-                    
-                    document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
-                    btn.classList.add('active');
-                    if(section === 'allSales') renderSalesTable();
-                    if(section === 'withdrawals') renderWithdrawalsTable();
-                });
-            });
-        }
-
-        init();
-    })();
-</script>
-</body>
-</html>();
-                });
-            });
-        }
-
-        init();
-    })();
-</script>       });
-            });
-        }
-
-        init();
-    })();
-</script>
-</body>
-    </html>
-<!DOCTYPE html>
-<html lang="pt-mz">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>ZentroPay — Gestão de Infoproduto Moçambique</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-        body {
-            background: #F5F7FB;
-            font-family: 'Inter', sans-serif;
-            color: #1E293B;
-            padding-bottom: 90px;
-            min-height: 100vh;
-        }
-        .app-container {
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 20px 16px 100px 16px;
-            position: relative;
-        }
-        /* HEADER */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 28px;
-            padding: 8px 0;
-        }
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .logo-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            background: linear-gradient(135deg, #7C3AED, #A855F7);
             flex-shrink: 0;
         }
+
         .logo-icon img {
             width: 100%;
             height: 100%;
             object-fit: contain;
         }
+
         .logo-icon .logo-fallback {
             font-size: 22px;
             color: white;
             display: none;
         }
+
         .logo-text {
             font-weight: 800;
             font-size: 22px;
@@ -1428,6 +78,7 @@
             color: transparent;
             letter-spacing: -0.5px;
         }
+
         .header-greeting {
             background: white;
             padding: 8px 16px;
@@ -1438,10 +89,12 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
             border: 1px solid #E2E8F0;
         }
+
         .header-greeting i {
             color: #7C3AED;
             margin-right: 6px;
         }
+
         /* WELCOME BANNER */
         .welcome-banner {
             background: linear-gradient(135deg, #7C3AED, #A855F7);
@@ -1451,11 +104,13 @@
             color: white;
             box-shadow: 0 8px 20px rgba(124, 58, 237, 0.25);
         }
+
         .welcome-banner h2 {
             font-size: 20px;
             font-weight: 800;
             margin-bottom: 6px;
         }
+
         .welcome-banner p {
             font-size: 13px;
             opacity: 0.9;
@@ -1464,6 +119,7 @@
             gap: 8px;
             flex-wrap: wrap;
         }
+
         .welcome-banner .date-badge {
             background: rgba(255,255,255,0.2);
             padding: 4px 12px;
@@ -1471,6 +127,7 @@
             font-size: 11px;
             font-weight: 600;
         }
+
         /* FILTER DROPDOWN */
         .filter-section {
             display: flex;
@@ -1529,6 +186,7 @@
             color: #7C3AED;
             font-weight: 600;
         }
+
         /* CARDS */
         .balance-card {
             background: white;
@@ -1538,6 +196,7 @@
             box-shadow: 0 8px 24px rgba(0,0,0,0.05);
             border: 1px solid #E9EEF3;
         }
+
         .balance-label {
             font-size: 14px;
             color: #64748B;
@@ -1547,6 +206,7 @@
             gap: 8px;
             font-weight: 500;
         }
+
         .balance-amount {
             font-size: 52px;
             font-weight: 800;
@@ -1554,11 +214,13 @@
             margin-bottom: 16px;
             color: #0F172A;
         }
+
         .balance-amount small {
             font-size: 18px;
             font-weight: 500;
             color: #94A3B8;
         }
+
         .pending-row {
             display: flex;
             justify-content: space-between;
@@ -1567,22 +229,26 @@
             border-top: 1px solid #E9EEF3;
             font-size: 14px;
         }
+
         .pending-label {
             color: #64748B;
             display: flex;
             align-items: center;
             gap: 6px;
         }
+
         .pending-value {
             font-weight: 700;
             color: #F59E0B;
         }
+
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 14px;
             margin-bottom: 24px;
         }
+
         .stat-card-kv {
             background: white;
             border-radius: 24px;
@@ -1590,6 +256,7 @@
             border: 1px solid #E9EEF3;
             box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
+
         .stat-card-kv .stat-title {
             font-size: 12px;
             color: #64748B;
@@ -1599,17 +266,20 @@
             gap: 6px;
             font-weight: 600;
         }
+
         .stat-card-kv .stat-number {
             font-size: 32px;
             font-weight: 800;
             letter-spacing: -0.5px;
             color: #0F172A;
         }
+
         .stat-card-kv .stat-sub {
             font-size: 11px;
             color: #94A3B8;
             margin-top: 8px;
         }
+
         /* FUNIL */
         .funnel-wrapper {
             background: white;
@@ -1618,6 +288,7 @@
             margin-bottom: 24px;
             border: 1px solid #E9EEF3;
         }
+
         .funnel-title {
             font-size: 16px;
             font-weight: 700;
@@ -1627,18 +298,21 @@
             gap: 8px;
             color: #1E293B;
         }
+
         .funnel-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 12px;
             margin-bottom: 16px;
         }
+
         .funnel-step {
             text-align: center;
             background: #F8FAFE;
             padding: 14px 8px;
             border-radius: 20px;
         }
+
         .funnel-step span {
             font-size: 11px;
             color: #64748B;
@@ -1646,16 +320,19 @@
             margin-bottom: 8px;
             font-weight: 500;
         }
+
         .funnel-step strong {
             font-size: 22px;
             font-weight: 800;
             color: #0F172A;
         }
+
         .funnel-secondary {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 12px;
         }
+
         /* MÉTODOS */
         .methods-card {
             background: white;
@@ -1664,16 +341,19 @@
             margin-bottom: 24px;
             border: 1px solid #E9EEF3;
         }
+
         .methods-icons {
             display: flex;
             gap: 20px;
             margin-top: 16px;
             justify-content: space-around;
         }
+
         .method-item {
             text-align: center;
             flex: 1;
         }
+
         .method-icon {
             width: 60px;
             height: 60px;
@@ -1687,25 +367,30 @@
             overflow: hidden;
             padding: 6px;
         }
+
         .method-icon img {
             width: 100%;
             height: 100%;
             object-fit: contain;
         }
+
         .method-icon i {
             font-size: 28px;
             color: #7C3AED;
         }
+
         .method-name {
             font-size: 12px;
             color: #64748B;
             font-weight: 500;
         }
+
         .method-percent {
             font-weight: 800;
             font-size: 15px;
             color: #1E293B;
         }
+
         /* BOTTOM MENU */
         .bottom-menu {
             position: fixed;
@@ -1725,6 +410,7 @@
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
             border: 1px solid rgba(124, 58, 237, 0.15);
         }
+
         .menu-item {
             display: flex;
             flex-direction: column;
@@ -1741,14 +427,17 @@
             padding: 6px 12px;
             border-radius: 40px;
         }
+
         .menu-item i {
             font-size: 22px;
             margin-bottom: 2px;
         }
+
         .menu-item.active {
             color: #7C3AED;
             background: rgba(124, 58, 237, 0.08);
         }
+
         /* TABELAS */
         .data-card {
             background: white;
@@ -1757,6 +446,7 @@
             margin-top: 16px;
             border: 1px solid #E9EEF3;
         }
+
         .section-header {
             display: flex;
             justify-content: space-between;
@@ -1765,11 +455,13 @@
             flex-wrap: wrap;
             gap: 12px;
         }
+
         .section-header h2 {
             font-size: 22px;
             font-weight: 800;
             color: #0F172A;
         }
+
         .btn-small {
             background: #7C3AED;
             border: none;
@@ -1785,13 +477,16 @@
             box-shadow: 0 4px 10px rgba(124, 58, 237, 0.2);
             font-family: 'Inter', sans-serif;
         }
+
         .table-responsive {
             overflow-x: auto;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
         }
+
         th {
             text-align: left;
             padding: 14px 8px;
@@ -1800,12 +495,14 @@
             font-weight: 600;
             text-transform: uppercase;
         }
+
         td {
             padding: 14px 8px;
             font-size: 13px;
             border-top: 1px solid #F1F5F9;
             color: #334155;
         }
+
         .badge {
             padding: 4px 12px;
             border-radius: 40px;
@@ -1813,9 +510,11 @@
             font-weight: 700;
             display: inline-block;
         }
+
         .badge-active { background: rgba(34,197,94,0.12); color: #059669; }
         .badge-pending { background: rgba(245,158,11,0.12); color: #D97706; }
         .badge-rejected { background: rgba(239,68,68,0.12); color: #DC2626; }
+
         .action-btn {
             background: transparent;
             border: none;
@@ -1826,6 +525,7 @@
             transition: color 0.2s;
         }
         .action-btn:hover { color: #7C3AED; }
+
         .product-img-small {
             width: 42px;
             height: 52px;
@@ -1838,6 +538,7 @@
             align-items: center;
             gap: 12px;
         }
+
         /* MODAIS */
         .modal {
             position: fixed;
@@ -2024,6 +725,7 @@
             cursor: not-allowed;
             transform: none;
         }
+
         .toast {
             position: fixed;
             bottom: 100px;
@@ -2064,11 +766,13 @@
             <i class="fas fa-user"></i> Carregando...
         </div>
     </div>
+
     <!-- WELCOME BANNER -->
     <div class="welcome-banner">
         <h2>Olá! Parceiro</h2>
         <p>Boas vendas <span class="date-badge" id="todayDate"></span></p>
     </div>
+
     <!-- DASHBOARD -->
     <div id="dashboardSection">
         <div class="filter-section">
@@ -2086,6 +790,7 @@
                 </div>
             </div>
         </div>
+
         <div class="balance-card">
             <div class="balance-label"><i class="fas fa-wallet"></i> Saldo disponível</div>
             <div class="balance-amount"><span id="availableBalance">0,00</span><small> MZN</small></div>
@@ -2094,6 +799,7 @@
                 <span class="pending-value" id="pendingBalance">0,00 MZN</span>
             </div>
         </div>
+
         <div class="stats-grid">
             <div class="stat-card-kv">
                 <div class="stat-title"><i class="fas fa-chart-simple"></i> Vendas aprovadas</div>
@@ -2106,6 +812,7 @@
                 <div class="stat-sub">MZN por venda</div>
             </div>
         </div>
+
         <div class="funnel-wrapper">
             <div class="funnel-title"><i class="fas fa-filter"></i> Funil de vendas</div>
             <div class="funnel-grid">
@@ -2120,6 +827,7 @@
                 <div class="funnel-step"><span>Abandonado</span><strong id="funnelAbandonado">0</strong></div>
             </div>
         </div>
+
         <div class="methods-card">
             <div class="funnel-title"><i class="fas fa-credit-card"></i> Métodos de pagamento</div>
             <div class="methods-icons">
@@ -2158,6 +866,7 @@
             </div>
         </div>
     </div>
+
     <!-- VENDAS SECTION -->
     <div id="allSalesSection" style="display: none;">
         <div class="section-header">
@@ -2196,6 +905,7 @@
             </div>
         </div>
     </div>
+
     <!-- PRODUTOS SECTION -->
     <div id="productSection" style="display: none;">
         <div class="section-header">
@@ -2220,6 +930,7 @@
             </div>
         </div>
     </div>
+
     <!-- SAQUES SECTION -->
     <div id="withdrawalsSection" style="display: none;">
         <div class="section-header">
@@ -2245,6 +956,7 @@
         </div>
     </div>
 </div>
+
 <!-- BOTTOM MENU -->
 <div class="bottom-menu">
     <button class="menu-item active" data-nav="dashboard" id="navDashboard">
@@ -2260,8 +972,10 @@
         <i class="fas fa-hand-holding-usd"></i><span>Saques</span>
     </button>
 </div>
+
 <!-- TOAST -->
 <div class="toast" id="toastMsg"></div>
+
 <!-- MODAL PRODUTO -->
 <div id="productModal" class="modal">
     <div class="modal-content">
@@ -2271,7 +985,7 @@
             <h3 id="productModalTitle">Novo Produto</h3>
             <p>Adicione um infoproduto à sua loja</p>
         </div>
-        <form id="productForm">
+        <form id="productForm" novalidate>
             <div class="form-group">
                 <label>Capa do produto</label>
                 <div class="upload-area" id="uploadArea">
@@ -2285,15 +999,15 @@
             </div>
             <div class="form-group">
                 <label>Título</label>
-                <input type="text" id="prodTitle" required placeholder="Ex: Curso de Marketing Digital">
+                <input type="text" id="prodTitle" name="prodTitle" required placeholder="Ex: Curso de Marketing Digital">
             </div>
             <div class="form-group">
                 <label>Preço (MZN)</label>
-                <input type="number" id="prodPrice" required placeholder="1250.00" min="0" step="0.01">
+                <input type="number" id="prodPrice" name="prodPrice" required placeholder="1250.00" min="0" step="0.01">
             </div>
             <div class="form-group">
                 <label>Link de acesso</label>
-                <input type="url" id="prodContentLink" required placeholder="https://seusite.com/acesso">
+                <input type="url" id="prodContentLink" name="prodContentLink" required placeholder="https://seusite.com/acesso">
             </div>
             <div class="form-group">
                 <label>Métodos de pagamento</label>
@@ -2313,6 +1027,7 @@
         </form>
     </div>
 </div>
+
 <!-- MODAL SAQUE -->
 <div id="withdrawalModal" class="modal">
     <div class="modal-content">
@@ -2322,10 +1037,10 @@
             <h3>Solicitar Saque</h3>
             <p>Retire seus ganhos da plataforma</p>
         </div>
-        <form id="withdrawalForm">
+        <form id="withdrawalForm" novalidate>
             <div class="form-group">
                 <label>Valor (MZN)</label>
-                <input type="number" id="withdrawalAmount" min="500" max="10000" placeholder="500 - 10.000" required>
+                <input type="number" id="withdrawalAmount" name="withdrawalAmount" min="500" max="10000" placeholder="500 - 10.000" required>
             </div>
             <div class="tax-info">
                 💰 Taxa da plataforma: -10% → <strong><span id="netAmount">0,00</span> MZN</strong> (valor líquido)
@@ -2339,12 +1054,13 @@
             </div>
             <div class="form-group">
                 <label>Número celular</label>
-                <input type="tel" id="withdrawalPhone" placeholder="84 000 0000" required>
+                <input type="tel" id="withdrawalPhone" name="withdrawalPhone" placeholder="84 000 0000" required>
             </div>
             <button type="submit" class="btn-primary-modal" id="withdrawalSubmitBtn">Solicitar Saque</button>
         </form>
     </div>
 </div>
+
 <!-- MODAL DETALHES DO LEAD -->
 <div id="leadModal" class="modal">
     <div class="modal-content">
@@ -2357,14 +1073,17 @@
         <div id="leadDetailsContent" class="lead-details"></div>
     </div>
 </div>
+
 <script>
 (function () {
     'use strict';
+
     /* ============================================================
        CONFIGURAÇÃO SUPABASE
     ============================================================ */
     const SUPABASE_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
+
     let sb = null;
     try {
         if (window.supabase && typeof window.supabase.createClient === 'function') {
@@ -2373,6 +1092,7 @@
     } catch (e) {
         console.error("Supabase init error:", e);
     }
+
     /* ============================================================
        STATE
     ============================================================ */
@@ -2383,17 +1103,20 @@
     let currentSection = 'dashboard';
     let editingProductId = null;
     let currentImageBase64 = null;
+
     /* ============================================================
        UTILS
     ============================================================ */
     const $ = (id) => document.getElementById(id);
     const setText = (id, val) => { const el = $(id); if (el) el.textContent = val; };
     const setHTML = (id, val) => { const el = $(id); if (el) el.innerHTML = val; };
+
     const formatMoney = (val) => {
         const num = parseFloat(val) || 0;
         return num.toLocaleString('pt-MZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     };
     const netAmountCalc = (gross) => (parseFloat(gross) || 0) * 0.9;
+
     function showToast(msg, type = '') {
         const t = $('toastMsg');
         if (!t) return;
@@ -2401,6 +1124,7 @@
         t.className = 'toast show' + (type ? ' ' + type : '');
         setTimeout(() => { t.className = 'toast'; }, 3500);
     }
+
     /* ============================================================
        CHECKOUT LINK
     ============================================================ */
@@ -2414,6 +1138,7 @@
             prompt("Copie o link manualmente:", checkoutUrl);
         }
     };
+
     /* ============================================================
        DATE
     ============================================================ */
@@ -2425,6 +1150,7 @@
             });
         }
     })();
+
     /* ============================================================
        DATE FILTER HELPER
     ============================================================ */
@@ -2443,6 +1169,7 @@
             return true;
         };
     }
+
     /* ============================================================
        INIT
     ============================================================ */
@@ -2450,6 +1177,7 @@
         setupNavigation();
         setupFilters();
         setupForms();
+
         if (!sb) {
             setHTML('greetingMessage', '<i class="fas fa-exclamation-triangle"></i> Erro Supabase');
             // Still allow UI to work for demos
@@ -2459,6 +1187,7 @@
             renderDashboard();
             return;
         }
+
         try {
             const { data: { session }, error: sErr } = await sb.auth.getSession();
             if (sErr) throw sErr;
@@ -2467,19 +1196,23 @@
                 return;
             }
             currentUser = session.user;
+
             const { data: profile } = await sb.from('usuarios').select('status').eq('id', currentUser.id).maybeSingle();
             if (profile?.status === 'banned') {
                 document.body.innerHTML = '<div style="text-align:center;padding:40px;color:#ef4444;font-weight:800;">Conta suspensa</div>';
                 return;
             }
+
             const nome = currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || 'Usuário';
             setHTML('greetingMessage', `<i class="fas fa-user"></i> Olá, ${nome}`);
+
             await loadData();
         } catch (err) {
             console.error('Init error:', err);
             setHTML('greetingMessage', '<i class="fas fa-exclamation-triangle"></i> Erro de Conexão');
         }
     }
+
     /* ============================================================
        LOAD DATA
     ============================================================ */
@@ -2491,19 +1224,25 @@
                 .from('pedidos')
                 .select('*, produtos(nome, vendedor_id)')
                 .eq('produtos.vendedor_id', currentUser.id);
+
             if (pErr) console.warn("Pedidos:", pErr.message);
+
             // Fetch products for this vendor
             const { data: prods, error: prErr } = await sb
                 .from('produtos')
                 .select('id, nome, preco, link_produto, imagem, metodos_pagamento, status')
                 .eq('vendedor_id', currentUser.id);
+
             if (prErr) console.warn("Produtos:", prErr.message);
+
             // Fetch withdrawals
             const { data: saques, error: sErr } = await sb
                 .from('saques')
                 .select('*')
                 .eq('vendedor_id', currentUser.id);
+
             if (sErr) console.warn("Saques:", sErr.message);
+
             allPedidos = (pedidos || []).filter(p => {
                 // Only include orders where the product belongs to this vendor
                 return p.produtos && p.produtos.vendedor_id === currentUser.id;
@@ -2511,6 +1250,7 @@
             allSales = allPedidos.filter(p => ['pago', 'sucesso', 'completed'].includes(p.status));
             produtos = prods || [];
             allWithdrawals = saques || [];
+
             renderDashboard();
             renderProductsTable();
             renderWithdrawalsTable();
@@ -2519,6 +1259,7 @@
             console.error("loadData error:", err);
         }
     }
+
     /* ============================================================
        RENDER DASHBOARD
     ============================================================ */
@@ -2526,15 +1267,18 @@
         const filterFn = getDateFilter('criado_em', currentFilter);
         const filteredSales = allSales.filter(filterFn);
         const filteredAll = allPedidos.filter(filterFn);
+
         const totalRevenue = filteredSales.reduce((s, v) => s + (parseFloat(v.valor) || 0), 0);
         const pendingOrders = filteredAll.filter(p => p.status === 'pendente');
         const pendingTotal = pendingOrders.reduce((s, p) => s + (parseFloat(p.valor) || 0), 0);
         const approvedCount = filteredSales.length;
         const avgTicket = approvedCount > 0 ? totalRevenue / approvedCount : 0;
+
         setText('availableBalance', formatMoney(totalRevenue));
         setText('pendingBalance', formatMoney(pendingTotal) + ' MZN');
         setText('approvedSalesCount', approvedCount);
         setText('avgTicket', formatMoney(avgTicket));
+
         setText('funnelCheckout', filteredAll.length);
         setText('funnelPagamento', filteredSales.length);
         setText('funnelSucesso', filteredSales.filter(v => v.status === 'pago').length);
@@ -2544,6 +1288,7 @@
         setText('funnelAbandonado', filteredAll.filter(v =>
             !['pago', 'sucesso', 'completed', 'pendente', 'falhou', 'reembolsado'].includes(v.status)
         ).length);
+
         let mpesa = 0, emola = 0, cartao = 0;
         filteredSales.forEach(v => {
             const m = (v.metodo_pagamento || '').toLowerCase();
@@ -2556,6 +1301,7 @@
         setText('emolaPercent', Math.round((emola / total) * 100) + '%');
         setText('cartaoPercent', Math.round((cartao / total) * 100) + '%');
     }
+
     /* ============================================================
        RENDER SALES TABLE
     ============================================================ */
@@ -2586,6 +1332,7 @@
                 </tr>`;
         }).join('');
     }
+
     window.viewLead = function (idx) {
         const data = window[`_lead_${idx}`];
         if (!data) return;
@@ -2601,6 +1348,7 @@
         `);
         openModal('leadModal');
     };
+
     /* ============================================================
        RENDER PRODUCTS TABLE
     ============================================================ */
@@ -2630,6 +1378,7 @@
                 </td>
             </tr>`).join('');
     }
+
     /* ============================================================
        RENDER WITHDRAWALS TABLE
     ============================================================ */
@@ -2648,6 +1397,7 @@
                 <td><small>${new Date(w.criado_em).toLocaleDateString('pt-MZ')}</small></td>
             </tr>`).join('');
     }
+
     /* ============================================================
        PRODUCT CRUD
     ============================================================ */
@@ -2659,6 +1409,7 @@
         showToast('✅ Produto removido!', 'success');
         await loadData();
     };
+
     window.editProduct = async function (id) {
         const p = produtos.find(pr => pr.id === id);
         if (!p) return;
@@ -2682,6 +1433,7 @@
         $('productModalTitle').textContent = 'Editar Produto';
         openModal('productModal');
     };
+
     window.openProductModal = function () {
         editingProductId = null;
         $('productForm').reset();
@@ -2690,9 +1442,11 @@
         $('productModalTitle').textContent = 'Novo Produto';
         openModal('productModal');
     };
+
     window.closeProductModal = function () { closeModal('productModal'); };
     window.closeWithdrawalModal = function () { closeModal('withdrawalModal'); };
     window.closeLeadModal = function () { closeModal('leadModal'); };
+
     /* ============================================================
        MODALS HELPERS
     ============================================================ */
@@ -2704,6 +1458,7 @@
         const m = $(id);
         if (m) m.classList.remove('active');
     }
+
     /* ============================================================
        FORMS
     ============================================================ */
@@ -2714,17 +1469,21 @@
             pForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 if (!sb || !currentUser) return showToast('❌ Erro de autenticação', 'error');
+
                 const btn = $('productSubmitBtn');
                 if (btn) { btn.disabled = true; btn.textContent = 'A salvar...'; }
+
                 const selected = Array.from(document.querySelectorAll('input[name="pay_method"]:checked')).map(c => c.value);
                 const nome = $('prodTitle').value.trim();
                 const preco = parseFloat($('prodPrice').value);
                 const link_produto = $('prodContentLink').value.trim();
+
                 if (!nome || isNaN(preco) || !link_produto) {
                     showToast('❌ Preencha todos os campos obrigatórios', 'error');
                     if (btn) { btn.disabled = false; btn.textContent = 'Salvar Produto'; }
                     return;
                 }
+
                 const payload = {
                     nome,
                     preco,
@@ -2737,6 +1496,7 @@
                 if (currentImageBase64) {
                     payload.imagem = currentImageBase64;
                 }
+
                 try {
                     let error;
                     if (editingProductId) {
@@ -2758,21 +1518,26 @@
                 }
             });
         }
+
         // --- WITHDRAWAL FORM ---
         const wForm = $('withdrawalForm');
         if (wForm) {
             wForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 if (!sb || !currentUser) return showToast('❌ Erro de autenticação', 'error');
+
                 const btn = $('withdrawalSubmitBtn');
                 const valor = parseFloat($('withdrawalAmount').value);
                 const metodo = document.querySelector('input[name="withdrawalMethod"]:checked')?.value;
                 const telefone = $('withdrawalPhone').value.trim();
+
                 if (isNaN(valor) || valor < 500 || valor > 10000) {
                     return showToast('❌ Valor mínimo 500 MZN, máximo 10.000 MZN', 'error');
                 }
                 if (!telefone) return showToast('❌ Insira o número de celular', 'error');
+
                 if (btn) { btn.disabled = true; btn.textContent = 'A processar...'; }
+
                 try {
                     const liquid = netAmountCalc(valor);
                     const { error } = await sb.from('saques').insert({
@@ -2795,6 +1560,7 @@
                 }
             });
         }
+
         // --- IMAGE UPLOAD ---
         const uploadArea = $('uploadArea');
         const imgFile = $('productImageFile');
@@ -2818,6 +1584,7 @@
                 reader.readAsDataURL(file);
             });
         }
+
         // --- WITHDRAWAL AMOUNT PREVIEW ---
         const wAmount = $('withdrawalAmount');
         if (wAmount) {
@@ -2826,17 +1593,23 @@
                 setText('netAmount', formatMoney(netAmountCalc(v)));
             });
         }
+
         // --- MODAL BUTTONS ---
         const btnOpenProduct = $('btnOpenProductModal');
         if (btnOpenProduct) btnOpenProduct.addEventListener('click', () => window.openProductModal());
+
         const btnOpenWithdrawal = $('btnOpenWithdrawalModal');
         if (btnOpenWithdrawal) btnOpenWithdrawal.addEventListener('click', () => openModal('withdrawalModal'));
+
         const btnCloseProduct = $('btnCloseProductModal');
         if (btnCloseProduct) btnCloseProduct.addEventListener('click', () => closeModal('productModal'));
+
         const btnCloseWithdrawal = $('btnCloseWithdrawalModal');
         if (btnCloseWithdrawal) btnCloseWithdrawal.addEventListener('click', () => closeModal('withdrawalModal'));
+
         const btnCloseLead = $('btnCloseLeadModal');
         if (btnCloseLead) btnCloseLead.addEventListener('click', () => closeModal('leadModal'));
+
         // Close modals on backdrop click
         document.querySelectorAll('.modal').forEach(modal => {
             modal.addEventListener('click', (e) => {
@@ -2844,11 +1617,13 @@
             });
         });
     }
+
     /* ============================================================
        FILTERS
     ============================================================ */
     function setupFilters() {
         const filterLabels = { today: 'Hoje', '7days': '7 dias', '30days': '30 dias', all: 'Sempre' };
+
         function initDropdown(btnId, dropId, labelId, onSelect) {
             const btn = $(btnId);
             const drop = $(dropId);
@@ -2869,18 +1644,22 @@
                 });
             });
         }
+
         initDropdown('dashboardFilterBtn', 'dashboardFilterDropdown', 'dashboardFilterLabel', (val) => {
             currentFilter = val;
             renderDashboard();
         });
+
         initDropdown('salesFilterBtn', 'salesFilterDropdown', 'salesFilterLabel', (val) => {
             currentSalesFilter = val;
             renderSalesTable();
         });
+
         document.addEventListener('click', () => {
             document.querySelectorAll('.filter-dropdown').forEach(d => d.classList.remove('show'));
         });
     }
+
     /* ============================================================
        NAVIGATION
     ============================================================ */
@@ -2891,27 +1670,33 @@
             products: 'productSection',
             withdrawals: 'withdrawalsSection'
         };
+
         document.querySelectorAll('.menu-item[data-nav]').forEach(btn => {
             btn.addEventListener('click', () => {
                 const section = btn.dataset.nav;
                 currentSection = section;
+
                 // Show/hide sections
                 Object.entries(sections).forEach(([key, id]) => {
                     const el = $(id);
                     if (el) el.style.display = key === section ? 'block' : 'none';
                 });
+
                 // Update active nav button
                 document.querySelectorAll('.menu-item[data-nav]').forEach(m => m.classList.remove('active'));
                 btn.classList.add('active');
+
                 // Re-render on switch
                 if (section === 'allSales') renderSalesTable();
                 if (section === 'withdrawals') renderWithdrawalsTable();
                 if (section === 'products') renderProductsTable();
+
                 // Scroll to top
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
         });
     }
+
     /* ============================================================
        HTML ESCAPE
     ============================================================ */
@@ -2923,6 +1708,7 @@
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;');
     }
+
     /* ============================================================
        START
     ============================================================ */
