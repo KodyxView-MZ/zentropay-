@@ -1129,7 +1129,7 @@
        CHECKOUT LINK
     ============================================================ */
     window.copyCheckoutLink = function (productId) {
-        const checkoutUrl = `https://zentropay.digital/checkoutip.html?id=${productId}`;
+        const checkoutUrl = `https://pay.zentropay.digital/checkoutip.html?id=${productId}`;
         if (navigator.clipboard) {
             navigator.clipboard.writeText(checkoutUrl)
                 .then(() => showToast('✅ Link copiado!', 'success'))
