@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-mz">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,21 +15,18 @@
             --text: #1f2937;
             --border: #e5e7eb;
         }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Inter', sans-serif;
         }
-
         body {
             background: var(--bg);
             color: var(--text);
             padding-top: 45px;
             padding-bottom: 40px;
         }
-
         .top-timer {
             background: #d90429;
             color: white;
@@ -48,13 +44,11 @@
             z-index: 1000;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-
         .container {
             max-width: 480px;
             margin: 0 auto;
             padding: 15px;
         }
-
         .checkout-header {
             display: flex;
             align-items: center;
@@ -63,13 +57,11 @@
             padding: 10px 5px;
             margin-bottom: 15px;
         }
-
         .brand-logo {
             height: 40px;
             width: auto;
             object-fit: contain;
         }
-
         .brand-name {
             font-weight: 800;
             font-size: 24px;
@@ -81,11 +73,9 @@
             color: transparent;
             animation: shine 3s linear infinite;
         }
-
         @keyframes shine {
             to { background-position: 200% center; }
         }
-
         .product-card {
             background: white;
             border-radius: 20px;
@@ -94,14 +84,12 @@
             margin-bottom: 20px;
             border: 1px solid #f0f0f0;
         }
-
         .prod-header {
             display: flex;
             gap: 15px;
             align-items: flex-start;
             margin-bottom: 15px;
         }
-
         .prod-img {
             width: 90px;
             height: 90px;
@@ -109,9 +97,7 @@
             object-fit: cover;
             background: #eee;
         }
-
         .prod-info { flex: 1; }
-
         .prod-info h2 {
             font-size: 16px;
             font-weight: 700;
@@ -119,13 +105,11 @@
             margin-bottom: 5px;
             text-transform: uppercase;
         }
-
         .prod-price {
             color: var(--primary);
             font-weight: 800;
             font-size: 20px;
         }
-
         .summary-row {
             display: flex;
             justify-content: space-between;
@@ -133,7 +117,6 @@
             margin-top: 12px;
             color: #6b7280;
         }
-
         .total-row {
             display: flex;
             justify-content: space-between;
@@ -144,7 +127,6 @@
             border-top: 1px solid #f3f4f6;
             color: var(--primary);
         }
-
         .delivery-notice {
             background: #f0fff4;
             border: 1px solid #c3e6cb;
@@ -158,12 +140,10 @@
             gap: 8px;
             font-weight: 600;
         }
-
         .form-group {
             margin-bottom: 18px;
             position: relative;
         }
-
         label {
             display: block;
             font-size: 14px;
@@ -171,13 +151,11 @@
             margin-bottom: 8px;
             color: #374151;
         }
-
         .input-wrapper {
             position: relative;
             display: flex;
             align-items: center;
         }
-
         .input-wrapper i,
         .input-wrapper .prefix {
             position: absolute;
@@ -185,7 +163,6 @@
             color: #9ca3af;
             font-size: 16px;
         }
-
         .input-wrapper input {
             width: 100%;
             padding: 14px 14px 14px 45px;
@@ -194,14 +171,12 @@
             font-size: 15px;
             background: white;
         }
-
         .payment-methods {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
             margin: 15px 0;
         }
-
         .method-card {
             border: 1.5px solid var(--border);
             border-radius: 12px;
@@ -214,19 +189,16 @@
             background: white;
             transition: all 0.3s;
         }
-
         .method-card.active {
             border-color: var(--primary);
             background: #f0fdf4;
         }
-
         .method-card img {
             width: 32px;
             height: 32px;
             border-radius: 8px;
             object-fit: contain;
         }
-
         .btn-pay {
             width: 100%;
             background: var(--primary);
@@ -243,12 +215,10 @@
             gap: 10px;
             transition: all 0.3s;
         }
-
         .btn-pay:disabled {
             background: #9ca3af;
             cursor: not-allowed;
         }
-
         .error-message {
             background: #fee2e2;
             border: 1px solid #fecaca;
@@ -259,7 +229,6 @@
             font-size: 14px;
             display: none;
         }
-
         .success-message {
             background: #d1fae5;
             border: 1px solid #a7f3d0;
@@ -270,7 +239,6 @@
             font-size: 14px;
             display: none;
         }
-
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -285,9 +253,7 @@
             flex-direction: column;
             gap: 15px;
         }
-
         .loading-overlay.active { display: flex; }
-
         .loading-spinner {
             width: 50px;
             height: 50px;
@@ -296,29 +262,23 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-
         .loading-text {
             color: white;
             font-size: 14px;
         }
     </style>
 </head>
-
 <body>
-
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-spinner"></div>
         <div class="loading-text">Processando pagamento...</div>
     </div>
-
     <div class="top-timer">
         <i class="far fa-clock"></i> Oferta termina em: <span id="timer">14:59</span>
     </div>
-
     <div class="container">
         <header class="checkout-header">
             <!-- BUG FIX 1: Imagens com onerror robusto apontando para CDN externo caso o ficheiro local falhe -->
@@ -326,7 +286,6 @@
                 onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/KodyxView-MZ/zentropay-/fd622269e8d62ba7fd89c73176b664f9fadda44e/logo.png'">
             <span class="brand-name">ZentroPay</span>
         </header>
-
         <div class="product-card">
             <div class="prod-header">
                 <img src="" id="p-img" class="prod-img"
@@ -339,12 +298,10 @@
             <div class="summary-row"><span>Subtotal:</span> <span id="p-subtotal">MT 0,00</span></div>
             <div class="total-row"><span>Total:</span> <span id="p-total">MT 0,00</span></div>
         </div>
-
         <div class="delivery-notice">
             <i class="fas fa-check-circle"></i>
             <span>Você receberá o acesso do produto imediatamente após a confirmação do pagamento.</span>
         </div>
-
         <div class="form-group">
             <label>Nome completo *</label>
             <div class="input-wrapper">
@@ -352,7 +309,6 @@
                 <input type="text" id="c-nome" placeholder="Nome completo" value="">
             </div>
         </div>
-
         <div class="form-group">
             <label>E-mail *</label>
             <div class="input-wrapper">
@@ -360,7 +316,6 @@
                 <input type="email" id="c-email" placeholder="seu@email.com" value="">
             </div>
         </div>
-
         <div class="form-group">
             <label>Número de Telefone (WhatsApp) *</label>
             <div class="input-wrapper">
@@ -368,7 +323,6 @@
                 <input type="tel" id="c-telefone" placeholder="84 000 0000" value="">
             </div>
         </div>
-
         <label>Selecione o método de pagamento *</label>
         <div class="payment-methods" id="paymentMethodsContainer">
             <div class="method-card active" data-method="emola" id="method-emola">
@@ -392,7 +346,6 @@
                 <span style="font-size:13px; font-weight:600">Cartão</span>
             </div>
         </div>
-
         <div class="form-group">
             <label id="label-carteira">Número da Carteira E-Mola *</label>
             <div class="input-wrapper">
@@ -401,27 +354,22 @@
                 <input type="tel" id="c-numero_carteira" placeholder="84 000 0000" style="padding-left: 95px;" value="">
             </div>
         </div>
-
         <button class="btn-pay" id="btn-pagar">
             <i class="fas fa-shopping-cart"></i> Finalizar Compra - MT <span id="btn-val">0,00</span>
         </button>
-
         <div id="erro-display" class="error-message"></div>
         <div id="success-display" class="success-message"></div>
     </div>
-
     <script>
         (function () {
             // CONFIGURAÇÃO SUPABASE
-            const SUP_URL = "https://pbxufurblxmbzflaiqmh.supabase.co";
-            const SUP_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
+            const SUP_URL = "https://slwodwkpfciakhxdbjko.supabase.co";
+            const SUP_KEY = "sb_publishable_gpAdRCtp33UGfOV4NGd76A_GDb5ko-V";
             const supabase = window.supabase.createClient(SUP_URL, SUP_KEY);
-
             let produtoAtual = { nome: "Carregando...", preco: 0 };
             let metodoSelecionado = 'emola';
             let timerInterval = null;
             let timerSeconds = 899;
-
             // Timer
             function startTimer() {
                 const timerDisplay = document.getElementById('timer');
@@ -436,7 +384,6 @@
                 }, 1000);
             }
             startTimer();
-
             // Troca de Métodos
             function setupMethodToggle() {
                 document.querySelectorAll('.method-card').forEach(card => {
@@ -444,16 +391,13 @@
                         document.querySelectorAll('.method-card').forEach(c => c.classList.remove('active'));
                         this.classList.add('active');
                         metodoSelecionado = this.getAttribute('data-method');
-
                         const labelMap = {
                             'emola': 'e-Mola',
                             'mpesa': 'M-Pesa',
                             'mkesh': 'mKesh',
                             'visa_mastercard': 'Cartão'
                         };
-
                         document.getElementById('label-carteira').innerHTML = `Número ${labelMap[metodoSelecionado]} *`;
-
                         const prefix = document.querySelector('.prefix');
                         if (metodoSelecionado === 'visa_mastercard') {
                             if (prefix) prefix.style.display = 'none';
@@ -468,11 +412,9 @@
                 });
             }
             setupMethodToggle();
-
             async function fetchData() {
                 const urlParams = new URLSearchParams(window.location.search);
                 let productId = urlParams.get('id');
-
                 try {
                     let query = supabase.from('produtos').select('*');
                     if (productId) {
@@ -480,15 +422,12 @@
                     } else {
                         query = query.order('id', { ascending: false }).limit(1).single();
                     }
-
                     const { data, error } = await query;
-
                     if (error || !data) {
                         console.warn('Produto não encontrado ou erro no Supabase, usando fallback.');
                         setProductFallback();
                         return;
                     }
-
                     // VERIFICAÇÃO DE BANIMENTO
                     if (data.status === 'banned') {
                         document.body.innerHTML = `
@@ -499,22 +438,18 @@
                             </div>`;
                         return;
                     }
-
                     updateUI(data);
-
                 } catch (err) {
                     console.error('Erro crítico no fetchData:', err);
                     setProductFallback();
                 }
             }
-
             function updateUI(data) {
                 produtoAtual = {
                     id: data.id || "demo",
                     nome: data.nome || "Produto ZentroPay",
                     preco: parseFloat(data.preco) || 197
                 };
-
                 const elements = {
                     'p-nome': produtoAtual.nome,
                     'p-preco': produtoAtual.preco.toLocaleString('pt-MZ', { minimumFractionDigits: 2 }),
@@ -522,23 +457,18 @@
                     'p-subtotal': "MT " + produtoAtual.preco.toLocaleString('pt-MZ', { minimumFractionDigits: 2 }),
                     'p-total': "MT " + produtoAtual.preco.toLocaleString('pt-MZ', { minimumFractionDigits: 2 })
                 };
-
                 for (const [id, val] of Object.entries(elements)) {
                     const el = document.getElementById(id);
                     if (el) el.innerText = val;
                 }
-
                 const imgEl = document.getElementById('p-img');
                 if (imgEl && data.imagem) imgEl.src = data.imagem;
-
                 // CONFIGURAR MÉTODOS DE PAGAMENTO DINÂMICOS
                 const allMethodCards = document.querySelectorAll('.method-card');
-
                 if (data.metodos_pagamento) {
                     try {
                         let allowed = data.metodos_pagamento;
                         if (typeof allowed === 'string') allowed = JSON.parse(allowed);
-
                         if (Array.isArray(allowed) && allowed.length > 0) {
                             allMethodCards.forEach(c => c.style.display = 'none');
                             let firstVisible = null;
@@ -562,7 +492,6 @@
                     allMethodCards.forEach(c => c.style.display = 'flex');
                 }
             }
-
             function setProductFallback() {
                 updateUI({
                     id: "demo",
@@ -570,12 +499,10 @@
                     preco: 197.00
                 });
             }
-
             function showMessage(text, type) {
                 const errorDiv = document.getElementById('erro-display');
                 const successDiv = document.getElementById('success-display');
                 const overlay = document.getElementById('loadingOverlay');
-
                 if (type === 'error') {
                     errorDiv.innerText = text;
                     errorDiv.style.display = 'block';
@@ -585,36 +512,28 @@
                     successDiv.style.display = 'block';
                     errorDiv.style.display = 'none';
                 }
-
                 if (overlay) overlay.classList.remove('active');
-
                 setTimeout(() => {
                     errorDiv.style.display = 'none';
                     successDiv.style.display = 'none';
                 }, 5000);
             }
-
             async function processarPagamento() {
                 const btn = document.getElementById('btn-pagar');
                 const nome = document.getElementById('c-nome').value.trim();
                 const email = document.getElementById('c-email').value.trim();
                 const tel = document.getElementById('c-telefone').value.trim();
                 const carteira = document.getElementById('c-numero_carteira').value.trim();
-
                 if (!nome) { showMessage("❌ Preencha o nome!", "error"); return; }
                 if (!email || !email.includes('@')) { showMessage("❌ E-mail inválido!", "error"); return; }
                 if (!tel || tel.length < 9) { showMessage("❌ Telefone inválido!", "error"); return; }
                 if (!carteira || carteira.length < 9) { showMessage("❌ Número da carteira inválido!", "error"); return; }
-
                 btn.disabled = true;
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> A PROCESSAR...';
-
                 const overlay = document.getElementById('loadingOverlay');
                 if (overlay) overlay.classList.add('active');
-
                 // Gerar referência única
                 const reference = "PAY" + Date.now() + Math.floor(Math.random() * 10000);
-
                 try {
                     // 1. PRIMEIRO: SALVAR PEDIDO COMO PENDENTE
                     const pedido = {
@@ -628,14 +547,11 @@
                         transaction_id: reference,
                         criado_em: new Date().toISOString()
                     };
-
                     await supabase.from('pedidos').insert([pedido]);
                     console.log("✅ Pedido salvo no Supabase:", reference);
-
                     // BUG FIX 3: era "metodoSelecionado === 'emola' ? 'emola' : 'mpesa'"
                     // o que hardcodava mkesh e visa_mastercard como 'mpesa' — corrigido:
                     const method = metodoSelecionado;
-
                     const payload = {
                         amount: produtoAtual.preco,
                         reference: reference,
@@ -649,18 +565,14 @@
                             email: email
                         }
                     };
-
                     console.log("📤 Tentando Debito...", payload);
-
                     // Mostrar mensagem de espera para mobile money
                     if (method === 'mpesa' || method === 'emola' || method === 'mkesh') {
                         showMessage("⏳ Pedido enviado! Por favor, confirme o PIN no seu telemóvel agora...", "success");
                     }
-
                     // Timeout de 60 segundos para pagamentos móveis
                     const controller = new AbortController();
                     const timeoutId = setTimeout(() => controller.abort(), 60000);
-
                     let data;
                     try {
                         // BUG FIX 2: /api/pay retornava 404 porque o vercel.json estava quebrado.
@@ -683,15 +595,11 @@
                         }
                         throw e;
                     }
-
                     console.log("📥 Resposta Debito:", data);
-
                     if (data?.success) {
                         const isSuccess = data.status === 'success' || data.event === 'payment.completed';
-
                         // Atualizar status inicial
                         await supabase.from('pedidos').update({ status: isSuccess ? 'pago' : 'pendente' }).eq('transaction_id', reference);
-
                         if (data.checkout_url) {
                             showMessage("✅ Redirecionando para pagamento...", "success");
                             setTimeout(() => { window.location.href = data.checkout_url; }, 1500);
@@ -701,18 +609,14 @@
                         } else {
                             // CASO PENDENTE (USSD/Push): Iniciar Polling
                             showMessage("⏳ Aguardando confirmação no seu celular...", "success");
-
                             let checkCount = 0;
                             const maxChecks = 40; // 40 * 3s = 120s
-
                             const interval = setInterval(async () => {
                                 checkCount++;
                                 console.log(`Verificando status (${checkCount}/${maxChecks})...`);
-
                                 try {
                                     const statusRes = await fetch(`/api/check-status/${reference}`);
                                     const statusData = await statusRes.json();
-
                                     if (statusData?.status === 'pago' || statusData?.status === 'completed' || statusData?.status === 'paid') {
                                         clearInterval(interval);
                                         showMessage("✅ Pagamento confirmado!", "success");
@@ -721,7 +625,6 @@
                                 } catch (err) {
                                     console.warn("Erro ao verificar status, tentando novamente...", err);
                                 }
-
                                 if (checkCount >= maxChecks) {
                                     clearInterval(interval);
                                     const overlay = document.getElementById('loadingOverlay');
@@ -735,24 +638,19 @@
                     } else {
                         throw new Error(data?.error || data?.message || "Erro ao processar o pagamento com a Debito.");
                     }
-
                 } catch (paysuite_error) {
                     console.error("⚠️ Erro no processamento:", paysuite_error.message);
-
                     await supabase.from('pedidos').update({ status: 'falhou' }).eq('transaction_id', reference);
                     const overlay = document.getElementById('loadingOverlay');
                     if (overlay) overlay.classList.remove('active');
-
                     showMessage("❌ Erro ao iniciar pagamento. Tente novamente.", "error");
                     btn.disabled = false;
                     btn.innerHTML = `<i class="fas fa-shopping-cart"></i> Finalizar Compra - MT ${produtoAtual.preco.toLocaleString('pt-MZ', { minimumFractionDigits: 2 })}`;
                 }
             }
-
             document.getElementById('btn-pagar').addEventListener('click', processarPagamento);
             fetchData();
         })();
     </script>
 </body>
-
 </html>
