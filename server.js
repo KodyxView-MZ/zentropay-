@@ -147,8 +147,8 @@ app.get('/api/check-status/:reference', async (req, res) => {
         console.log(`📥 Resposta Status (${reference}):`, data);
 
         if (data.success && (data.status === 'completed' || data.status === 'success' || data.status === 'paid')) {
-            const SUPABASE_URL = process.env.SUPABASE_URL || "https://pbxufurblxmbzflaiqmh.supabase.co";
-            const SUPABASE_KEY = process.env.SUPABASE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
+            const SUPABASE_URL = process.env.SUPABASE_URL || "https://slwodwkpfciakhxdbjko.supabase.co";
+            const SUPABASE_KEY = process.env.SUPABASE_KEY || "sb_publishable_gpAdRCtp33UGfOV4NGd76A_GDb5ko-V";
             const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
             const { error: dbError } = await supabase
@@ -176,8 +176,8 @@ app.get('/api/check-status/:reference', async (req, res) => {
 // ---------- ROTA: WEBHOOK RECEBIDO ----------
 app.post('/api/webhook', async (req, res) => {
     const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET || "whsec_eec693e8334351177963120cd7ad6c7a8ab658a3908cd3f5cb195180296e1eb5";
-    const SUPABASE_URL = process.env.SUPABASE_URL || "https://pbxufurblxmbzflaiqmh.supabase.co";
-    const SUPABASE_KEY = process.env.SUPABASE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBieHVmdXJibHhtYnpmbGFpcW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDY5MjcsImV4cCI6MjA5MzE4MjkyN30.wDSSnT4QWm1HK9dQDcXutyM271Qsg5kmFqQZFytA4pA";
+    const SUPABASE_URL = process.env.SUPABASE_URL || "https://slwodwkpfciakhxdbjko.supabase.co";
+    const SUPABASE_KEY = process.env.SUPABASE_KEY || "sb_publishable_gpAdRCtp33UGfOV4NGd76A_GDb5ko-V";
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     // Verificar assinatura
